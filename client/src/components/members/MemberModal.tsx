@@ -46,8 +46,8 @@ export const MemberModal: React.FC<MemberModalProps> = ({
         setEmail('');
         setPassword('Password123!');
         setRole('MEMBER');
-        setDepartment('');
-        setYear('Junior (3rd Year)');
+        setDepartment('CSE');
+        setYear('3rd Year');
         setAvatar('');
         setIsActive(true);
       }
@@ -87,41 +87,41 @@ export const MemberModal: React.FC<MemberModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} maxWidth="md">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 text-xs">
         {/* Name */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-            Full Name <span className="text-rose-500">*</span>
+          <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1 font-mono">
+            Full Name <span className="text-[#FF6814]">*</span>
           </label>
           <input
             type="text"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Maya Lin"
-            className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+            placeholder="e.g. Anurag Pandey"
+            className="w-full px-3.5 py-2 text-xs bg-[#111114] border border-white/8 rounded-lg text-[#F5F5F0] placeholder:text-zinc-600 focus-ring"
           />
         </div>
 
         {/* Email */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-            Email Address <span className="text-rose-500">*</span>
+          <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1 font-mono">
+            College Email Address <span className="text-[#FF6814]">*</span>
           </label>
           <input
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="e.g. maya@university.edu"
-            className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+            placeholder="e.g. anurag@clubflow.local"
+            className="w-full px-3.5 py-2 text-xs bg-[#111114] border border-white/8 rounded-lg text-[#F5F5F0] placeholder:text-zinc-600 focus-ring"
           />
         </div>
 
         {/* Password */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-            {member ? 'Reset Password (optional)' : 'Temporary Password *'}
+          <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1 font-mono">
+            {member ? 'Reset Password (optional)' : 'Password *'}
           </label>
           <input
             type="password"
@@ -129,20 +129,20 @@ export const MemberModal: React.FC<MemberModalProps> = ({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder={member ? 'Leave blank to retain existing password' : 'Min 6 characters'}
-            className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+            className="w-full px-3.5 py-2 text-xs bg-[#111114] border border-white/8 rounded-lg text-[#F5F5F0] placeholder:text-zinc-600 focus-ring"
           />
         </div>
 
         {/* Role & Status */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1 font-mono">
               Role
             </label>
             <select
               value={role}
               onChange={(e) => setRole(e.target.value as UserRole)}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none bg-white"
+              className="w-full px-3 py-2 text-xs border border-white/8 rounded-lg bg-[#111114] text-zinc-300 focus-ring"
             >
               <option value="MEMBER">Member</option>
               <option value="PROJECT_LEAD">Project Lead</option>
@@ -151,13 +151,13 @@ export const MemberModal: React.FC<MemberModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1 font-mono">
               Account Status
             </label>
             <select
               value={isActive ? 'active' : 'inactive'}
               onChange={(e) => setIsActive(e.target.value === 'active')}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none bg-white"
+              className="w-full px-3 py-2 text-xs border border-white/8 rounded-lg bg-[#111114] text-zinc-300 focus-ring"
             >
               <option value="active">Active</option>
               <option value="inactive">Inactive / Deactivated</option>
@@ -168,7 +168,7 @@ export const MemberModal: React.FC<MemberModalProps> = ({
         {/* Department & Year */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1 font-mono">
               Department
             </label>
             <input
@@ -176,45 +176,45 @@ export const MemberModal: React.FC<MemberModalProps> = ({
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
               placeholder="e.g. Computer Science"
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+              className="w-full px-3.5 py-2 text-xs bg-[#111114] border border-white/8 rounded-lg text-[#F5F5F0] placeholder:text-zinc-600 focus-ring"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-              Year / Level
+            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1 font-mono">
+              Year / Academic Level
             </label>
             <input
               type="text"
               value={year}
               onChange={(e) => setYear(e.target.value)}
-              placeholder="e.g. Senior (4th Year)"
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+              placeholder="e.g. 3rd Year"
+              className="w-full px-3.5 py-2 text-xs bg-[#111114] border border-white/8 rounded-lg text-[#F5F5F0] placeholder:text-zinc-600 focus-ring"
             />
           </div>
         </div>
 
         {/* Avatar URL */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+          <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1 font-mono">
             Avatar Image URL (optional)
           </label>
           <input
             type="url"
             value={avatar}
             onChange={(e) => setAvatar(e.target.value)}
-            placeholder="https://images.unsplash.com/..."
-            className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+            placeholder="https://..."
+            className="w-full px-3.5 py-2 text-xs bg-[#111114] border border-white/8 rounded-lg text-[#F5F5F0] placeholder:text-zinc-600 focus-ring"
           />
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 mt-6">
-          <Button type="button" variant="outline" size="md" onClick={onClose} disabled={isLoading}>
+        <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-white/8 mt-6">
+          <Button type="button" variant="outline" size="sm" onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>
-          <Button type="submit" variant="primary" size="md" isLoading={isLoading}>
-            {member ? 'Save Changes' : 'Create Member'}
+          <Button type="submit" variant="primary" size="sm" isLoading={isLoading}>
+            {member ? 'Save Changes' : 'Enroll Member'}
           </Button>
         </div>
       </form>

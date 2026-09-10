@@ -9,36 +9,65 @@ export default {
     extend: {
       colors: {
         brand: {
-          50: '#ecfdf5',
-          100: '#d1fae5',
-          200: '#a7f3d0',
-          300: '#6ee7b7',
-          400: '#34d399',
-          500: '#10b981', // emerald-500
-          600: '#059669',
-          700: '#047857',
-          800: '#065f46',
-          900: '#064e3b',
-          950: '#022c22',
+          50: '#fff7ed',
+          100: '#ffedd5',
+          200: '#fed7aa',
+          300: '#fdba74',
+          400: '#ff8540',
+          500: '#FF6814', // Primary Brand Orange
+          600: '#ea580c',
+          700: '#c2410c',
+          800: '#9a3412',
+          900: '#7c2d12',
+          950: '#431407',
+        },
+        accent: {
+          300: '#fff080',
+          400: '#ffe640',
+          500: '#FFDD00', // Primary Brand Yellow
+          600: '#e6c700',
+          700: '#bfa500',
         },
         surface: {
           50: '#fbfbfb',
           100: '#f4f4f5',
-          200: '#e4e4e7',
-          800: '#18181b',
-          900: '#121215',
-          950: '#090a0f',
+          200: '#27272a',
+          700: '#16161a',
+          800: '#111114', // Muted dark surface
+          900: '#0A0A0C', // Secondary dark surface
+          950: '#030304', // Main background
         },
+        border: {
+          DEFAULT: 'rgba(255, 255, 255, 0.08)',
+          subtle: 'rgba(255, 255, 255, 0.05)',
+          hover: 'rgba(255, 104, 20, 0.28)',
+          glow: 'rgba(255, 221, 0, 0.3)',
+        },
+        text: {
+          primary: '#F5F5F0',
+          secondary: '#A1A1A1',
+          muted: '#686868',
+        },
+      },
+      borderRadius: {
+        'sm': '6px',
+        'DEFAULT': '8px',
+        'md': '8px',
+        'lg': '10px',
+        'xl': '12px',
+        '2xl': '16px',
       },
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
-        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.04)',
-        'premium': '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 4px 12px -2px rgba(0, 0, 0, 0.03)',
-        'elevated': '0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 8px 10px -6px rgba(0, 0, 0, 0.03)',
-        'dropdown': '0 12px 30px -4px rgba(0, 0, 0, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.04)',
+        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.5)',
+        'premium': '0 4px 20px -2px rgba(0, 0, 0, 0.7), 0 0 1px 1px rgba(255, 255, 255, 0.05)',
+        'glow-orange': '0 0 30px rgba(255, 104, 20, 0.14)',
+        'glow-yellow': '0 0 25px rgba(255, 221, 0, 0.12)',
+        'elevated': '0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(255, 255, 255, 0.06)',
+        'dropdown': '0 16px 40px -4px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.08)',
       },
       animation: {
         'marquee': 'marquee 35s linear infinite',

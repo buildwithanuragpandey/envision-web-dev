@@ -81,7 +81,6 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           }
         })
         .catch(() => {
-          // If fallback, load general users
           userApi.getUsers({ isActive: true }).then((res) => {
             if (res.success && res.data) setProjectMembers(res.data);
           });
@@ -121,11 +120,11 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} maxWidth="lg">
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 text-xs">
         {/* Title */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-            Task Title <span className="text-rose-500">*</span>
+          <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1 font-mono">
+            Task Title <span className="text-[#FF6814]">*</span>
           </label>
           <input
             type="text"
@@ -133,21 +132,21 @@ export const TaskModal: React.FC<TaskModalProps> = ({
             value={taskTitle}
             onChange={(e) => setTaskTitle(e.target.value)}
             placeholder="e.g. Implement OAuth2 login flow"
-            className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+            className="w-full px-3.5 py-2 text-xs bg-[#111114] border border-white/8 rounded-lg text-[#F5F5F0] placeholder:text-zinc-600 focus-ring"
           />
         </div>
 
         {/* Project Selector */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
-            Project <span className="text-rose-500">*</span>
+          <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1 font-mono">
+            Project <span className="text-[#FF6814]">*</span>
           </label>
           <select
             required
             value={projectId}
             onChange={(e) => setProjectId(e.target.value)}
             disabled={!!defaultProjectId && !task}
-            className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none bg-white disabled:bg-slate-100"
+            className="w-full px-3 py-2 text-xs border border-white/8 rounded-lg bg-[#111114] text-zinc-300 focus-ring disabled:opacity-60"
           >
             <option value="">-- Select Project --</option>
             {projects.map((p) => (
@@ -160,28 +159,28 @@ export const TaskModal: React.FC<TaskModalProps> = ({
 
         {/* Description */}
         <div>
-          <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+          <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1 font-mono">
             Description
           </label>
           <textarea
             rows={3}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Outline task details, acceptance criteria, or relevant links..."
-            className="w-full px-3.5 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+            placeholder="Outline deliverable specifications, acceptance criteria, or links..."
+            className="w-full px-3.5 py-2 text-xs bg-[#111114] border border-white/8 rounded-lg text-[#F5F5F0] placeholder:text-zinc-600 focus-ring"
           />
         </div>
 
         {/* Assignee & Priority */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1 font-mono">
               Assignee
             </label>
             <select
               value={assignedToId}
               onChange={(e) => setAssignedToId(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none bg-white"
+              className="w-full px-3 py-2 text-xs border border-white/8 rounded-lg bg-[#111114] text-zinc-300 focus-ring"
             >
               <option value="">-- Unassigned --</option>
               {projectMembers.map((m) => (
@@ -193,13 +192,13 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1 font-mono">
               Priority
             </label>
             <select
               value={priority}
               onChange={(e) => setPriority(e.target.value as TaskPriority)}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none bg-white"
+              className="w-full px-3 py-2 text-xs border border-white/8 rounded-lg bg-[#111114] text-zinc-300 focus-ring"
             >
               <option value="LOW">Low</option>
               <option value="MEDIUM">Medium</option>
@@ -212,13 +211,13 @@ export const TaskModal: React.FC<TaskModalProps> = ({
         {/* Status & Deadline */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1 font-mono">
               Status
             </label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value as TaskStatus)}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none bg-white"
+              className="w-full px-3 py-2 text-xs border border-white/8 rounded-lg bg-[#111114] text-zinc-300 focus-ring"
             >
               <option value="TODO">To Do</option>
               <option value="IN_PROGRESS">In Progress</option>
@@ -227,24 +226,24 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1 font-mono">
               Target Deadline
             </label>
             <input
               type="date"
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none bg-white"
+              className="w-full px-3 py-2 text-xs border border-white/8 rounded-lg bg-[#111114] text-zinc-300 focus-ring"
             />
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 mt-6">
-          <Button type="button" variant="outline" size="md" onClick={onClose} disabled={isLoading}>
+        <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-white/8 mt-6">
+          <Button type="button" variant="outline" size="sm" onClick={onClose} disabled={isLoading}>
             Cancel
           </Button>
-          <Button type="submit" variant="primary" size="md" isLoading={isLoading}>
+          <Button type="submit" variant="primary" size="sm" isLoading={isLoading}>
             {task ? 'Save Changes' : 'Create Task'}
           </Button>
         </div>

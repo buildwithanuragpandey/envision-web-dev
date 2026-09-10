@@ -10,10 +10,9 @@ import {
   Users,
   Settings,
   LayoutDashboard,
+  BarChart3,
   ArrowRight,
   Sparkles,
-  Command,
-  X,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -24,7 +23,7 @@ interface CommandPaletteProps {
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const { role } = useAuth();
+  const { role, isAdmin } = useAuth();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -70,14 +69,19 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
     const actions = [];
     if (role === 'ADMIN') actions.push({ label: 'Go to Admin Dashboard', path: '/admin/dashboard', icon: LayoutDashboard });
     else if (role === 'PROJECT_LEAD') actions.push({ label: 'Go to Lead Dashboard', path: '/lead/dashboard', icon: LayoutDashboard });
-    else actions.push({ label: 'Go to Member Dashboard', path: '/member/dashboard', icon: LayoutDashboard });
+    else actions.push({ label: 'Go to Member Workspace', path: '/member/dashboard', icon: LayoutDashboard });
 
     actions.push(
       { label: 'View All Projects', path: '/projects', icon: FolderKanban },
       { label: 'Task Center & Kanban Board', path: '/tasks', icon: CheckSquare },
-      { label: 'Club Member Directory', path: '/members', icon: Users },
-      { label: 'Account & Security Settings', path: '/settings', icon: Settings }
+      { label: 'Club Member Directory', path: '/members', icon: Users }
     );
+
+    if (isAdmin || role === 'PROJECT_LEAD') {
+      actions.push({ label: 'Analytics & Performance', path: '/analytics', icon: BarChart3 });
+    }
+
+    actions.push({ label: 'Account & Security Settings', path: '/settings', icon: Settings });
     return actions;
   };
 
@@ -168,7 +172,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-zinc-950/50 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
           />
 
           {/* Modal Box */}
@@ -177,12 +181,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: -10 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
-            className="relative w-full max-w-xl bg-white dark:bg-zinc-900 rounded-2xl shadow-dropdown border border-zinc-200 dark:border-zinc-800 overflow-hidden z-10"
+            className="relative w-full max-w-xl bg-[#0A0A0C] rounded-lg shadow-dropdown border border-white/10 overflow-hidden z-10 text-[#F5F5F0]"
             onKeyDown={handleKeyDown}
           >
             {/* Search Input Bar */}
-            <div className="flex items-center px-4 py-3.5 border-b border-zinc-100 dark:border-zinc-800">
-              <Search className="w-4 h-4 text-zinc-400 shrink-0 mr-3" />
+            <div className="flex items-center px-4 py-3.5 border-b border-white/8 bg-[#050506]">
+              <Search className="w-4 h-4 text-[#FF6814] shrink-0 mr-3" />
               <input
                 ref={inputRef}
                 type="text"
@@ -192,9 +196,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                   setSelectedIndex(0);
                 }}
                 placeholder="Search projects, tasks, members, or navigate..."
-                className="w-full bg-transparent text-sm text-zinc-900 dark:text-white placeholder:text-zinc-400 focus:outline-none"
+                className="w-full bg-transparent text-sm text-[#F5F5F0] placeholder:text-zinc-500 focus:outline-none"
               />
-              <span className="text-[10px] font-mono text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700 select-none">
+              <span className="text-[10px] font-mono text-zinc-400 bg-[#111114] px-1.5 py-0.5 rounded border border-white/10 select-none">
                 ESC
               </span>
             </div>
@@ -202,7 +206,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             {/* Results List */}
             <div className="max-h-80 overflow-y-auto p-2 space-y-1 text-xs">
               {allResults.length === 0 ? (
-                <div className="py-8 text-center text-zinc-400 text-xs">
+                <div className="py-8 text-center text-zinc-500 text-xs">
                   No matching results found for "{query}"
                 </div>
               ) : (
@@ -215,18 +219,16 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                       key={item.id}
                       onClick={item.action}
                       onMouseEnter={() => setSelectedIndex(index)}
-                      className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-all ${
+                      className={`flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-all ${
                         isSelected
-                          ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 shadow-sm'
-                          : 'text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                          ? 'bg-[#16161A] text-[#F5F5F0] border border-[#FF6814]/40 shadow-glow-orange'
+                          : 'text-zinc-300 hover:bg-[#111114] border border-transparent'
                       }`}
                     >
                       <div className="flex items-center space-x-3 min-w-0">
                         <Icon
                           className={`w-4 h-4 shrink-0 ${
-                            isSelected
-                              ? 'text-emerald-400 dark:text-emerald-600'
-                              : 'text-zinc-400'
+                            isSelected ? 'text-[#FF6814]' : 'text-zinc-500'
                           }`}
                         />
                         <span className="font-medium truncate">{item.title}</span>
@@ -235,8 +237,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
                       <span
                         className={`text-[10px] font-mono uppercase px-1.5 py-0.5 rounded ${
                           isSelected
-                            ? 'bg-zinc-800 text-zinc-300 dark:bg-zinc-200 dark:text-zinc-700'
-                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400'
+                            ? 'bg-[#111114] text-[#FFDD00] border border-white/10'
+                            : 'bg-[#111114] text-zinc-500'
                         }`}
                       >
                         {item.category}
@@ -248,25 +250,25 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             </div>
 
             {/* Footer Navigation Hints */}
-            <div className="px-4 py-2 bg-zinc-50 dark:bg-zinc-950/60 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-[11px] text-zinc-400">
+            <div className="px-4 py-2 bg-[#050506] border-t border-white/8 flex items-center justify-between text-[11px] text-zinc-500">
               <div className="flex items-center space-x-3">
                 <span>
-                  <kbd className="font-mono bg-zinc-200 dark:bg-zinc-800 px-1 rounded text-[10px]">
+                  <kbd className="font-mono bg-[#111114] text-zinc-300 px-1 rounded text-[10px] border border-white/5">
                     ↑
                   </kbd>{' '}
-                  <kbd className="font-mono bg-zinc-200 dark:bg-zinc-800 px-1 rounded text-[10px]">
+                  <kbd className="font-mono bg-[#111114] text-zinc-300 px-1 rounded text-[10px] border border-white/5">
                     ↓
                   </kbd>{' '}
                   Navigate
                 </span>
                 <span>
-                  <kbd className="font-mono bg-zinc-200 dark:bg-zinc-800 px-1 rounded text-[10px]">
+                  <kbd className="font-mono bg-[#111114] text-zinc-300 px-1 rounded text-[10px] border border-white/5">
                     ↵
                   </kbd>{' '}
                   Select
                 </span>
               </div>
-              <span className="font-mono text-[10px]">ClubFlow Quick Navigation</span>
+              <span className="font-mono text-[10px] text-zinc-500">ClubFlow OS</span>
             </div>
           </motion.div>
         </div>

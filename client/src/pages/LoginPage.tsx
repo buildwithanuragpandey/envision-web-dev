@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/common/Button';
-import { Eye, EyeOff, Lock, Mail, ShieldCheck, UserCheck, Layers, Play } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, ShieldCheck, UserCheck, Layers } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Marquee } from '../components/common/Marquee';
+import { BackgroundAtmosphere } from '../components/common/BackgroundAtmosphere';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -56,77 +57,62 @@ export const LoginPage: React.FC = () => {
     'HACKFEST 2026',
     'CLUB WEBSITE REDESIGN',
     'WEB DEV BOOTCAMP',
-    'TECH FEST KEYNOTE',
+    'TECH FEST EXPO',
     'OPEN SOURCE SPRINT',
   ];
 
   const marqueeItems2 = [
-    'PLAN → BUILD → DELIVER → REPEAT',
+    'BUILD • LEARN • COLLABORATE • SHIP • REPEAT',
     '36-HOUR HACKATHON',
-    '150+ ACTIVE STUDENTS',
     'STUDENT TECH COMMUNITY',
+    'ROLE-BASED WORKSPACE',
   ];
 
   return (
-    <div className="min-h-screen w-full flex bg-[#fafafa] overflow-hidden">
-      {/* LEFT SIDE: Authentic College Club Visual & Video Reel (Desktop Only) */}
-      <div className="hidden lg:flex lg:w-1/2 bg-zinc-950 text-white flex-col justify-between p-12 relative border-r border-zinc-900 overflow-hidden">
-        {/* Subtle video background loop for authentic college student coding & events */}
-        <div className="absolute inset-0 z-0">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            poster="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1200&auto=format&fit=crop&q=80"
-            className="w-full h-full object-cover opacity-25"
-          >
-            <source
-              src="https://assets.mixkit.co/videos/preview/mixkit-group-of-people-working-in-a-collaborative-space-40092-large.mp4"
-              type="video/mp4"
-            />
-          </video>
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-zinc-950/90" />
-        </div>
+    <div className="min-h-screen w-full flex bg-[#030304] text-[#F5F5F0] overflow-hidden select-none">
+      {/* LEFT SIDE: Video Atmosphere Reel (Desktop Only) */}
+      <div className="hidden lg:flex lg:w-1/2 bg-[#050506] flex-col justify-between p-12 relative border-r border-white/8 overflow-hidden">
+        {/* Background Video Atmosphere */}
+        <BackgroundAtmosphere variant="login" showAmbientMesh={true} />
 
         {/* Top Header */}
         <div className="relative z-10">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg bg-white text-zinc-950 flex items-center justify-center font-extrabold text-sm shadow-sm shrink-0">
-              <Layers className="w-4 h-4" />
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#FF6814] to-[#FFDD00] text-black flex items-center justify-center font-black text-sm shadow-glow-orange shrink-0">
+              <Layers className="w-5 h-5 text-black" />
             </div>
             <div>
               <span className="font-bold text-base tracking-tight text-white flex items-center gap-1.5">
-                Club<span className="text-zinc-400 font-normal">Flow</span>
-                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-md bg-zinc-900 text-zinc-400 border border-zinc-800">
-                  WORKSPACE
+                Club<span className="text-[#FF6814] font-semibold">Flow</span>
+                <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-[#111114] text-[#FFDD00] border border-white/10 font-bold">
+                  OPERATING SYSTEM
                 </span>
               </span>
             </div>
           </div>
 
           <div className="mt-12 max-w-lg">
-            <span className="font-mono text-xs uppercase tracking-widest text-emerald-400 font-semibold">
-              Student Technical Operations
+            <span className="font-mono text-xs uppercase tracking-widest text-[#FF6814] font-semibold">
+              Technical Club Operations
             </span>
-            <h1 className="text-3xl xl:text-4xl font-extrabold text-white tracking-tight leading-tight mt-2">
-              Your club. Your teams. Your projects.
+            <h1 className="text-3xl xl:text-4xl font-extrabold text-[#F5F5F0] tracking-tight leading-tight mt-2">
+              Your club. In motion.
             </h1>
             <p className="mt-3 text-sm text-zinc-400 leading-relaxed">
-              Organize hackathons, bootcamp sessions, design sprints, and deliverable milestones across all college technical committees.
+              Projects, teams, and deliverables — all coordinated in one high-performance dark workspace.
             </p>
           </div>
         </div>
 
         {/* Real Live Initiatives Showcase Box */}
         <div className="relative z-10 my-6">
-          <div className="p-5 rounded-2xl bg-zinc-900/90 border border-zinc-800 shadow-2xl backdrop-blur-md space-y-3.5 max-w-md">
-            <div className="flex items-center justify-between pb-2.5 border-b border-zinc-800 text-xs">
+          <div className="p-5 rounded-lg bg-[#0A0A0C]/90 border border-white/8 shadow-2xl backdrop-blur-md space-y-3.5 max-w-md">
+            <div className="flex items-center justify-between pb-2.5 border-b border-white/8 text-xs">
               <span className="font-mono text-zinc-400 uppercase tracking-wider text-[11px]">
                 Active Initiatives
               </span>
-              <span className="inline-flex items-center gap-1.5 text-emerald-400 font-semibold text-[11px]">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 text-[#FFDD00] font-semibold text-[11px]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FFDD00] animate-pulse" />
                 Live Sync
               </span>
             </div>
@@ -134,38 +120,38 @@ export const LoginPage: React.FC = () => {
             {/* HackFest 2026 */}
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-medium">
-                <span className="text-zinc-200">HackFest 2026 – Hackathon Operations</span>
-                <span className="font-mono text-zinc-400">80%</span>
+                <span className="text-zinc-200">HackFest 2026 – Hackathon Sprint</span>
+                <span className="font-mono text-[#FF6814] font-semibold">82%</span>
               </div>
-              <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full w-[80%]" />
+              <div className="h-1.5 w-full bg-[#16161A] rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-[#FF6814] to-[#FFDD00] rounded-full w-[82%]" />
               </div>
             </div>
 
             {/* Club Website Redesign */}
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-medium">
-                <span className="text-zinc-200">Official Club Website Redesign</span>
-                <span className="font-mono text-zinc-400">67%</span>
+                <span className="text-zinc-200">Club Website & Design System</span>
+                <span className="font-mono text-[#FF6814] font-semibold">67%</span>
               </div>
-              <div className="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
-                <div className="h-full bg-zinc-400 rounded-full w-[67%]" />
+              <div className="h-1.5 w-full bg-[#16161A] rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-[#FF6814] to-[#FF8540] rounded-full w-[67%]" />
               </div>
             </div>
 
             {/* Live stats summary footer */}
             <div className="pt-2 grid grid-cols-3 gap-2 text-center text-xs">
-              <div className="p-2 rounded-xl bg-zinc-800/60 border border-zinc-800">
-                <div className="text-[10px] font-mono text-zinc-400">DELIVERABLES</div>
-                <div className="font-bold text-white mt-0.5">14 Active</div>
+              <div className="p-2 rounded bg-[#111114] border border-white/5">
+                <div className="text-[10px] font-mono text-zinc-500">PROJECTS</div>
+                <div className="font-bold text-[#F5F5F0] mt-0.5">04 Active</div>
               </div>
-              <div className="p-2 rounded-xl bg-zinc-800/60 border border-zinc-800">
-                <div className="text-[10px] font-mono text-zinc-400">COMMUNITY</div>
-                <div className="font-bold text-white mt-0.5">9 Members</div>
+              <div className="p-2 rounded bg-[#111114] border border-white/5">
+                <div className="text-[10px] font-mono text-zinc-500">MEMBERS</div>
+                <div className="font-bold text-[#F5F5F0] mt-0.5">12 Students</div>
               </div>
-              <div className="p-2 rounded-xl bg-zinc-800/60 border border-zinc-800">
-                <div className="text-[10px] font-mono text-zinc-400">ON TRACK</div>
-                <div className="font-bold text-emerald-400 mt-0.5">92%</div>
+              <div className="p-2 rounded bg-[#111114] border border-white/5">
+                <div className="text-[10px] font-mono text-zinc-500">VELOCITY</div>
+                <div className="font-bold text-[#FFDD00] mt-0.5">88%</div>
               </div>
             </div>
           </div>
@@ -173,28 +159,28 @@ export const LoginPage: React.FC = () => {
 
         {/* Bottom Marquee tickers */}
         <div className="relative z-10 space-y-1.5 -mx-12">
-          <Marquee items={marqueeItems1} speed="normal" className="opacity-50" />
-          <Marquee items={marqueeItems2} reverse={true} speed="normal" className="opacity-30" />
+          <Marquee items={marqueeItems1} speed="normal" className="opacity-40 text-xs font-mono text-zinc-400" />
+          <Marquee items={marqueeItems2} reverse={true} speed="normal" className="opacity-30 text-xs font-mono text-[#FF6814]" />
         </div>
       </div>
 
       {/* RIGHT SIDE: Authentication Form */}
-      <div className="flex-1 flex flex-col justify-center items-center p-6 sm:p-12 md:p-16 relative">
+      <div className="flex-1 flex flex-col justify-center items-center p-6 sm:p-12 md:p-16 relative bg-[#030304]">
         <div className="w-full max-w-sm space-y-6">
           {/* Mobile Header */}
           <div className="lg:hidden flex items-center space-x-2.5 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-extrabold text-sm shadow-sm">
-              <Layers className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF6814] to-[#FFDD00] text-black flex items-center justify-center font-black text-sm shadow-glow-orange">
+              <Layers className="w-4 h-4 text-black" />
             </div>
-            <span className="font-bold text-lg tracking-tight text-zinc-900">
-              Club<span className="text-zinc-500 font-normal">Flow</span>
+            <span className="font-bold text-lg tracking-tight text-[#F5F5F0]">
+              Club<span className="text-[#FF6814]">Flow</span>
             </span>
           </div>
 
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-zinc-900">Sign in to ClubFlow</h2>
-            <p className="mt-1 text-xs text-zinc-500">
-              Enter your student credentials or select a demo role to proceed.
+            <h2 className="text-2xl font-bold tracking-tight text-[#F5F5F0]">Welcome back</h2>
+            <p className="mt-1 text-xs text-zinc-400">
+              Sign in to your club workspace to access projects and deliverables.
             </p>
           </div>
 
@@ -202,7 +188,7 @@ export const LoginPage: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium"
+              className="p-3 rounded-lg bg-rose-950/40 border border-rose-800/60 text-rose-400 text-xs font-medium"
             >
               {errorMessage}
             </motion.div>
@@ -211,18 +197,18 @@ export const LoginPage: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email Field */}
             <div>
-              <label className="block text-xs font-semibold text-zinc-700 uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider mb-1.5 font-mono">
                 College Email
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3" />
+                <Mail className="w-4 h-4 text-zinc-500 absolute left-3.5 top-3" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@clubflow.local"
-                  className="w-full pl-10 pr-3.5 py-2 text-sm bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus-ring shadow-subtle"
+                  className="w-full pl-10 pr-3.5 py-2 text-sm bg-[#0A0A0C] border border-white/10 rounded-lg text-[#F5F5F0] placeholder:text-zinc-600 focus-ring shadow-subtle"
                 />
               </div>
             </div>
@@ -230,24 +216,24 @@ export const LoginPage: React.FC = () => {
             {/* Password Field */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-semibold text-zinc-700 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wider font-mono">
                   Password
                 </label>
               </div>
               <div className="relative">
-                <Lock className="w-4 h-4 text-zinc-400 absolute left-3.5 top-3" />
+                <Lock className="w-4 h-4 text-zinc-500 absolute left-3.5 top-3" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2 text-sm bg-white border border-zinc-200 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus-ring shadow-subtle"
+                  className="w-full pl-10 pr-10 py-2 text-sm bg-[#0A0A0C] border border-white/10 rounded-lg text-[#F5F5F0] placeholder:text-zinc-600 focus-ring shadow-subtle"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-3 text-zinc-400 hover:text-zinc-600"
+                  className="absolute right-3.5 top-3 text-zinc-500 hover:text-zinc-300"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -269,43 +255,43 @@ export const LoginPage: React.FC = () => {
           </form>
 
           {/* Quick Demo Fillers */}
-          <div className="pt-4 border-t border-zinc-200/80">
-            <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider text-center mb-2.5">
-              1-Click Demo Profiles
+          <div className="pt-4 border-t border-white/8">
+            <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider text-center mb-2.5">
+              1-Click Demo Access
             </p>
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => fillCredentials('admin@clubflow.local')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-white hover:bg-zinc-100 border border-zinc-200 hover:border-zinc-300 text-zinc-800 transition-all text-xs group shadow-subtle"
+                className="flex flex-col items-center justify-center p-2.5 rounded-lg bg-[#0A0A0C] hover:bg-[#111114] border border-white/8 hover:border-[#FF6814]/40 text-zinc-200 transition-all text-xs group shadow-subtle"
               >
-                <ShieldCheck className="w-4 h-4 text-zinc-900 mb-1 group-hover:scale-110 transition-transform" />
+                <ShieldCheck className="w-4 h-4 text-[#FFDD00] mb-1 group-hover:scale-110 transition-transform" />
                 <span className="font-semibold text-[11px]">Advisor</span>
-                <span className="text-[9px] text-zinc-400">Dr. Sharma</span>
+                <span className="text-[9px] text-zinc-500">Dr. Sharma</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => fillCredentials('lead@clubflow.local')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-white hover:bg-zinc-100 border border-zinc-200 hover:border-zinc-300 text-zinc-800 transition-all text-xs group shadow-subtle"
+                className="flex flex-col items-center justify-center p-2.5 rounded-lg bg-[#0A0A0C] hover:bg-[#111114] border border-white/8 hover:border-[#FF6814]/40 text-zinc-200 transition-all text-xs group shadow-subtle"
               >
-                <UserCheck className="w-4 h-4 text-blue-600 mb-1 group-hover:scale-110 transition-transform" />
+                <UserCheck className="w-4 h-4 text-[#FF6814] mb-1 group-hover:scale-110 transition-transform" />
                 <span className="font-semibold text-[11px]">Lead</span>
-                <span className="text-[9px] text-zinc-400">Anurag P.</span>
+                <span className="text-[9px] text-zinc-500">Anurag P.</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => fillCredentials('member1@clubflow.local')}
-                className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-white hover:bg-zinc-100 border border-zinc-200 hover:border-zinc-300 text-zinc-800 transition-all text-xs group shadow-subtle"
+                className="flex flex-col items-center justify-center p-2.5 rounded-lg bg-[#0A0A0C] hover:bg-[#111114] border border-white/8 hover:border-[#FF6814]/40 text-zinc-200 transition-all text-xs group shadow-subtle"
               >
-                <UserCheck className="w-4 h-4 text-emerald-600 mb-1 group-hover:scale-110 transition-transform" />
+                <UserCheck className="w-4 h-4 text-zinc-400 mb-1 group-hover:scale-110 transition-transform" />
                 <span className="font-semibold text-[11px]">Member</span>
-                <span className="text-[9px] text-zinc-400">Rohit G.</span>
+                <span className="text-[9px] text-zinc-500">Rohit G.</span>
               </button>
             </div>
-            <p className="text-[11px] font-mono text-zinc-400 text-center mt-2.5">
-              Default Password: <code className="text-zinc-600 font-bold">Password123!</code>
+            <p className="text-[11px] font-mono text-zinc-500 text-center mt-2.5">
+              Password: <code className="text-[#FF6814] font-semibold">Password123!</code>
             </p>
           </div>
         </div>

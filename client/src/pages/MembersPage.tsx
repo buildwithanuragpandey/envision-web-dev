@@ -13,8 +13,6 @@ import {
   FolderKanban,
   Mail,
   X,
-  Calendar,
-  Building,
 } from 'lucide-react';
 import { Button } from '../components/common/Button';
 import { RoleBadge } from '../components/common/Badge';
@@ -97,16 +95,16 @@ export const MembersPage: React.FC = () => {
   return (
     <PageTransition>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-zinc-200/80">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-white/8">
         <div>
-          <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-400 font-semibold">
-            Club Community & Roster
+          <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">
+            CLUB COMMUNITY & ROSTER
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight mt-1.5">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F5F5F0] tracking-tight mt-1.5">
             Club Directory
           </h1>
-          <p className="text-xs text-zinc-500 mt-1">
-            Browse members, manage committee permissions, and view organizational involvement.
+          <p className="text-xs text-zinc-400 mt-1">
+            Browse members, manage role appointments, and view squad participation.
           </p>
         </div>
 
@@ -115,7 +113,7 @@ export const MembersPage: React.FC = () => {
             variant="primary"
             size="sm"
             onClick={() => setIsAddModalOpen(true)}
-            leftIcon={<Plus className="w-3.5 h-3.5" />}
+            leftIcon={<Plus className="w-3.5 h-3.5 text-black font-bold" />}
           >
             Enroll Member
           </Button>
@@ -123,23 +121,23 @@ export const MembersPage: React.FC = () => {
       </div>
 
       {/* Search & Filter Bar */}
-      <div className="bg-white p-3.5 rounded-xl border border-zinc-200/80 shadow-subtle flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="bg-[#0A0A0C] p-3 rounded-lg border border-white/8 shadow-subtle flex flex-col md:flex-row items-center justify-between gap-3">
         <div className="flex flex-1 items-center gap-3 w-full">
           <div className="relative flex-1">
-            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3.5 top-3" />
+            <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3.5 top-3" />
             <input
               type="text"
-              placeholder="Search members by name, email, or department..."
+              placeholder="Search members by student name, roll, or department..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3.5 py-1.5 text-xs bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 placeholder:text-zinc-400 focus-ring"
+              className="w-full pl-9 pr-3.5 py-1.5 text-xs bg-[#111114] border border-white/8 rounded-lg text-[#F5F5F0] placeholder:text-zinc-500 focus-ring"
             />
           </div>
 
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-3 py-1.5 text-xs border border-zinc-200 rounded-lg bg-zinc-50 font-medium text-zinc-700 outline-none"
+            className="px-3 py-1.5 text-xs border border-white/8 rounded-lg bg-[#111114] font-medium text-zinc-300 outline-none"
           >
             <option value="">All Roles</option>
             <option value="ADMIN">Admin</option>
@@ -150,7 +148,7 @@ export const MembersPage: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-1.5 text-xs border border-zinc-200 rounded-lg bg-zinc-50 font-medium text-zinc-700 outline-none"
+            className="px-3 py-1.5 text-xs border border-white/8 rounded-lg bg-[#111114] font-medium text-zinc-300 outline-none"
           >
             <option value="">All Statuses</option>
             <option value="active">Active</option>
@@ -163,12 +161,12 @@ export const MembersPage: React.FC = () => {
       {isLoading ? (
         <div className="space-y-2.5">
           {[1, 2, 3, 4, 5].map((i) => (
-            <Skeleton key={i} className="h-16 rounded-xl" />
+            <Skeleton key={i} className="h-16 rounded-lg" />
           ))}
         </div>
       ) : !users || users.length === 0 ? (
         <EmptyState
-          icon={<Users className="w-6 h-6 text-zinc-400" />}
+          icon={<Users className="w-6 h-6 text-[#FF6814]" />}
           title="No members found"
           description="Adjust your search criteria or enroll a new member."
           action={
@@ -177,7 +175,7 @@ export const MembersPage: React.FC = () => {
                 variant="primary"
                 size="sm"
                 onClick={() => setIsAddModalOpen(true)}
-                leftIcon={<Plus className="w-3.5 h-3.5" />}
+                leftIcon={<Plus className="w-3.5 h-3.5 text-black font-bold" />}
               >
                 Enroll Member
               </Button>
@@ -185,10 +183,10 @@ export const MembersPage: React.FC = () => {
           }
         />
       ) : (
-        <div className="bg-white rounded-xl border border-zinc-200/80 shadow-subtle overflow-hidden">
+        <div className="bg-[#0A0A0C] rounded-lg border border-white/8 shadow-subtle overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-zinc-50 text-zinc-500 uppercase text-[10px] font-mono border-b border-zinc-200/80">
+              <thead className="bg-[#050506] text-zinc-400 uppercase text-[10px] font-mono border-b border-white/8">
                 <tr>
                   <th className="py-3 px-4">Member</th>
                   <th className="py-3 px-4">Role</th>
@@ -199,22 +197,22 @@ export const MembersPage: React.FC = () => {
                   {isAdmin && <th className="py-3 px-4 text-right">Actions</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className="divide-y divide-white/5">
                 {users.map((u) => (
                   <tr
                     key={u.id}
                     onClick={() => setInspectingMember(u)}
-                    className="hover:bg-zinc-50/60 transition-colors group cursor-pointer"
+                    className="hover:bg-[#111114]/60 transition-colors group cursor-pointer"
                   >
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <Avatar name={u.name} size="md" className="shrink-0" />
                         <div className="min-w-0">
-                          <p className="font-bold text-zinc-900 text-xs truncate group-hover:text-emerald-700 transition-colors">
+                          <p className="font-semibold text-[#F5F5F0] text-xs truncate group-hover:text-[#FF6814] transition-colors">
                             {u.name}
                           </p>
-                          <p className="text-[11px] text-zinc-400 truncate flex items-center gap-1 font-mono">
-                            <Mail className="w-3 h-3 text-zinc-400" />
+                          <p className="text-[11px] text-zinc-500 truncate flex items-center gap-1 font-mono">
+                            <Mail className="w-3 h-3 text-zinc-500" />
                             {u.email}
                           </p>
                         </div>
@@ -226,14 +224,14 @@ export const MembersPage: React.FC = () => {
                     </td>
 
                     <td className="py-3 px-4">
-                      <span className="font-medium text-zinc-800 block truncate max-w-xs">
+                      <span className="font-medium text-zinc-300 block truncate max-w-xs">
                         {u.department || 'General'}
                       </span>
-                      <span className="text-[11px] text-zinc-400 font-mono">{u.year || 'Member'}</span>
+                      <span className="text-[11px] text-zinc-500 font-mono">{u.year || 'Member'}</span>
                     </td>
 
-                    <td className="py-3 px-4 font-semibold text-zinc-700">
-                      <span className="inline-flex items-center gap-1 bg-zinc-100 px-2 py-0.5 rounded text-[11px] font-mono">
+                    <td className="py-3 px-4 font-semibold text-zinc-300">
+                      <span className="inline-flex items-center gap-1 bg-[#111114] border border-white/5 px-2 py-0.5 rounded text-[11px] font-mono">
                         <FolderKanban className="w-3 h-3 text-zinc-500" />
                         {u._count?.projectMembers || 0} squads
                       </span>
@@ -241,19 +239,19 @@ export const MembersPage: React.FC = () => {
 
                     <td className="py-3 px-4">
                       {u.isActive ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
-                          <CheckCircle2 className="w-3 h-3" />
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#FFDD00] bg-[#111114] px-2 py-0.5 rounded border border-white/8">
+                          <CheckCircle2 className="w-3 h-3 text-[#FFDD00]" />
                           Active
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full border border-zinc-200">
-                          <XCircle className="w-3 h-3 text-zinc-400" />
+                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-zinc-500 bg-[#111114] px-2 py-0.5 rounded border border-white/5">
+                          <XCircle className="w-3 h-3 text-zinc-500" />
                           Inactive
                         </span>
                       )}
                     </td>
 
-                    <td className="py-3 px-4 text-zinc-400 font-mono text-[11px]">
+                    <td className="py-3 px-4 text-zinc-500 font-mono text-[11px]">
                       {format(new Date(u.createdAt), 'MMM dd, yyyy')}
                     </td>
 
@@ -263,7 +261,7 @@ export const MembersPage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => setEditingMember(u)}
-                            className="p-1.5 text-zinc-400 hover:text-zinc-800 rounded hover:bg-zinc-100 transition-colors"
+                            className="p-1.5 text-zinc-500 hover:text-white rounded hover:bg-[#16161A] transition-colors"
                             title="Edit Member"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
@@ -271,7 +269,7 @@ export const MembersPage: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => setDeletingUserId(u.id)}
-                            className="p-1.5 text-zinc-400 hover:text-rose-600 rounded hover:bg-rose-50 transition-colors"
+                            className="p-1.5 text-zinc-500 hover:text-rose-400 rounded hover:bg-rose-950/40 transition-colors"
                             title="Delete Member"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -296,7 +294,7 @@ export const MembersPage: React.FC = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setInspectingMember(null)}
-              className="absolute inset-0 bg-zinc-950/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             />
             <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
               <motion.div
@@ -304,17 +302,17 @@ export const MembersPage: React.FC = () => {
                 animate={{ x: 0 }}
                 exit={{ x: '100%' }}
                 transition={{ type: 'spring', damping: 30, stiffness: 350 }}
-                className="w-screen max-w-md bg-white border-l border-zinc-200/80 shadow-2xl p-6 flex flex-col justify-between"
+                className="w-screen max-w-md bg-[#0A0A0C] border-l border-white/10 shadow-2xl p-6 flex flex-col justify-between text-[#F5F5F0]"
               >
                 <div>
-                  <div className="flex items-center justify-between pb-4 border-b border-zinc-100">
+                  <div className="flex items-center justify-between pb-4 border-b border-white/8">
                     <span className="font-mono text-xs uppercase font-semibold text-zinc-400">
                       Member Profile
                     </span>
                     <button
                       type="button"
                       onClick={() => setInspectingMember(null)}
-                      className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
+                      className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-[#16161A]"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -322,47 +320,47 @@ export const MembersPage: React.FC = () => {
 
                   <div className="pt-6 flex flex-col items-center text-center space-y-2">
                     <Avatar name={inspectingMember.name} size="xl" />
-                    <h3 className="text-lg font-bold text-zinc-900 mt-2">{inspectingMember.name}</h3>
+                    <h3 className="text-lg font-bold text-[#F5F5F0] mt-2">{inspectingMember.name}</h3>
                     <RoleBadge role={inspectingMember.role} size="sm" />
-                    <p className="text-xs text-zinc-400 font-mono">{inspectingMember.email}</p>
+                    <p className="text-xs text-zinc-500 font-mono">{inspectingMember.email}</p>
                   </div>
 
-                  <div className="mt-6 rounded-xl bg-zinc-50 border border-zinc-200/70 p-4 space-y-3 text-xs">
+                  <div className="mt-6 rounded-lg bg-[#111114] border border-white/5 p-4 space-y-3 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-zinc-500 font-medium">Department</span>
-                      <span className="font-semibold text-zinc-800">
+                      <span className="text-zinc-400 font-medium">Department</span>
+                      <span className="font-semibold text-zinc-200">
                         {inspectingMember.department || 'Not set'}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-zinc-500 font-medium">Academic Level</span>
-                      <span className="font-semibold text-zinc-800">
+                      <span className="text-zinc-400 font-medium">Academic Level</span>
+                      <span className="font-semibold text-zinc-200">
                         {inspectingMember.year || 'Not set'}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-zinc-500 font-medium">Enrolled Squads</span>
-                      <span className="font-semibold text-zinc-800 font-mono">
+                      <span className="text-zinc-400 font-medium">Enrolled Squads</span>
+                      <span className="font-semibold text-[#FF6814] font-mono">
                         {inspectingMember._count?.projectMembers || 0} initiatives
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-zinc-500 font-medium">Account Status</span>
-                      <span className="font-semibold text-emerald-600">
+                      <span className="text-zinc-400 font-medium">Account Status</span>
+                      <span className="font-semibold text-[#FFDD00]">
                         {inspectingMember.isActive ? 'Active Member' : 'Inactive'}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-zinc-100 flex items-center justify-between">
+                <div className="pt-4 border-t border-white/8 flex items-center justify-between">
                   {isAdmin && (
                     <button
                       type="button"
                       onClick={() => {
                         setEditingMember(inspectingMember);
                       }}
-                      className="px-3.5 py-1.5 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white text-zinc-800 text-xs font-semibold"
+                      className="px-3.5 py-1.5 rounded-lg border border-white/10 hover:border-white/20 bg-[#16161A] text-zinc-200 text-xs font-semibold"
                     >
                       Edit Account
                     </button>
@@ -370,7 +368,7 @@ export const MembersPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setInspectingMember(null)}
-                    className="px-4 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold rounded-lg ml-auto shadow-sm"
+                    className="btn-dark px-4 py-1.5 text-xs font-semibold rounded-lg ml-auto"
                   >
                     Close
                   </button>
