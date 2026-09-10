@@ -18,6 +18,14 @@ import {
   FolderKanban,
   Activity,
   Layers,
+  Cpu,
+  Radio,
+  GitBranch,
+  Clock,
+  Sparkles,
+  Target,
+  Shield,
+  Terminal,
 } from 'lucide-react';
 import { AnimatedCounter } from '../components/common/AnimatedCounter';
 
@@ -279,50 +287,125 @@ export const LandingPage: React.FC = () => {
           <img
             src="/frames/01_vision_atrium.jpg"
             alt="Vision Atrium"
-            className="w-full h-full object-cover object-center filter brightness-[0.5] contrast-110"
+            className="w-full h-full object-cover object-center filter brightness-[0.55] contrast-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/60 to-[#050505]/80" />
           <div className="absolute inset-0 bg-radial from-transparent via-[#050505]/40 to-[#050505]" />
+
+          {/* Futuristic Corner Reticles over Hero */}
+          <div className="absolute top-28 left-8 text-white/20 font-mono text-[10px] hidden md:block">
+            ⌜ SYS: ATRIUM_OS_2.4
+          </div>
+          <div className="absolute top-28 right-8 text-white/20 font-mono text-[10px] hidden md:block">
+            LATENCY: 14ms ⌝
+          </div>
         </motion.div>
 
         {/* Continuous Traveling Orange Laser Line */}
         <div className="absolute top-0 left-0 h-[2px] w-full bg-gradient-to-r from-transparent via-[#FF6A16] to-transparent animate-travel-line z-10" />
 
-        {/* Hero Content */}
+        {/* Hero Content & HUD Overlays */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 w-full">
-          <div className="max-w-3xl space-y-6">
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-[#141416]/90 border border-white/10 backdrop-blur-md">
-              <span className="w-2 h-2 rounded-full bg-[#FF6A16] animate-ping" />
-              <span className="font-mono text-[10px] uppercase tracking-widest text-[#FFD400] font-bold">
-                01 / CLUB OPERATING SYSTEM
-              </span>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div className="lg:col-span-7 space-y-6">
+              <div className="inline-flex items-center gap-2.5 px-3.5 py-1 rounded-full bg-[#141416]/90 border border-white/10 backdrop-blur-md shadow-lg">
+                <span className="w-2 h-2 rounded-full bg-[#FF6A16] animate-ping" />
+                <span className="font-mono text-[10px] uppercase tracking-widest text-[#FFD400] font-bold">
+                  01 / CLUB OPERATING SYSTEM
+                </span>
+              </div>
+
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#F5F2EA] leading-[1.05]">
+                CLUBFLOW
+                <span className="block text-2xl sm:text-4xl lg:text-5xl font-light text-[#8C8A84] mt-2">
+                  YOUR CLUB. IN MOTION.
+                </span>
+              </h1>
+
+              <p className="text-sm sm:text-base lg:text-lg text-[#8C8A84] max-w-xl leading-relaxed">
+                Projects, teams and tasks moving together. Eliminate scattered group chats, spreadsheet chaos, and lost milestones with real-time collegiate club governance.
+              </p>
+
+              <div className="pt-4 flex flex-wrap items-center gap-4">
+                <button
+                  onClick={handleCtaClick}
+                  className="px-7 py-3.5 rounded-xl bg-[#FF6A16] hover:bg-[#FF9D00] text-black text-sm font-extrabold transition-all shadow-xl hover:shadow-[#FF6A16]/30 flex items-center gap-2 hover:-translate-y-0.5"
+                >
+                  <span>ENTER CLUBFLOW →</span>
+                </button>
+
+                <button
+                  onClick={() => scrollToSection('problem')}
+                  className="px-6 py-3.5 rounded-xl bg-[#141416] hover:bg-[#1C1C20] text-[#F5F2EA] text-sm font-bold border border-white/8 hover:border-white/20 transition-all flex items-center gap-2"
+                >
+                  <span>EXPLORE THE PLATFORM ↓</span>
+                </button>
+              </div>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#F5F2EA] leading-[1.05]">
-              CLUBFLOW
-              <span className="block text-2xl sm:text-4xl lg:text-5xl font-light text-[#8C8A84] mt-2">
-                YOUR CLUB. IN MOTION.
-              </span>
-            </h1>
+            {/* Right Side: Floating Live ClubFlow OS Telemetry Glass Card */}
+            <div className="lg:col-span-5 space-y-4">
+              <div className="p-6 rounded-2xl bg-[#0D0D0F]/90 backdrop-blur-xl border border-white/10 shadow-2xl space-y-4 relative overflow-hidden group hover:border-[#FF6A16]/40 transition-all">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#FF6A16]/10 rounded-full blur-2xl pointer-events-none" />
+                
+                {/* Header HUD */}
+                <div className="flex items-center justify-between pb-3 border-b border-white/8">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="font-mono text-xs font-bold text-[#F5F2EA]">CENTRAL COMMAND DECK</span>
+                  </div>
+                  <span className="font-mono text-[10px] text-[#FF6A16] bg-[#FF6A16]/10 px-2 py-0.5 rounded border border-[#FF6A16]/20">
+                    LIVE SPRINT
+                  </span>
+                </div>
 
-            <p className="text-sm sm:text-base lg:text-lg text-[#8C8A84] max-w-xl leading-relaxed">
-              Projects, teams and tasks moving together. Eliminate scattered group chats, spreadsheet chaos, and lost milestones with real-time collegiate club governance.
-            </p>
+                {/* Active Initiatives Stream */}
+                <div className="space-y-3">
+                  <div className="p-3 rounded-xl bg-[#141416] border border-white/5 space-y-1.5">
+                    <div className="flex justify-between text-xs font-bold">
+                      <span className="text-[#F5F2EA]">HackFest 2026 Arena</span>
+                      <span className="font-mono text-[#FF6A16]">82%</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-[#050505] rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-[#FF6A16] to-[#FFD400] w-[82%] rounded-full" />
+                    </div>
+                    <div className="flex justify-between text-[10px] font-mono text-[#8C8A84] pt-0.5">
+                      <span>Lead: Rahul V.</span>
+                      <span>4 Tasks In Progress</span>
+                    </div>
+                  </div>
 
-            <div className="pt-4 flex flex-wrap items-center gap-4">
-              <button
-                onClick={handleCtaClick}
-                className="px-7 py-3.5 rounded-xl bg-[#FF6A16] hover:bg-[#FF9D00] text-black text-sm font-extrabold transition-all shadow-xl hover:shadow-[#FF6A16]/30 flex items-center gap-2 hover:-translate-y-0.5"
-              >
-                <span>ENTER CLUBFLOW →</span>
-              </button>
+                  <div className="p-3 rounded-xl bg-[#141416] border border-white/5 space-y-1.5">
+                    <div className="flex justify-between text-xs font-bold">
+                      <span className="text-[#F5F2EA]">Autonomous Flight Core</span>
+                      <span className="font-mono text-[#FFD400]">67%</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-[#050505] rounded-full overflow-hidden">
+                      <div className="h-full bg-[#FFD400] w-[67%] rounded-full" />
+                    </div>
+                    <div className="flex justify-between text-[10px] font-mono text-[#8C8A84] pt-0.5">
+                      <span>Lead: Sarah C.</span>
+                      <span>Sprint #14</span>
+                    </div>
+                  </div>
+                </div>
 
-              <button
-                onClick={() => scrollToSection('problem')}
-                className="px-6 py-3.5 rounded-xl bg-[#141416] hover:bg-[#1C1C20] text-[#F5F2EA] text-sm font-bold border border-white/8 hover:border-white/20 transition-all flex items-center gap-2"
-              >
-                <span>EXPLORE THE PLATFORM ↓</span>
-              </button>
+                {/* Live Node Badges */}
+                <div className="grid grid-cols-3 gap-2 pt-1 text-center font-mono text-xs">
+                  <div className="p-2 rounded-lg bg-[#050505] border border-white/5">
+                    <div className="text-[9px] text-[#8C8A84]">TEAMS</div>
+                    <div className="font-bold text-[#F5F2EA] mt-0.5">14 Synced</div>
+                  </div>
+                  <div className="p-2 rounded-lg bg-[#050505] border border-white/5">
+                    <div className="text-[9px] text-[#8C8A84]">MEMBERS</div>
+                    <div className="font-bold text-[#FF6A16] mt-0.5">12 Online</div>
+                  </div>
+                  <div className="p-2 rounded-lg bg-[#050505] border border-white/5">
+                    <div className="text-[9px] text-[#8C8A84]">HEALTH</div>
+                    <div className="font-bold text-emerald-400 mt-0.5">99.8%</div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -386,31 +469,67 @@ export const LandingPage: React.FC = () => {
       ======================================================== */}
       <section id="projects" ref={corridorRef} className="py-28 px-6 sm:px-8 border-b border-white/8 bg-[#0D0D0F]">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Large Sticky Frame 03 */}
+          {/* Large Sticky Frame 03 with Interactive HUD */}
           <div className="lg:col-span-7 relative group rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-            <motion.div style={{ y: corridorImgY }} className="h-80 sm:h-[420px] w-full overflow-hidden">
+            <motion.div style={{ y: corridorImgY }} className="h-96 sm:h-[460px] w-full overflow-hidden relative">
               <img
                 src="/frames/03_project_corridor.jpg"
                 alt="Project Corridor"
                 className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-90" />
             </motion.div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0F] via-transparent to-transparent opacity-80" />
-            <div className="absolute top-0 left-0 h-[2px] w-full bg-gradient-to-r from-transparent via-[#FF6A16] to-transparent animate-travel-line" />
 
-            {/* Realistic Attached Project Progress UI */}
-            <div className="absolute bottom-6 left-6 right-6 bg-[#050505]/90 backdrop-blur-md p-4 rounded-xl border border-white/10 flex items-center justify-between gap-4">
-              <div className="space-y-0.5">
-                <span className="font-mono text-[9px] text-[#FFD400] font-bold uppercase tracking-wider">
-                  ACTIVE INITIATIVE
-                </span>
-                <p className="text-xs font-bold text-[#F5F2EA]">HACKFEST 2026 PLATFORM</p>
+            {/* Top HUD Node Banner */}
+            <div className="absolute top-4 left-4 right-4 flex items-center justify-between font-mono text-[10px] text-[#F5F2EA] bg-[#050505]/80 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-white/10">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FF6A16] animate-pulse" />
+                <span>NODE 02 // HARDWARE & PROTOTYPING CORRIDOR</span>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-28 h-2 bg-[#141416] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#FF6A16] w-[82%] rounded-full" />
+              <span className="text-[#8C8A84] hidden sm:inline">MILESTONES ACTIVE: 4/5</span>
+            </div>
+
+            {/* Corner Crosshairs */}
+            <div className="absolute top-12 left-4 text-white/30 font-mono text-xs pointer-events-none">⌜</div>
+            <div className="absolute top-12 right-4 text-white/30 font-mono text-xs pointer-events-none">⌝</div>
+
+            {/* Realistic Attached Project Progress HUD Box */}
+            <div className="absolute bottom-6 left-6 right-6 bg-[#050505]/95 backdrop-blur-xl p-5 rounded-xl border border-white/10 shadow-2xl space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="font-mono text-[9px] text-[#FFD400] font-bold uppercase tracking-wider block">
+                    CURRENT SPRINT CHARTER
+                  </span>
+                  <p className="text-sm font-bold text-[#F5F2EA]">HACKFEST 2026 INFRASTRUCTURE</p>
                 </div>
-                <span className="font-mono text-xs font-bold text-[#FF6A16]">82% COMPLETE</span>
+                <div className="text-right">
+                  <span className="font-mono text-sm font-bold text-[#FF6A16]">82% COMPLETE</span>
+                  <span className="font-mono text-[10px] text-[#8C8A84] block">4 Days to Expo</span>
+                </div>
+              </div>
+
+              {/* Multi-phase milestone pipeline */}
+              <div className="grid grid-cols-4 gap-1.5 pt-1">
+                <div className="p-1.5 rounded bg-[#141416] border border-white/5 text-center">
+                  <div className="text-[8px] font-mono text-emerald-400 font-bold">PHASE 1 ✓</div>
+                  <div className="text-[10px] text-zinc-300 font-semibold truncate">Charter</div>
+                </div>
+                <div className="p-1.5 rounded bg-[#141416] border border-white/5 text-center">
+                  <div className="text-[8px] font-mono text-emerald-400 font-bold">PHASE 2 ✓</div>
+                  <div className="text-[10px] text-zinc-300 font-semibold truncate">Architecture</div>
+                </div>
+                <div className="p-1.5 rounded bg-[#141416] border border-[#FF6A16]/40 text-center">
+                  <div className="text-[8px] font-mono text-[#FF6A16] font-bold animate-pulse">PHASE 3 ●</div>
+                  <div className="text-[10px] text-[#F5F2EA] font-semibold truncate">Integration</div>
+                </div>
+                <div className="p-1.5 rounded bg-[#141416] border border-white/5 text-center opacity-50">
+                  <div className="text-[8px] font-mono text-[#8C8A84] font-bold">PHASE 4</div>
+                  <div className="text-[10px] text-[#8C8A84] font-semibold truncate">Deploy</div>
+                </div>
+              </div>
+
+              <div className="w-full h-2 bg-[#141416] rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-[#FF6A16] to-[#FFD400] w-[82%] rounded-full" />
               </div>
             </div>
           </div>
@@ -425,22 +544,22 @@ export const LandingPage: React.FC = () => {
             </h2>
 
             <div className="space-y-3 font-mono text-xs text-[#8C8A84]">
-              <div className="p-3 rounded-xl bg-[#141416] border border-white/5 flex items-center gap-3">
+              <div className="p-3.5 rounded-xl bg-[#141416] border border-white/5 flex items-center gap-3">
                 <span className="w-2 h-2 rounded-full bg-[#FF6A16]" />
                 <span className="font-bold text-[#F5F2EA]">PROJECTS:</span>
                 <span>Dedicated charters & milestones</span>
               </div>
-              <div className="p-3 rounded-xl bg-[#141416] border border-white/5 flex items-center gap-3">
+              <div className="p-3.5 rounded-xl bg-[#141416] border border-white/5 flex items-center gap-3">
                 <span className="w-2 h-2 rounded-full bg-[#FFD400]" />
                 <span className="font-bold text-[#F5F2EA]">OWNERS:</span>
                 <span>Assigned student Project Leads</span>
               </div>
-              <div className="p-3 rounded-xl bg-[#141416] border border-white/5 flex items-center gap-3">
+              <div className="p-3.5 rounded-xl bg-[#141416] border border-white/5 flex items-center gap-3">
                 <span className="w-2 h-2 rounded-full bg-[#F5F2EA]" />
                 <span className="font-bold text-[#F5F2EA]">TEAMS:</span>
                 <span>Active contributor rosters</span>
               </div>
-              <div className="p-3 rounded-xl bg-[#141416] border border-white/5 flex items-center gap-3">
+              <div className="p-3.5 rounded-xl bg-[#141416] border border-white/5 flex items-center gap-3">
                 <span className="w-2 h-2 rounded-full bg-[#FF6A16]" />
                 <span className="font-bold text-[#F5F2EA]">PROGRESS:</span>
                 <span>Strictly computed task fulfillment</span>
@@ -455,18 +574,52 @@ export const LandingPage: React.FC = () => {
       ======================================================== */}
       <section id="teams" ref={teamsRef} className="py-28 px-6 sm:px-8 border-b border-white/8 bg-[#050505]">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          {/* Left: Frame 02 Image (approx 55%) */}
+          {/* Left: Frame 02 Image with Interactive Role Nodes */}
           <div className="lg:col-span-7 relative group rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-            <motion.div style={{ scale: teamsImgScale }} className="h-80 sm:h-[420px] w-full overflow-hidden">
+            <motion.div style={{ scale: teamsImgScale }} className="h-96 sm:h-[460px] w-full overflow-hidden relative">
               <img
                 src="/frames/02_collaboration_lab.jpg"
                 alt="Collaboration Lab"
-                className="w-full h-full object-cover object-center"
+                className="w-full h-full object-cover object-center filter contrast-105"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-80" />
             </motion.div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-80" />
-            <div className="absolute bottom-4 left-4 font-mono text-[10px] text-[#F5F2EA] bg-[#050505]/80 backdrop-blur-md px-3 py-1 rounded border border-white/10">
-              02 / COLLABORATION LAB
+
+            {/* Top Node HUD */}
+            <div className="absolute top-4 left-4 right-4 flex items-center justify-between font-mono text-[10px] text-[#F5F2EA] bg-[#050505]/80 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-white/10">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FFD400] animate-pulse" />
+                <span>NODE 03 // COLLABORATION & SPRINT SQUADS</span>
+              </div>
+              <span className="text-[#FF6A16] font-bold">14 ACTIVE SQUADS</span>
+            </div>
+
+            {/* Floating Live Role HUD Overlay */}
+            <div className="absolute bottom-6 left-6 right-6 bg-[#050505]/95 backdrop-blur-xl p-5 rounded-xl border border-white/10 shadow-2xl space-y-3">
+              <div className="flex justify-between items-center pb-2 border-b border-white/8 text-xs font-mono">
+                <span className="text-[#F5F2EA] font-bold">SQUAD DELTA • SOFTWARE & ROBOTICS</span>
+                <span className="text-emerald-400">● 6 ENGINEERS ACTIVE</span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                <div className="p-2.5 rounded-lg bg-[#141416] border border-white/5 space-y-0.5">
+                  <span className="text-[9px] font-mono font-bold text-[#FF6A16] block">[ADMIN]</span>
+                  <div className="text-[11px] font-bold text-[#F5F2EA]">Governance</div>
+                  <div className="text-[9px] text-[#8C8A84]">Full Permissions</div>
+                </div>
+
+                <div className="p-2.5 rounded-lg bg-[#141416] border border-white/5 space-y-0.5">
+                  <span className="text-[9px] font-mono font-bold text-[#FFD400] block">[LEAD]</span>
+                  <div className="text-[11px] font-bold text-[#F5F2EA]">Sprint Backlog</div>
+                  <div className="text-[9px] text-[#8C8A84]">Task Allocation</div>
+                </div>
+
+                <div className="p-2.5 rounded-lg bg-[#141416] border border-white/5 space-y-0.5">
+                  <span className="text-[9px] font-mono font-bold text-[#F5F2EA] block">[MEMBER]</span>
+                  <div className="text-[11px] font-bold text-[#F5F2EA]">Deliverables</div>
+                  <div className="text-[9px] text-[#8C8A84]">1-Click Updates</div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -604,21 +757,21 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* ========================================================
-          SECTION 06: CONTINUOUS SCROLL (Kinetic Marquee)
+          SECTION 06: CONTINUOUS KINETIC TYPOGRAPHY SCROLL
       ======================================================== */}
-      <section className="py-12 bg-[#050505] border-b border-white/8 overflow-hidden relative">
-        <div className="flex space-x-8 whitespace-nowrap animate-marquee">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center space-x-8 text-xl sm:text-3xl font-extrabold tracking-widest font-mono text-[#8C8A84]/40 uppercase">
+      <section className="py-20 border-b border-white/8 bg-[#050505] overflow-hidden whitespace-nowrap">
+        <div className="flex items-center gap-12 text-3xl sm:text-5xl font-black font-mono tracking-tighter text-white/20 animate-marquee select-none">
+          {[...Array(4)].map((_, idx) => (
+            <div key={idx} className="flex items-center gap-12 shrink-0">
               <span className="text-[#FF6A16]">PROJECTS</span>
               <span>→</span>
-              <span className="text-[#F5F2EA]">TEAMS</span>
+              <span className="text-[#FFD400]">TEAMS</span>
               <span>→</span>
-              <span className="text-[#FFD400]">TASKS</span>
+              <span className="text-[#F5F2EA]">TASKS</span>
               <span>→</span>
-              <span className="text-[#FF6A16]">DEADLINES</span>
+              <span className="text-[#8C8A84]">DEADLINES</span>
               <span>→</span>
-              <span className="text-[#F5F2EA]">PROGRESS</span>
+              <span className="text-[#FF6A16]">PROGRESS</span>
               <span>→</span>
               <span className="text-[#FFD400]">DELIVER</span>
               <span>→</span>
@@ -645,29 +798,48 @@ export const LandingPage: React.FC = () => {
           </div>
 
           <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl group">
-            <div className="h-80 sm:h-[420px] w-full overflow-hidden">
+            <div className="h-96 sm:h-[460px] w-full overflow-hidden relative">
               <img
                 src="/frames/04_innovation_hub.jpg"
                 alt="Innovation Hub"
-                className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105 filter contrast-105"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0F] via-[#0D0D0F]/40 to-transparent" />
             </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0D0D0F] via-[#0D0D0F]/40 to-transparent" />
+
+            {/* Top Node HUD */}
+            <div className="absolute top-4 left-4 right-4 flex items-center justify-between font-mono text-[10px] text-[#F5F2EA] bg-[#050505]/80 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-white/10">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#FF6A16] animate-pulse" />
+                <span>NODE 04 // TECH FEST EXPO ARENA & KEYNOTE STAGE</span>
+              </div>
+              <span className="text-emerald-400 font-bold">BROADCAST READY</span>
+            </div>
 
             {/* Live Progress Bar Animating 0 -> 82% */}
-            <div className="absolute bottom-6 left-6 right-6 bg-[#050505]/90 backdrop-blur-md p-6 rounded-xl border border-white/10 space-y-3">
+            <div className="absolute bottom-6 left-6 right-6 bg-[#050505]/95 backdrop-blur-xl p-6 rounded-xl border border-white/10 space-y-3 shadow-2xl">
               <div className="flex justify-between items-center font-mono text-xs">
-                <span className="text-[#8C8A84]">COLLEGIATE ACCELERATION</span>
-                <span className="text-[#FF6A16] font-bold text-sm">
+                <div>
+                  <span className="text-[#8C8A84] block text-[10px]">COLLEGIATE ACCELERATION TELEMETRY</span>
+                  <span className="text-[#F5F2EA] font-bold text-sm">Tech Showcase 2026 • 450 Attendees</span>
+                </div>
+                <span className="text-[#FF6A16] font-bold text-base">
                   {isInnovationInView ? '82% SHIPPED' : '0%'}
                 </span>
               </div>
+              
               <div className="w-full h-3 bg-[#141416] rounded-full overflow-hidden">
                 <div
-                  className={`h-full bg-gradient-to-r from-[#FF6A16] to-[#FF9D00] rounded-full transition-all duration-1000 ease-out ${
+                  className={`h-full bg-gradient-to-r from-[#FF6A16] via-[#FF8540] to-[#FFD400] rounded-full transition-all duration-1000 ease-out ${
                     isInnovationInView ? 'w-[82%]' : 'w-0'
                   }`}
                 />
+              </div>
+
+              <div className="flex justify-between items-center text-[10px] font-mono text-[#8C8A84] pt-1">
+                <span>✓ Hardware Validated</span>
+                <span>✓ Cloud API Deployed</span>
+                <span>✓ Stage Demos Configured</span>
               </div>
             </div>
           </div>
@@ -729,70 +901,190 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* ========================================================
-          SECTION 09: CINEMATIC FRAME GALLERY (Asymmetric Editorial)
+          SECTION 09: CINEMATIC FRAME GALLERY (Interactive Mission Modules)
       ======================================================== */}
       <section id="gallery" ref={galleryRef} className="py-28 px-6 sm:px-8 border-b border-white/8 bg-[#0D0D0F]">
         <div className="max-w-7xl mx-auto space-y-12">
-          <div className="space-y-2">
-            <span className="font-mono text-xs uppercase tracking-widest text-[#FF6A16] font-bold">
-              PHYSICAL ARCHITECTURAL FRAMES
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div className="space-y-2">
+              <span className="font-mono text-xs uppercase tracking-widest text-[#FF6A16] font-bold flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#FF6A16] animate-pulse" />
+                ARCHITECTURAL MISSION MATRIX
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F5F2EA] tracking-tight">
+                THE CAMPUS LABS
+              </h2>
+            </div>
+            <span className="font-mono text-xs text-[#8C8A84] bg-[#050505] px-3.5 py-1.5 rounded-lg border border-white/5">
+              4 MISSION NODES SYNCHRONIZED
             </span>
-            <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F5F2EA] tracking-tight">
-              THE CAMPUS LABS
-            </h2>
           </div>
 
-          {/* Asymmetric Offset Gallery */}
+          {/* Asymmetric Offset Interactive HUD Gallery */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
-            {/* Large Frame 01 */}
-            <motion.div style={{ y: gal1Y }} className="md:col-span-8 rounded-2xl overflow-hidden border border-white/10 relative h-80 sm:h-[400px] group">
+            {/* Frame 01: Vision Atrium Command Deck (Large) */}
+            <motion.div style={{ y: gal1Y }} className="md:col-span-8 rounded-2xl overflow-hidden border border-white/15 relative h-96 sm:h-[440px] group bg-[#050505] shadow-2xl">
               <img
                 src="/frames/01_vision_atrium.jpg"
                 alt="Frame 01 Vision Atrium"
-                className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105 filter brightness-[0.75] group-hover:brightness-90 contrast-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-80" />
-              <div className="absolute bottom-4 left-4 font-mono text-xs text-[#F5F2EA] bg-[#050505]/80 backdrop-blur-md px-3 py-1 rounded border border-white/10">
-                FRAME 01 / VISION ATRIUM
+              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent" />
+              
+              {/* Corner Tech Reticles */}
+              <div className="absolute top-3 left-3 text-[#FF6A16] font-mono text-[10px] font-bold">⌜ 01</div>
+              <div className="absolute top-3 right-3 text-white/40 font-mono text-[10px]">ONLINE ⌝</div>
+              <div className="absolute bottom-3 left-3 text-white/30 font-mono text-[10px]">⌞ LAT: 12ms</div>
+              <div className="absolute bottom-3 right-3 text-[#FFD400] font-mono text-[10px]">SYNCED ⌟</div>
+
+              {/* Top Banner HUD */}
+              <div className="absolute top-6 left-6 right-6 flex items-center justify-between font-mono text-[10px] text-[#F5F2EA] bg-[#050505]/85 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-white/10">
+                <span className="text-[#FF6A16] font-bold">[NODE 01 // EXECUTIVE ATRIUM]</span>
+                <span className="text-zinc-300">CAMPUS COMMAND DECK</span>
+              </div>
+
+              {/* Floating Glassmorphism Telemetry Overlay */}
+              <div className="absolute bottom-6 left-6 right-6 bg-[#050505]/95 backdrop-blur-xl p-4 sm:p-5 rounded-xl border border-white/10 space-y-2.5 shadow-2xl group-hover:border-[#FF6A16]/50 transition-colors">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-sm sm:text-base font-bold text-[#F5F2EA]">Central Operations Hub</h3>
+                    <p className="text-xs text-[#8C8A84]">Executive board initiative planning & telemetry stream</p>
+                  </div>
+                  <span className="font-mono text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30">
+                    ● ACTIVE
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-[10px] font-mono pt-1">
+                  <div className="p-1.5 rounded bg-[#141416] border border-white/5">
+                    <div className="text-[#8C8A84]">SQUADS</div>
+                    <div className="font-bold text-[#F5F2EA]">14 Synced</div>
+                  </div>
+                  <div className="p-1.5 rounded bg-[#141416] border border-white/5">
+                    <div className="text-[#8C8A84]">VELOCITY</div>
+                    <div className="font-bold text-[#FF6A16]">94.2%</div>
+                  </div>
+                  <div className="p-1.5 rounded bg-[#141416] border border-white/5">
+                    <div className="text-[#8C8A84]">CHARTERS</div>
+                    <div className="font-bold text-[#FFD400]">06 Active</div>
+                  </div>
+                </div>
               </div>
             </motion.div>
 
-            {/* Small Frame 02 */}
-            <motion.div style={{ y: gal2Y }} className="md:col-span-4 rounded-2xl overflow-hidden border border-white/10 relative h-80 sm:h-[400px] group">
+            {/* Frame 02: Collaboration Lab (Small) */}
+            <motion.div style={{ y: gal2Y }} className="md:col-span-4 rounded-2xl overflow-hidden border border-white/15 relative h-96 sm:h-[440px] group bg-[#050505] shadow-2xl">
               <img
                 src="/frames/02_collaboration_lab.jpg"
                 alt="Frame 02 Collaboration Lab"
-                className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105 filter brightness-[0.75] group-hover:brightness-90 contrast-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-80" />
-              <div className="absolute bottom-4 left-4 font-mono text-xs text-[#F5F2EA] bg-[#050505]/80 backdrop-blur-md px-3 py-1 rounded border border-white/10">
-                FRAME 02 / LAB
+              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent" />
+
+              {/* Corner Tech Reticles */}
+              <div className="absolute top-3 left-3 text-[#FFD400] font-mono text-[10px] font-bold">⌜ 02</div>
+              <div className="absolute top-3 right-3 text-white/40 font-mono text-[10px]">LAB ⌝</div>
+
+              {/* Top Banner HUD */}
+              <div className="absolute top-6 left-4 right-4 flex items-center justify-between font-mono text-[9px] text-[#F5F2EA] bg-[#050505]/85 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10">
+                <span className="text-[#FFD400] font-bold">[NODE 02 // SPRINT LAB]</span>
+                <span className="text-zinc-400">ROBOTICS & DEV</span>
+              </div>
+
+              {/* Floating Glassmorphism Telemetry Overlay */}
+              <div className="absolute bottom-6 left-4 right-4 bg-[#050505]/95 backdrop-blur-xl p-4 rounded-xl border border-white/10 space-y-2 shadow-2xl group-hover:border-[#FFD400]/50 transition-colors">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-xs sm:text-sm font-bold text-[#F5F2EA]">Squad Delta Dev Lab</h3>
+                    <p className="text-[10px] text-[#8C8A84]">Autonomous Flight Core • Sprint #14</p>
+                  </div>
+                </div>
+                <div className="p-2 rounded bg-[#141416] border border-white/5 font-mono text-[10px] space-y-1">
+                  <div className="flex justify-between">
+                    <span className="text-[#8C8A84]">Active Leads:</span>
+                    <span className="text-[#F5F2EA] font-bold">Sarah & Rahul</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[#8C8A84]">Commits Today:</span>
+                    <span className="text-[#FF6A16] font-bold">18 Merged</span>
+                  </div>
+                </div>
               </div>
             </motion.div>
 
-            {/* Medium Frame 03 */}
-            <motion.div style={{ y: gal3Y }} className="md:col-span-5 rounded-2xl overflow-hidden border border-white/10 relative h-80 sm:h-[400px] group">
+            {/* Frame 03: Project Corridor (Medium) */}
+            <motion.div style={{ y: gal3Y }} className="md:col-span-5 rounded-2xl overflow-hidden border border-white/15 relative h-96 sm:h-[440px] group bg-[#050505] shadow-2xl">
               <img
                 src="/frames/03_project_corridor.jpg"
                 alt="Frame 03 Project Corridor"
-                className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105 filter brightness-[0.75] group-hover:brightness-90 contrast-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-80" />
-              <div className="absolute bottom-4 left-4 font-mono text-xs text-[#F5F2EA] bg-[#050505]/80 backdrop-blur-md px-3 py-1 rounded border border-white/10">
-                FRAME 03 / CORRIDOR
+              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent" />
+
+              {/* Corner Tech Reticles */}
+              <div className="absolute top-3 left-3 text-[#FF6A16] font-mono text-[10px] font-bold">⌜ 03</div>
+              <div className="absolute top-3 right-3 text-white/40 font-mono text-[10px]">CORRIDOR ⌝</div>
+
+              {/* Top Banner HUD */}
+              <div className="absolute top-6 left-4 right-4 flex items-center justify-between font-mono text-[9px] text-[#F5F2EA] bg-[#050505]/85 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10">
+                <span className="text-[#FF6A16] font-bold">[NODE 03 // EMBEDDED BAY]</span>
+                <span className="text-zinc-400">HARDWARE CORRIDOR</span>
+              </div>
+
+              {/* Floating Glassmorphism Telemetry Overlay */}
+              <div className="absolute bottom-6 left-4 right-4 bg-[#050505]/95 backdrop-blur-xl p-4 rounded-xl border border-white/10 space-y-2 shadow-2xl group-hover:border-[#FF6A16]/50 transition-colors">
+                <h3 className="text-xs sm:text-sm font-bold text-[#F5F2EA]">Drone & Sensor Calibration Bay</h3>
+                <p className="text-[10px] text-[#8C8A84]">Telemetry sensors & PCB assembly line</p>
+                <div className="p-2 rounded bg-[#141416] border border-white/5 font-mono text-[10px] flex justify-between items-center">
+                  <span className="text-[#8C8A84]">Milestones 3/4 Verified</span>
+                  <span className="text-[#FFD400] font-bold">82% Shipped</span>
+                </div>
               </div>
             </motion.div>
 
-            {/* Large Frame 04 */}
-            <motion.div style={{ y: gal4Y }} className="md:col-span-7 rounded-2xl overflow-hidden border border-white/10 relative h-80 sm:h-[400px] group">
+            {/* Frame 04: Innovation Hub Stage (Large) */}
+            <motion.div style={{ y: gal4Y }} className="md:col-span-7 rounded-2xl overflow-hidden border border-white/15 relative h-96 sm:h-[440px] group bg-[#050505] shadow-2xl">
               <img
                 src="/frames/04_innovation_hub.jpg"
                 alt="Frame 04 Innovation Hub"
-                className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105 filter brightness-[0.75] group-hover:brightness-90 contrast-110"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-80" />
-              <div className="absolute bottom-4 left-4 font-mono text-xs text-[#F5F2EA] bg-[#050505]/80 backdrop-blur-md px-3 py-1 rounded border border-white/10">
-                FRAME 04 / INNOVATION HUB
+              <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/40 to-transparent" />
+
+              {/* Corner Tech Reticles */}
+              <div className="absolute top-3 left-3 text-[#FFD400] font-mono text-[10px] font-bold">⌜ 04</div>
+              <div className="absolute top-3 right-3 text-emerald-400 font-mono text-[10px]">STAGE LIVE ⌝</div>
+
+              {/* Top Banner HUD */}
+              <div className="absolute top-6 left-6 right-6 flex items-center justify-between font-mono text-[10px] text-[#F5F2EA] bg-[#050505]/85 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-white/10">
+                <span className="text-[#FFD400] font-bold">[NODE 04 // DEMO ARENA]</span>
+                <span className="text-emerald-400">BROADCAST READY</span>
+              </div>
+
+              {/* Floating Glassmorphism Telemetry Overlay */}
+              <div className="absolute bottom-6 left-6 right-6 bg-[#050505]/95 backdrop-blur-xl p-4 sm:p-5 rounded-xl border border-white/10 space-y-2.5 shadow-2xl group-hover:border-[#FFD400]/50 transition-colors">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="text-sm sm:text-base font-bold text-[#F5F2EA]">University Main Stage & Expo Arena</h3>
+                    <p className="text-xs text-[#8C8A84]">Collegiate showcase keynotes and live project demonstrations</p>
+                  </div>
+                  <span className="font-mono text-[10px] bg-[#FFD400]/20 text-[#FFD400] px-2 py-0.5 rounded border border-[#FFD400]/30 font-bold">
+                    450+ ATTENDEES
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-[10px] font-mono pt-1">
+                  <div className="p-1.5 rounded bg-[#141416] border border-white/5">
+                    <div className="text-[#8C8A84]">LIVE DEMOS</div>
+                    <div className="font-bold text-[#F5F2EA]">12 Projects</div>
+                  </div>
+                  <div className="p-1.5 rounded bg-[#141416] border border-white/5">
+                    <div className="text-[#8C8A84]">ACCELERATION</div>
+                    <div className="font-bold text-[#FF6A16]">82% Ready</div>
+                  </div>
+                  <div className="p-1.5 rounded bg-[#141416] border border-white/5">
+                    <div className="text-[#8C8A84]">KEYNOTE</div>
+                    <div className="font-bold text-emerald-400">Scheduled</div>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </div>
