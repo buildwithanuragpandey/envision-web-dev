@@ -1,0 +1,108 @@
+// Prisma Schema for ClubFlow – Role-Based Club Management System
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String          @id @default(uuid())
+  name         String
+  email        String          @unique
+  passwordHash String
+  role         String          @default("MEMBER") // ADMIN, PROJECT_LEAD, MEMBER
+  avatar       String?
+  department   String?
+  year         String?
+  isActive     Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  // Relationships
+  ledProjects     Project[]       @relation("ProjectLead")
+  createdProjects Project[]       @relation("ProjectCreator")
+  projectMembers  ProjectMember[]
+  assignedTasks   Task[]          @relation("AssignedTasks")
+  createdTasks    Task[]          @relation("CreatedTasks")
+  activityLogs    ActivityLog[]
+
+  @@index([role])
+  @@index([email])
+}
+
+model Project {
+  id            String          @id @default(uuid())
+  name          String
+  description   String?
+  status        String          @default("ACTIVE") // PLANNING, ACTIVE, COMPLETED, ARCHIVED
+  startDate     DateTime?
+  endDate       DateTime?
+  createdById   String?
+  createdBy     User?           @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  projectLeadId String?
+  projectLead   User?           @relation("ProjectLead", fields: [projectLeadId], references: [id], onDelete: SetNull)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  // Relationships
+  members       ProjectMember[]
+  tasks         Task[]
+
+  @@index([status])
+  @@index([projectLeadId])
+}
+
+model ProjectMember {
+  id        String   @id @default(uuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt  DateTime @default(now())
+
+  @@unique([projectId, userId])
+  @@index([projectId])
+  @@index([userId])
+}
+
+model Task {
+  id           String    @id @default(uuid())
+  title        String
+  description  String?
+  projectId    String
+  project      Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignedToId String?
+  assignedTo   User?     @relation("AssignedTasks", fields: [assignedToId], references: [id], onDelete: SetNull)
+  createdById  String?
+  createdBy    User?     @relation("CreatedTasks", fields: [createdById], references: [id], onDelete: SetNull)
+  priority     String    @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  status       String    @default("TODO")   // TODO, IN_PROGRESS, COMPLETED
+  deadline     DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([projectId])
+  @@index([assignedToId])
+  @@index([status])
+  @@index([priority])
+}
+
+model ActivityLog {
+  id          String   @id @default(uuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action      String   // CREATE, UPDATE, DELETE, STATUS_CHANGE, ASSIGN, MEMBER_ADD, MEMBER_REMOVE
+  entityType  String   // PROJECT, TASK, USER, MEMBER
+  entityId    String?
+  description String
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([userId])
+  @@index([entityType])
+}
