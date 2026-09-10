@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform, useInView } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform, useInView } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -41,8 +41,8 @@ export const LandingPage: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  // Authentication State
-  const [authTab, setAuthTab] = useState<'telemetry' | 'signin'>('signin');
+  // Authentication State & Modal
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -59,18 +59,25 @@ export const LandingPage: React.FC = () => {
   // Automatically navigate once user is logged in
   useEffect(() => {
     if (isAuthenticated && role) {
+      setIsAuthModalOpen(false);
       if (role === 'ADMIN') navigate('/admin/dashboard', { replace: true });
       else if (role === 'PROJECT_LEAD') navigate('/lead/dashboard', { replace: true });
       else navigate('/member/dashboard', { replace: true });
     }
   }, [isAuthenticated, role, navigate]);
 
-  const handleCtaClick = async () => {
+  const openAuthModalWithPreset = (presetEmail = '', presetPassword = '') => {
+    setEmail(presetEmail);
+    setPassword(presetPassword);
+    setErrorMessage('');
+    setIsAuthModalOpen(true);
+  };
+
+  const handleCtaClick = () => {
     if (isAuthenticated) {
       navigate(getDestination());
     } else {
-      // 1-Click Instant Enter ClubFlow with Admin Demo
-      await fillCredentialsAndLogin('admin@clubflow.local');
+      openAuthModalWithPreset('admin@clubflow.local', 'Password123!');
     }
   };
 
@@ -95,17 +102,13 @@ export const LandingPage: React.FC = () => {
     }
   };
 
-  const fillCredentialsAndLogin = async (demoEmail: string) => {
+  const populateInPageForm = (demoEmail: string) => {
     setEmail(demoEmail);
     setPassword('Password123!');
     setErrorMessage('');
-    setIsLoading(true);
-    try {
-      await login(demoEmail, 'Password123!');
-    } catch (err: any) {
-      setErrorMessage(err.response?.data?.error || 'Sign in failed');
-    } finally {
-      setIsLoading(false);
+    const formEl = document.getElementById('credentials-form');
+    if (formEl) {
+      formEl.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -454,9 +457,8 @@ export const LandingPage: React.FC = () => {
                     {/* Admin Launcher */}
                     <button
                       type="button"
-                      onClick={() => fillCredentialsAndLogin('admin@clubflow.local')}
-                      disabled={isLoading}
-                      className="p-3 rounded-xl bg-[#141416] hover:bg-[#1C1C20] border border-white/10 hover:border-[#FF6A16] flex items-center justify-between text-left transition-all group/btn"
+                      onClick={() => openAuthModalWithPreset('admin@clubflow.local', 'Password123!')}
+                      className="p-3 rounded-xl bg-[#141416] hover:bg-[#1C1C20] border border-white/10 hover:border-[#FF6A16] flex items-center justify-between text-left transition-all group/btn cursor-pointer"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-7 h-7 rounded-lg bg-[#FF6A16]/20 text-[#FF6A16] flex items-center justify-center font-bold text-xs">
@@ -475,9 +477,8 @@ export const LandingPage: React.FC = () => {
                     {/* Lead Launcher */}
                     <button
                       type="button"
-                      onClick={() => fillCredentialsAndLogin('lead.web@clubflow.local')}
-                      disabled={isLoading}
-                      className="p-3 rounded-xl bg-[#141416] hover:bg-[#1C1C20] border border-white/10 hover:border-[#FFD400] flex items-center justify-between text-left transition-all group/btn"
+                      onClick={() => openAuthModalWithPreset('lead.web@clubflow.local', 'Password123!')}
+                      className="p-3 rounded-xl bg-[#141416] hover:bg-[#1C1C20] border border-white/10 hover:border-[#FFD400] flex items-center justify-between text-left transition-all group/btn cursor-pointer"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-7 h-7 rounded-lg bg-[#FFD400]/20 text-[#FFD400] flex items-center justify-center font-bold text-xs">
@@ -496,9 +497,8 @@ export const LandingPage: React.FC = () => {
                     {/* Member Launcher */}
                     <button
                       type="button"
-                      onClick={() => fillCredentialsAndLogin('alex.member@clubflow.local')}
-                      disabled={isLoading}
-                      className="p-3 rounded-xl bg-[#141416] hover:bg-[#1C1C20] border border-white/10 hover:border-white/30 flex items-center justify-between text-left transition-all group/btn"
+                      onClick={() => openAuthModalWithPreset('alex.member@clubflow.local', 'Password123!')}
+                      className="p-3 rounded-xl bg-[#141416] hover:bg-[#1C1C20] border border-white/10 hover:border-white/30 flex items-center justify-between text-left transition-all group/btn cursor-pointer"
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-7 h-7 rounded-lg bg-white/10 text-white flex items-center justify-center font-bold text-xs">
@@ -1287,8 +1287,8 @@ export const LandingPage: React.FC = () => {
               </div>
 
               <button
-                onClick={() => fillCredentialsAndLogin('admin@clubflow.local')}
-                className="w-full py-2.5 rounded-xl bg-[#141416] group-hover:bg-[#FF6A16] text-[#F5F2EA] group-hover:text-black font-extrabold text-xs transition-all border border-white/10 group-hover:border-[#FF6A16] flex items-center justify-center gap-2 shadow-md"
+                onClick={() => populateInPageForm('admin@clubflow.local')}
+                className="w-full py-2.5 rounded-xl bg-[#141416] group-hover:bg-[#FF6A16] text-[#F5F2EA] group-hover:text-black font-extrabold text-xs transition-all border border-white/10 group-hover:border-[#FF6A16] flex items-center justify-center gap-2 shadow-md cursor-pointer"
               >
                 <span>Launch as Admin</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -1311,8 +1311,8 @@ export const LandingPage: React.FC = () => {
               </div>
 
               <button
-                onClick={() => fillCredentialsAndLogin('lead.web@clubflow.local')}
-                className="w-full py-2.5 rounded-xl bg-[#141416] group-hover:bg-[#FFD400] text-[#F5F2EA] group-hover:text-black font-extrabold text-xs transition-all border border-white/10 group-hover:border-[#FFD400] flex items-center justify-center gap-2 shadow-md"
+                onClick={() => populateInPageForm('lead.web@clubflow.local')}
+                className="w-full py-2.5 rounded-xl bg-[#141416] group-hover:bg-[#FFD400] text-[#F5F2EA] group-hover:text-black font-extrabold text-xs transition-all border border-white/10 group-hover:border-[#FFD400] flex items-center justify-center gap-2 shadow-md cursor-pointer"
               >
                 <span>Launch as Project Lead</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -1335,8 +1335,8 @@ export const LandingPage: React.FC = () => {
               </div>
 
               <button
-                onClick={() => fillCredentialsAndLogin('alex.member@clubflow.local')}
-                className="w-full py-2.5 rounded-xl bg-[#141416] group-hover:bg-[#F5F2EA] text-[#F5F2EA] group-hover:text-black font-extrabold text-xs transition-all border border-white/10 group-hover:border-white flex items-center justify-center gap-2 shadow-md"
+                onClick={() => populateInPageForm('alex.member@clubflow.local')}
+                className="w-full py-2.5 rounded-xl bg-[#141416] group-hover:bg-[#F5F2EA] text-[#F5F2EA] group-hover:text-black font-extrabold text-xs transition-all border border-white/10 group-hover:border-white flex items-center justify-center gap-2 shadow-md cursor-pointer"
               >
                 <span>Launch as Member</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -1345,7 +1345,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Direct Custom Credentials Form Box */}
-          <div className="max-w-xl mx-auto p-8 rounded-2xl bg-[#050505] border border-white/10 shadow-2xl space-y-5">
+          <div id="credentials-form" className="max-w-xl mx-auto p-8 rounded-2xl bg-[#050505] border border-white/10 shadow-2xl space-y-5 scroll-mt-28">
             <div className="flex items-center justify-between pb-3 border-b border-white/8">
               <div className="flex items-center gap-2">
                 <Lock className="w-4 h-4 text-[#FF6A16]" />
@@ -1353,6 +1353,12 @@ export const LandingPage: React.FC = () => {
               </div>
               <span className="font-mono text-[10px] text-[#8C8A84]">SESSION ENCRYPTED</span>
             </div>
+
+            {errorMessage && (
+              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono">
+                {errorMessage}
+              </div>
+            )}
 
             <form onSubmit={handleAuthSubmit} className="space-y-4">
               <div>
@@ -1387,7 +1393,7 @@ export const LandingPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300"
+                    className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 cursor-pointer"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -1397,7 +1403,7 @@ export const LandingPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 rounded-xl bg-[#FF6A16] hover:bg-[#FF9D00] text-black font-extrabold text-xs transition-all shadow-xl hover:shadow-[#FF6A16]/30 flex items-center justify-center gap-2 disabled:opacity-50"
+                className="w-full py-3 rounded-xl bg-[#FF6A16] hover:bg-[#FF9D00] text-black font-extrabold text-xs transition-all shadow-xl hover:shadow-[#FF6A16]/30 flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
               >
                 {isLoading ? (
                   <span className="animate-pulse">Authenticating Session...</span>
@@ -1487,6 +1493,186 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
       </footer>
+      {/* ========================================================
+          AUTH MODAL DIALOG (Prompt for Email & Password)
+      ======================================================== */}
+      <AnimatePresence>
+        {isAuthModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsAuthModalOpen(false)}
+              className="fixed inset-0 bg-black/85 backdrop-blur-md transition-opacity"
+            />
+
+            {/* Modal Dialog Card */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+              className="relative w-full max-w-md rounded-2xl bg-[#0D0D0F] border border-white/15 p-6 sm:p-8 shadow-2xl z-10 space-y-6 overflow-hidden text-left"
+            >
+              {/* Subtle top glow */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#FF6A16]/15 rounded-full blur-2xl pointer-events-none" />
+
+              {/* Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-white/8">
+                <div className="flex items-center gap-3">
+                  <img
+                    src="/clubflow_icon.jpg"
+                    alt="ClubFlow"
+                    className="w-8 h-8 rounded-lg object-contain shadow-glow-orange shrink-0 border border-white/10"
+                  />
+                  <div>
+                    <h3 className="text-base font-extrabold text-[#F5F2EA] leading-tight">
+                      Sign In to ClubFlow
+                    </h3>
+                    <p className="font-mono text-[10px] text-[#8C8A84] uppercase tracking-wider">
+                      CAMPUS OPERATING SYSTEM
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setIsAuthModalOpen(false)}
+                  className="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#8C8A84] hover:text-[#F5F2EA] transition-colors cursor-pointer"
+                  aria-label="Close dialog"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Role Preset Quick Switchers */}
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-[#8C8A84] block font-bold">
+                  Quick Role Presets
+                </span>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('admin@clubflow.local');
+                      setPassword('Password123!');
+                      setErrorMessage('');
+                    }}
+                    className={`py-2 px-1 rounded-xl text-xs font-bold font-mono transition-all border flex flex-col items-center gap-1 cursor-pointer ${
+                      email === 'admin@clubflow.local'
+                        ? 'bg-[#FF6A16]/20 border-[#FF6A16] text-[#FF6A16]'
+                        : 'bg-[#141416] border-white/8 text-[#8C8A84] hover:text-[#F5F2EA] hover:border-white/20'
+                    }`}
+                  >
+                    <span>👑 Admin</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('lead.web@clubflow.local');
+                      setPassword('Password123!');
+                      setErrorMessage('');
+                    }}
+                    className={`py-2 px-1 rounded-xl text-xs font-bold font-mono transition-all border flex flex-col items-center gap-1 cursor-pointer ${
+                      email === 'lead.web@clubflow.local'
+                        ? 'bg-[#FFD400]/20 border-[#FFD400] text-[#FFD400]'
+                        : 'bg-[#141416] border-white/8 text-[#8C8A84] hover:text-[#F5F2EA] hover:border-white/20'
+                    }`}
+                  >
+                    <span>⚡ Lead</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEmail('alex.member@clubflow.local');
+                      setPassword('Password123!');
+                      setErrorMessage('');
+                    }}
+                    className={`py-2 px-1 rounded-xl text-xs font-bold font-mono transition-all border flex flex-col items-center gap-1 cursor-pointer ${
+                      email === 'alex.member@clubflow.local'
+                        ? 'bg-white/20 border-white text-white'
+                        : 'bg-[#141416] border-white/8 text-[#8C8A84] hover:text-[#F5F2EA] hover:border-white/20'
+                    }`}
+                  >
+                    <span>🛠️ Member</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Error Banner */}
+              {errorMessage && (
+                <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono">
+                  {errorMessage}
+                </div>
+              )}
+
+              {/* Sign In Credentials Form */}
+              <form onSubmit={handleAuthSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8C8A84] mb-1.5">
+                    College Email
+                  </label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 text-zinc-500 absolute left-3.5 top-3" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="e.g. admin@clubflow.local"
+                      required
+                      className="w-full pl-10 pr-3.5 py-2.5 text-xs bg-[#141416] border border-white/10 rounded-xl text-[#F5F2EA] placeholder:text-zinc-600 focus:outline-none focus:border-[#FF6A16]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8C8A84] mb-1.5">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="w-4 h-4 text-zinc-500 absolute left-3.5 top-3" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Password123!"
+                      required
+                      className="w-full pl-10 pr-10 py-2.5 text-xs bg-[#141416] border border-white/10 rounded-xl text-[#F5F2EA] placeholder:text-zinc-600 focus:outline-none focus:border-[#FF6A16]"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 cursor-pointer"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full py-3 rounded-xl bg-[#FF6A16] hover:bg-[#FF9D00] text-black font-extrabold text-xs transition-all shadow-xl hover:shadow-[#FF6A16]/30 flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                  >
+                    {isLoading ? (
+                      <span className="animate-pulse">Authenticating Session...</span>
+                    ) : (
+                      <>
+                        <span>Sign In to ClubFlow</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
