@@ -50,10 +50,23 @@ async function main() {
   const lead2 = await prisma.user.create({
     data: {
       name: 'Aditya Verma',
-      email: 'sarah.lead@clubflow.local', // mapped for existing test & login compatibility
+      email: 'sarah.lead@clubflow.local',
       passwordHash,
       role: 'PROJECT_LEAD',
       department: 'Information Technology',
+      year: '3rd Year (Junior)',
+      avatar: '',
+      isActive: true,
+    },
+  });
+
+  const lead3 = await prisma.user.create({
+    data: {
+      name: 'Anurag Pandey',
+      email: 'lead.web@clubflow.local',
+      passwordHash,
+      role: 'PROJECT_LEAD',
+      department: 'Computer Science & Engineering',
       year: '3rd Year (Junior)',
       avatar: '',
       isActive: true,
@@ -65,6 +78,19 @@ async function main() {
     data: {
       name: 'Rohit Gupta',
       email: 'member1@clubflow.local',
+      passwordHash,
+      role: 'MEMBER',
+      department: 'Computer Science & Engineering',
+      year: '2nd Year (Sophomore)',
+      avatar: '',
+      isActive: true,
+    },
+  });
+
+  const memberAlex = await prisma.user.create({
+    data: {
+      name: 'Alex Rivera',
+      email: 'alex.member@clubflow.local',
       passwordHash,
       role: 'MEMBER',
       department: 'Computer Science & Engineering',
