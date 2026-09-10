@@ -20,10 +20,12 @@ import {
 } from 'lucide-react';
 import { Button } from '../components/common/Button';
 import { StatusBadge, PriorityBadge } from '../components/common/Badge';
+import { Avatar } from '../components/common/Avatar';
 import { ProgressBar, Skeleton, ConfirmDialog } from '../components/common/CommonUI';
 import { PageTransition } from '../components/common/PageTransition';
 import { KanbanBoard } from '../components/tasks/KanbanBoard';
 import { TaskModal } from '../components/tasks/TaskModal';
+import { TaskDetailDrawer } from '../components/tasks/TaskDetailDrawer';
 import { ProjectModal } from '../components/projects/ProjectModal';
 import { AddMemberModal } from '../components/projects/AddMemberModal';
 import { format } from 'date-fns';
@@ -39,11 +41,12 @@ export const ProjectDetailPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'tasks' | 'team' | 'overview'>('tasks');
   const [taskViewMode, setTaskViewMode] = useState<'board' | 'table'>('board');
 
-  // Modal states
+  // Modal & Drawer states
   const [isEditProjectOpen, setIsEditProjectOpen] = useState(false);
   const [isDeleteProjectOpen, setIsDeleteProjectOpen] = useState(false);
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [inspectingTask, setInspectingTask] = useState<Task | null>(null);
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
   const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
 
@@ -60,8 +63,8 @@ export const ProjectDetailPage: React.FC = () => {
   if (isLoading || !project) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-44 rounded-2xl" />
-        <Skeleton className="h-96 rounded-2xl" />
+        <Skeleton className="h-44 rounded-xl" />
+        <Skeleton className="h-96 rounded-xl" />
       </div>
     );
   }
@@ -73,7 +76,7 @@ export const ProjectDetailPage: React.FC = () => {
   const handleUpdateProject = async (formData: any) => {
     try {
       await projectApi.updateProject(project.id, formData);
-      success('Project Updated', 'Project details have been updated.');
+      success('Project Updated', 'Initiative details have been saved.');
       refetch();
     } catch (err: any) {
       error('Update Failed', err.response?.data?.error || 'Could not update project');
@@ -84,7 +87,7 @@ export const ProjectDetailPage: React.FC = () => {
   const handleDeleteProject = async () => {
     try {
       await projectApi.deleteProject(project.id);
-      success('Project Deleted', `Project "${project.name}" has been deleted.`);
+      success('Project Deleted', `Initiative "${project.name}" has been deleted.`);
       navigate('/projects');
     } catch (err: any) {
       error('Delete Failed', err.response?.data?.error || 'Could not delete project');
@@ -95,7 +98,7 @@ export const ProjectDetailPage: React.FC = () => {
   const handleCreateTask = async (formData: any) => {
     try {
       await taskApi.createTask(formData);
-      success('Task Created', `Task "${formData.title}" created.`);
+      success('Task Created', `Deliverable "${formData.title}" created.`);
       refetch();
     } catch (err: any) {
       error('Failed to create task', err.response?.data?.error || 'Could not create task');
@@ -107,7 +110,7 @@ export const ProjectDetailPage: React.FC = () => {
     if (!editingTask) return;
     try {
       await taskApi.updateTask(editingTask.id, formData);
-      success('Task Updated', `Task "${formData.title}" updated.`);
+      success('Task Updated', `Deliverable "${formData.title}" updated.`);
       setEditingTask(null);
       refetch();
     } catch (err: any) {
@@ -119,8 +122,11 @@ export const ProjectDetailPage: React.FC = () => {
   const handleUpdateTaskStatus = async (taskId: string, newStatus: TaskStatus) => {
     try {
       await taskApi.updateTaskStatus(taskId, newStatus);
-      success('Status Updated', `Task status changed to ${newStatus}`);
+      success('Status Updated', `Task moved to ${newStatus.replace('_', ' ')}`);
       refetch();
+      if (inspectingTask && inspectingTask.id === taskId) {
+        setInspectingTask({ ...inspectingTask, status: newStatus });
+      }
     } catch (err: any) {
       error('Failed to update status', err.response?.data?.error || 'Could not change task status');
     }
@@ -129,7 +135,10 @@ export const ProjectDetailPage: React.FC = () => {
   const handleDeleteTask = async (taskId: string) => {
     try {
       await taskApi.deleteTask(taskId);
-      success('Task Deleted', 'Task removed successfully.');
+      success('Task Deleted', 'Deliverable removed successfully.');
+      if (inspectingTask && inspectingTask.id === taskId) {
+        setInspectingTask(null);
+      }
       refetch();
     } catch (err: any) {
       error('Delete Failed', err.response?.data?.error || 'Could not delete task');
@@ -140,7 +149,7 @@ export const ProjectDetailPage: React.FC = () => {
   const handleAddMember = async (userId: string) => {
     try {
       await projectApi.addMember(project.id, userId);
-      success('Member Added', 'New member joined the project team.');
+      success('Member Added', 'Student added to the initiative squad.');
       refetch();
     } catch (err: any) {
       error('Failed to add member', err.response?.data?.error || 'Could not add member');
@@ -152,7 +161,7 @@ export const ProjectDetailPage: React.FC = () => {
     if (!removingMemberId) return;
     try {
       await projectApi.removeMember(project.id, removingMemberId);
-      success('Member Removed', 'Member removed from project team.');
+      success('Member Removed', 'Student removed from the squad.');
       setRemovingMemberId(null);
       refetch();
     } catch (err: any) {
@@ -163,7 +172,7 @@ export const ProjectDetailPage: React.FC = () => {
   const handleLeadChange = async (newLeadId: string) => {
     try {
       await projectApi.setProjectLead(project.id, newLeadId || null);
-      success('Project Lead Updated', 'New project lead assigned.');
+      success('Project Lead Updated', 'New squad lead assigned.');
       refetch();
     } catch (err: any) {
       error('Failed to change lead', err.response?.data?.error || 'Could not update lead');
@@ -186,7 +195,7 @@ export const ProjectDetailPage: React.FC = () => {
       </div>
 
       {/* Project Hero Header */}
-      <div className="bg-white rounded-2xl border border-zinc-200/80 shadow-subtle p-6 sm:p-8">
+      <div className="bg-white rounded-xl border border-zinc-200/80 shadow-subtle p-6 sm:p-8">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-2 max-w-3xl">
             <div className="flex flex-wrap items-center gap-2.5">
@@ -260,16 +269,7 @@ export const ProjectDetailPage: React.FC = () => {
           </div>
 
           <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200/60 flex items-center gap-3">
-            <img
-              src={
-                project.projectLead?.avatar ||
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                  project.projectLead?.name || 'Lead'
-                )}&background=18181b&color=fff`
-              }
-              alt={project.projectLead?.name || 'Lead'}
-              className="w-9 h-9 rounded-lg object-cover ring-1 ring-zinc-200"
-            />
+            <Avatar name={project.projectLead?.name} size="md" />
             <div className="min-w-0">
               <span className="text-[10px] font-mono uppercase font-bold text-zinc-400 tracking-wider block">
                 Project Lead
@@ -282,7 +282,7 @@ export const ProjectDetailPage: React.FC = () => {
           </div>
 
           <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200/60 flex items-center gap-3">
-            <div className="p-2.5 bg-zinc-200 text-zinc-700 rounded-xl">
+            <div className="p-2.5 bg-zinc-200 text-zinc-700 rounded-lg">
               <Users className="w-4 h-4" />
             </div>
             <div>
@@ -298,8 +298,8 @@ export const ProjectDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center justify-between border-b border-zinc-200/80 bg-white px-6 rounded-2xl shadow-subtle">
+      {/* Tabs Header */}
+      <div className="flex items-center justify-between border-b border-zinc-200/80 bg-white px-6 rounded-xl shadow-subtle">
         <div className="flex space-x-6">
           <button
             onClick={() => setActiveTab('tasks')}
@@ -329,15 +329,15 @@ export const ProjectDetailPage: React.FC = () => {
                 : 'border-transparent text-zinc-400 hover:text-zinc-700'
             }`}
           >
-            Milestones & Metrics
+            Milestones & Priorities
           </button>
         </div>
 
         {activeTab === 'tasks' && (
-          <div className="flex items-center gap-1 bg-zinc-100 p-1 rounded-xl">
+          <div className="flex items-center gap-1 bg-zinc-100 p-1 rounded-lg">
             <button
               onClick={() => setTaskViewMode('board')}
-              className={`p-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`p-1.5 rounded-md text-xs font-semibold transition-all ${
                 taskViewMode === 'board'
                   ? 'bg-white text-zinc-900 shadow-2xs'
                   : 'text-zinc-400 hover:text-zinc-700'
@@ -348,7 +348,7 @@ export const ProjectDetailPage: React.FC = () => {
             </button>
             <button
               onClick={() => setTaskViewMode('table')}
-              className={`p-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`p-1.5 rounded-md text-xs font-semibold transition-all ${
                 taskViewMode === 'table'
                   ? 'bg-white text-zinc-900 shadow-2xs'
                   : 'text-zinc-400 hover:text-zinc-700'
@@ -368,12 +368,13 @@ export const ProjectDetailPage: React.FC = () => {
             <KanbanBoard
               tasks={project.tasks || []}
               onUpdateStatus={handleUpdateTaskStatus}
+              onSelectTask={(t) => setInspectingTask(t)}
               onEditTask={(t) => setEditingTask(t)}
               onDeleteTask={handleDeleteTask}
               canManageTasks={canManageProject}
             />
           ) : (
-            <div className="bg-white rounded-2xl border border-zinc-200/80 shadow-subtle overflow-hidden">
+            <div className="bg-white rounded-xl border border-zinc-200/80 shadow-subtle overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-zinc-50 text-zinc-500 uppercase text-[10px] font-mono border-b border-zinc-200/80">
@@ -390,12 +391,16 @@ export const ProjectDetailPage: React.FC = () => {
                     {(!project.tasks || project.tasks.length === 0) ? (
                       <tr>
                         <td colSpan={6} className="text-center py-8 text-zinc-400 font-mono">
-                          No tasks created yet in this project.
+                          No tasks created yet in this initiative.
                         </td>
                       </tr>
                     ) : (
                       project.tasks.map((t) => (
-                        <tr key={t.id} className="hover:bg-zinc-50/60">
+                        <tr
+                          key={t.id}
+                          onClick={() => setInspectingTask(t)}
+                          className="hover:bg-zinc-50/60 cursor-pointer"
+                        >
                           <td className="py-3 px-4 font-semibold text-zinc-900">
                             {t.title}
                             {t.description && (
@@ -406,16 +411,7 @@ export const ProjectDetailPage: React.FC = () => {
                           </td>
                           <td className="py-3 px-4">
                             <div className="flex items-center gap-2">
-                              <img
-                                src={
-                                  t.assignedTo?.avatar ||
-                                  `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                    t.assignedTo?.name || 'U'
-                                  )}&background=18181b&color=fff`
-                                }
-                                alt={t.assignedTo?.name || 'U'}
-                                className="w-5 h-5 rounded-full object-cover"
-                              />
+                              <Avatar name={t.assignedTo?.name} size="xs" />
                               <span className="font-medium text-zinc-700">
                                 {t.assignedTo?.name || 'Unassigned'}
                               </span>
@@ -427,7 +423,7 @@ export const ProjectDetailPage: React.FC = () => {
                           <td className="py-3 px-4 text-zinc-600 font-mono text-[11px]">
                             {t.deadline ? format(new Date(t.deadline), 'MMM dd, yyyy') : '-'}
                           </td>
-                          <td className="py-3 px-4">
+                          <td className="py-3 px-4" onClick={(e) => e.stopPropagation()}>
                             <select
                               value={t.status}
                               onChange={(e) =>
@@ -448,15 +444,17 @@ export const ProjectDetailPage: React.FC = () => {
                             </select>
                           </td>
                           {canManageProject && (
-                            <td className="py-3 px-4 text-right">
+                            <td className="py-3 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                               <div className="flex items-center justify-end gap-1">
                                 <button
+                                  type="button"
                                   onClick={() => setEditingTask(t)}
                                   className="p-1.5 text-zinc-400 hover:text-zinc-700 rounded hover:bg-zinc-100"
                                 >
                                   <Edit2 className="w-3.5 h-3.5" />
                                 </button>
                                 <button
+                                  type="button"
                                   onClick={() => handleDeleteTask(t.id)}
                                   className="p-1.5 text-zinc-400 hover:text-rose-600 rounded hover:bg-rose-50"
                                 >
@@ -476,16 +474,16 @@ export const ProjectDetailPage: React.FC = () => {
         </div>
       )}
 
-      {/* Tab 2: Team */}
+      {/* Tab 2: Team Roster */}
       {activeTab === 'team' && (
-        <div className="bg-white rounded-2xl border border-zinc-200/80 shadow-subtle p-6 space-y-6">
+        <div className="bg-white rounded-xl border border-zinc-200/80 shadow-subtle p-6 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <span className="font-mono text-[10px] uppercase font-bold tracking-widest text-zinc-400">
-                ROSTER
+                SQUAD ROSTER
               </span>
               <h3 className="text-base font-bold text-zinc-900 tracking-tight mt-0.5">
-                Squad Members
+                Active Student Collaborators
               </h3>
             </div>
             {canManageProject && (
@@ -504,21 +502,12 @@ export const ProjectDetailPage: React.FC = () => {
             {project.memberStats?.map((member) => (
               <div
                 key={member.id}
-                className="p-4 rounded-xl border border-zinc-200/80 hover:border-zinc-300 hover:shadow-subtle transition-all flex flex-col justify-between"
+                className="p-4 rounded-xl border border-zinc-200/80 hover:border-zinc-300 transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div className="flex items-center gap-3 min-w-0">
-                      <img
-                        src={
-                          member.avatar ||
-                          `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                            member.name
-                          )}&background=18181b&color=fff`
-                        }
-                        alt={member.name}
-                        className="w-9 h-9 rounded-lg object-cover ring-1 ring-zinc-200"
-                      />
+                      <Avatar name={member.name} size="md" />
                       <div className="min-w-0">
                         <p className="font-bold text-zinc-900 text-xs truncate flex items-center gap-1">
                           {member.name}
@@ -541,7 +530,7 @@ export const ProjectDetailPage: React.FC = () => {
 
                 <div className="pt-3 mt-3 border-t border-zinc-100">
                   <div className="flex items-center justify-between text-xs text-zinc-600 font-mono mb-1.5">
-                    <span>Tasks</span>
+                    <span>Deliverables</span>
                     <span className="font-bold text-zinc-900">
                       {member.completedTasks}/{member.totalTasks} ({member.progress}%)
                     </span>
@@ -552,6 +541,7 @@ export const ProjectDetailPage: React.FC = () => {
                     <div className="mt-3 pt-2 flex items-center justify-between text-xs">
                       {isAdmin && project.projectLeadId !== member.id && (
                         <button
+                          type="button"
                           onClick={() => handleLeadChange(member.id)}
                           className="text-[11px] font-semibold text-zinc-900 hover:text-emerald-600 flex items-center gap-1"
                         >
@@ -560,6 +550,7 @@ export const ProjectDetailPage: React.FC = () => {
                         </button>
                       )}
                       <button
+                        type="button"
                         onClick={() => setRemovingMemberId(member.id)}
                         className="text-[11px] font-semibold text-rose-600 hover:text-rose-700 ml-auto flex items-center gap-1"
                       >
@@ -578,23 +569,23 @@ export const ProjectDetailPage: React.FC = () => {
       {/* Tab 3: Milestones */}
       {activeTab === 'overview' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl border border-zinc-200/80 shadow-subtle p-6">
+          <div className="bg-white rounded-xl border border-zinc-200/80 shadow-subtle p-6">
             <h3 className="text-sm font-bold text-zinc-900 mb-4">Milestone Schedule</h3>
             <div className="space-y-3 text-xs">
-              <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/60 flex items-center justify-between">
+              <div className="p-3.5 rounded-lg bg-zinc-50 border border-zinc-200/60 flex items-center justify-between">
                 <div>
                   <span className="font-bold text-zinc-800 block">Inception & Approval</span>
-                  <span className="text-zinc-400">Initiative charter initialized</span>
+                  <span className="text-zinc-400">Initiative charter approved</span>
                 </div>
                 <span className="font-mono text-zinc-700 font-semibold">
                   {project.startDate ? format(new Date(project.startDate), 'MMM dd, yyyy') : '-'}
                 </span>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200/60 flex items-center justify-between">
+              <div className="p-3.5 rounded-lg bg-zinc-50 border border-zinc-200/60 flex items-center justify-between">
                 <div>
                   <span className="font-bold text-zinc-800 block">Target Deliverable Wrap-Up</span>
-                  <span className="text-zinc-400">Final evaluation & showcase</span>
+                  <span className="text-zinc-400">Showcase presentation</span>
                 </div>
                 <span className="font-mono text-zinc-700 font-semibold">
                   {project.endDate ? format(new Date(project.endDate), 'MMM dd, yyyy') : 'Open'}
@@ -603,15 +594,15 @@ export const ProjectDetailPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl border border-zinc-200/80 shadow-subtle p-6">
+          <div className="bg-white rounded-xl border border-zinc-200/80 shadow-subtle p-6">
             <h3 className="text-sm font-bold text-zinc-900 mb-4">Priority Distribution</h3>
             <div className="space-y-2.5 text-xs">
               {['URGENT', 'HIGH', 'MEDIUM', 'LOW'].map((priority) => {
                 const count = project.tasks?.filter((t) => t.priority === priority).length || 0;
                 return (
-                  <div key={priority} className="flex items-center justify-between p-2 rounded-xl bg-zinc-50 border border-zinc-100">
+                  <div key={priority} className="flex items-center justify-between p-2 rounded-lg bg-zinc-50 border border-zinc-100">
                     <PriorityBadge priority={priority as any} size="sm" />
-                    <span className="font-mono font-bold text-zinc-900">{count} Tasks</span>
+                    <span className="font-mono font-bold text-zinc-900">{count} Deliverables</span>
                   </div>
                 );
               })}
@@ -620,13 +611,23 @@ export const ProjectDetailPage: React.FC = () => {
         </div>
       )}
 
+      {/* Slide-over Task Detail Drawer */}
+      <TaskDetailDrawer
+        task={inspectingTask}
+        isOpen={!!inspectingTask}
+        onClose={() => setInspectingTask(null)}
+        onStatusChange={handleUpdateTaskStatus}
+        onDelete={handleDeleteTask}
+        canEdit={canManageProject || inspectingTask?.assignedToId === user?.id}
+      />
+
       {/* Modals */}
       <ProjectModal
         isOpen={isEditProjectOpen}
         onClose={() => setIsEditProjectOpen(false)}
         onSubmit={handleUpdateProject}
         project={project}
-        title="Edit Project"
+        title="Edit Initiative"
       />
 
       <TaskModal
@@ -634,7 +635,7 @@ export const ProjectDetailPage: React.FC = () => {
         onClose={() => setIsCreateTaskOpen(false)}
         onSubmit={handleCreateTask}
         defaultProjectId={project.id}
-        title="Create New Task"
+        title="Create New Deliverable"
       />
 
       <TaskModal
@@ -643,7 +644,7 @@ export const ProjectDetailPage: React.FC = () => {
         onSubmit={handleUpdateTask}
         task={editingTask}
         defaultProjectId={project.id}
-        title="Edit Task Details"
+        title="Edit Deliverable Details"
       />
 
       <AddMemberModal
@@ -657,7 +658,7 @@ export const ProjectDetailPage: React.FC = () => {
         isOpen={isDeleteProjectOpen}
         onClose={() => setIsDeleteProjectOpen(false)}
         onConfirm={handleDeleteProject}
-        title="Delete Project"
+        title="Delete Initiative"
         message={`Are you sure you want to delete "${project.name}"? This action cannot be undone.`}
         confirmText="Delete Project"
         variant="danger"
@@ -668,7 +669,7 @@ export const ProjectDetailPage: React.FC = () => {
         onClose={() => setRemovingMemberId(null)}
         onConfirm={handleRemoveMember}
         title="Remove Member from Squad"
-        message="Are you sure you want to remove this member from the project team?"
+        message="Are you sure you want to remove this student from the squad?"
         confirmText="Remove Member"
         variant="danger"
       />

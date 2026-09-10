@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { authApi } from '../api/client';
 import { Button } from '../components/common/Button';
 import { RoleBadge } from '../components/common/Badge';
+import { Avatar } from '../components/common/Avatar';
 import { User, Lock, ShieldCheck, Mail, Building, KeyRound, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 
@@ -89,16 +90,7 @@ export const SettingsPage: React.FC = () => {
       {/* Profile Overview Banner */}
       <div className="bg-surface-0 rounded-xl border border-border p-6 shadow-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
-          <img
-            src={
-              avatar ||
-              `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                name || 'User'
-              )}&background=10b981&color=fff`
-            }
-            alt={name}
-            className="w-16 h-16 rounded-xl object-cover ring-2 ring-surface-100 shadow-sm"
-          />
+          <Avatar name={user?.name} src={avatar} size="xl" />
           <div>
             <div className="flex items-center gap-2.5">
               <h2 className="text-base font-bold text-surface-900">{user?.name}</h2>

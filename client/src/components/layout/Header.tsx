@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, LogOut, User, Bell, Search, ChevronDown, Command } from 'lucide-react';
+import { Menu, LogOut, User, Bell, Search, ChevronDown } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { Link, useLocation } from 'react-router-dom';
+import { Avatar } from '../common/Avatar';
 
 interface HeaderProps {
   onToggleMobileMenu: () => void;
@@ -88,16 +89,7 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileMenu, onOpenComman
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             className="flex items-center gap-2 p-1 rounded-xl hover:bg-zinc-100 transition-all border border-transparent hover:border-zinc-200"
           >
-            <img
-              src={
-                user?.avatar ||
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                  user?.name || 'User'
-                )}&background=18181b&color=fff`
-              }
-              alt={user?.name}
-              className="w-7 h-7 rounded-lg object-cover ring-1 ring-zinc-200"
-            />
+            <Avatar name={user?.name} src={user?.avatar} size="sm" />
             <ChevronDown className="w-3 h-3 text-zinc-400 hidden sm:block" />
           </button>
 

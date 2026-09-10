@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting database seed for ClubFlow...');
+  console.log('🌱 Starting database seed for ClubFlow (Authentic College Club Data)...');
 
   // Clean existing tables in correct order
   await prisma.activityLog.deleteMany({});
@@ -22,13 +22,13 @@ async function main() {
   // 1. Admin (Faculty Advisor)
   const admin = await prisma.user.create({
     data: {
-      name: 'Dr. Eleanor Vance',
+      name: 'Dr. Rajesh Sharma',
       email: 'admin@clubflow.local',
       passwordHash,
       role: 'ADMIN',
-      department: 'Electrical Engineering & Computer Science',
+      department: 'Computer Science & Engineering',
       year: 'Faculty Advisor',
-      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+      avatar: '',
       isActive: true,
     },
   });
@@ -36,26 +36,26 @@ async function main() {
   // 2. Project Leads
   const lead1 = await prisma.user.create({
     data: {
-      name: 'Marcus Kim',
+      name: 'Anurag Pandey',
       email: 'lead@clubflow.local',
       passwordHash,
       role: 'PROJECT_LEAD',
-      department: 'Robotics & Mechanical Engineering',
-      year: 'Senior (4th Year)',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+      department: 'Computer Science & Engineering',
+      year: '3rd Year (Junior)',
+      avatar: '',
       isActive: true,
     },
   });
 
   const lead2 = await prisma.user.create({
     data: {
-      name: 'Sarah Chen',
-      email: 'sarah.lead@clubflow.local',
+      name: 'Aditya Verma',
+      email: 'sarah.lead@clubflow.local', // mapped for existing test & login compatibility
       passwordHash,
       role: 'PROJECT_LEAD',
-      department: 'Computer Science',
-      year: 'Junior (3rd Year)',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      department: 'Information Technology',
+      year: '3rd Year (Junior)',
+      avatar: '',
       isActive: true,
     },
   });
@@ -63,90 +63,103 @@ async function main() {
   // 3. Members
   const member1 = await prisma.user.create({
     data: {
-      name: 'Alex Rivera',
+      name: 'Rohit Gupta',
       email: 'member1@clubflow.local',
       passwordHash,
       role: 'MEMBER',
-      department: 'Software Engineering',
-      year: 'Junior (3rd Year)',
-      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+      department: 'Computer Science & Engineering',
+      year: '2nd Year (Sophomore)',
+      avatar: '',
       isActive: true,
     },
   });
 
   const member2 = await prisma.user.create({
     data: {
-      name: 'Priya Sharma',
+      name: 'Sneha Patel',
       email: 'member2@clubflow.local',
       passwordHash,
       role: 'MEMBER',
-      department: 'Electrical Engineering',
-      year: 'Senior (4th Year)',
-      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+      department: 'Electronics & Communication',
+      year: '3rd Year (Junior)',
+      avatar: '',
       isActive: true,
     },
   });
 
   const member3 = await prisma.user.create({
     data: {
-      name: 'Lucas Thorne',
+      name: 'Arjun Nair',
       email: 'member3@clubflow.local',
       passwordHash,
       role: 'MEMBER',
-      department: 'HCI & Product Design',
-      year: 'Sophomore (2nd Year)',
-      avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80',
+      department: 'Design & Human-Computer Interaction',
+      year: '2nd Year (Sophomore)',
+      avatar: '',
       isActive: true,
     },
   });
 
   const member4 = await prisma.user.create({
     data: {
-      name: 'Elena Rostova',
+      name: 'Ananya Deshmukh',
       email: 'member4@clubflow.local',
       passwordHash,
       role: 'MEMBER',
-      department: 'Embedded Systems & Mechatronics',
-      year: 'Sophomore (2nd Year)',
-      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
+      department: 'Computer Science & Engineering',
+      year: '2nd Year (Sophomore)',
+      avatar: '',
       isActive: true,
     },
   });
 
   const member5 = await prisma.user.create({
     data: {
-      name: 'Jordan Taylor',
+      name: 'Harsh Vardhan',
       email: 'member5@clubflow.local',
       passwordHash,
       role: 'MEMBER',
-      department: 'Data Science & AI',
-      year: 'Freshman (1st Year)',
-      avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
+      department: 'Data Science & Analytics',
+      year: '1st Year (Freshman)',
+      avatar: '',
       isActive: true,
     },
   });
 
-  console.log('📁 Seeding collegiate engineering initiatives...');
+  const member6 = await prisma.user.create({
+    data: {
+      name: 'Priya Iyer',
+      email: 'priya@clubflow.local',
+      passwordHash,
+      role: 'MEMBER',
+      department: 'Electrical & Electronics',
+      year: '3rd Year (Junior)',
+      avatar: '',
+      isActive: true,
+    },
+  });
+
+  console.log('📁 Seeding realistic college club projects...');
 
   const now = new Date();
-  const past45Days = new Date(now.getTime() - 45 * 24 * 60 * 60 * 1000);
-  const past20Days = new Date(now.getTime() - 20 * 24 * 60 * 60 * 1000);
+  const past30Days = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const past15Days = new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000);
   const past3Days = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000);
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 18, 0, 0);
   const in2Days = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
-  const in5Days = new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000);
-  const in12Days = new Date(now.getTime() + 12 * 24 * 60 * 60 * 1000);
-  const in25Days = new Date(now.getTime() + 25 * 24 * 60 * 60 * 1000);
+  const in6Days = new Date(now.getTime() + 6 * 24 * 60 * 60 * 1000);
+  const in14Days = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+  const in28Days = new Date(now.getTime() + 28 * 24 * 60 * 60 * 1000);
   const in60Days = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000);
 
-  // Project 1: Formula SAE Electric
+  // Project 1: HackFest 2026
   const p1 = await prisma.project.create({
     data: {
-      name: 'Formula SAE Electric – Telemetry & Battery Pack',
-      description: 'Custom CAN-bus telemetry logging, 400V lithium cell balancing MCU firmware, and live trackside thermal analytics for 2026 competition vehicle.',
+      name: 'HackFest 2026 – Hackathon Operations & Event Portal',
+      description: 'Annual 36-hour collegiate hackathon operations covering participant registration, sponsor problem statements, mentor queue, and live judging portal.',
       status: 'ACTIVE',
-      startDate: past45Days,
-      endDate: in60Days,
+      startDate: past30Days,
+      endDate: in28Days,
       createdById: admin.id,
       projectLeadId: lead1.id,
       members: {
@@ -154,41 +167,21 @@ async function main() {
           { userId: lead1.id },
           { userId: member1.id },
           { userId: member2.id },
+          { userId: member3.id },
           { userId: member4.id },
         ],
       },
     },
   });
 
-  // Project 2: RoboSub AUV
+  // Project 2: Club Website Redesign
   const p2 = await prisma.project.create({
     data: {
-      name: 'RoboSub AUV – Computer Vision & Hydrophone Localization',
-      description: 'Acoustic pinger triangulation, thruster vectoring PID control, and YOLOv8 underwater gate navigation on NVIDIA Jetson Orin.',
+      name: 'Official Club Website Redesign & CMS Portal',
+      description: 'Redesigning the technical club primary web presence, including event archives, team directory, project showcase, and recruitment application portal.',
       status: 'ACTIVE',
-      startDate: past20Days,
-      endDate: in25Days,
-      createdById: admin.id,
-      projectLeadId: lead1.id,
-      members: {
-        create: [
-          { userId: lead1.id },
-          { userId: member1.id },
-          { userId: member4.id },
-          { userId: member5.id },
-        ],
-      },
-    },
-  });
-
-  // Project 3: HackMIT / National Hackathon Portal
-  const p3 = await prisma.project.create({
-    data: {
-      name: 'HackClub 2026 – Hacker Portal & Live Judging Queue',
-      description: 'Event operations platform handling 1,200 hacker check-ins, sponsor mentorship queues, WebSocket announcements, and live rubric scoring.',
-      status: 'ACTIVE',
-      startDate: past20Days,
-      endDate: in12Days,
+      startDate: past15Days,
+      endDate: in14Days,
       createdById: admin.id,
       projectLeadId: lead2.id,
       members: {
@@ -196,17 +189,38 @@ async function main() {
           { userId: lead2.id },
           { userId: member1.id },
           { userId: member3.id },
-          { userId: member5.id },
+          { userId: member4.id },
         ],
       },
     },
   });
 
-  // Project 4: OpenSource Club Design System
+  // Project 3: Web Dev Bootcamp
+  const p3 = await prisma.project.create({
+    data: {
+      name: 'Web Development & Cloud Bootcamp 2026',
+      description: 'Hands-on 4-week workshop series covering React, Tailwind CSS, Node.js, REST APIs, and cloud deployments for 150+ enrolled club freshmen.',
+      status: 'ACTIVE',
+      startDate: past15Days,
+      endDate: in14Days,
+      createdById: admin.id,
+      projectLeadId: lead1.id,
+      members: {
+        create: [
+          { userId: lead1.id },
+          { userId: member1.id },
+          { userId: member5.id },
+          { userId: member6.id },
+        ],
+      },
+    },
+  });
+
+  // Project 4: Annual Tech Fest
   const p4 = await prisma.project.create({
     data: {
-      name: 'ClubFlow Design System & Component Library v2',
-      description: 'Accessible, dark-mode ready Tailwind and React component tokens utilized across 8 collegiate student software initiatives.',
+      name: 'Annual Technical Fest – Project Expo & Keynote Tracks',
+      description: 'Inter-college technical symposium coordination including project exhibition curation, stage A/V setup, guest speaker logistics, and merchandise.',
       status: 'PLANNING',
       startDate: today,
       endDate: in60Days,
@@ -215,20 +229,20 @@ async function main() {
       members: {
         create: [
           { userId: lead2.id },
-          { userId: member3.id },
+          { userId: member2.id },
           { userId: member5.id },
         ],
       },
     },
   });
 
-  // Project 5: CubeSat Ground Station
+  // Project 5: Open Source Workshop Series (Completed)
   const p5 = await prisma.project.create({
     data: {
-      name: 'CubeSat Ground Station – Automated UHF/VHF Tracker',
-      description: 'Rotator azimuth/elevation control and Doppler frequency correction for student weather satellite downlinks.',
+      name: 'Git, GitHub & Open Source Contribution Sprint',
+      description: 'Weekend sprint sessions teaching version control best practices and guiding members through their first open source contributions.',
       status: 'COMPLETED',
-      startDate: new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000),
+      startDate: new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000),
       endDate: past3Days,
       createdById: admin.id,
       projectLeadId: lead1.id,
@@ -242,14 +256,14 @@ async function main() {
     },
   });
 
-  console.log('📝 Seeding realistic engineering deliverables & tasks...');
+  console.log('📝 Seeding realistic club tasks & deliverables...');
 
-  // Tasks for Project 1 (Formula SAE)
+  // Tasks for Project 1 (HackFest 2026)
   await prisma.task.createMany({
     data: [
       {
-        title: 'Calibrate CAN-bus 1Mbps baud rate on STM32F4 MCU',
-        description: 'Ensure zero frame collisions under high packet traffic from motor inverter and BMS sensors.',
+        title: 'Build event registration form & QR ticket generator',
+        description: 'Create responsive Next.js registration view with student ID validation and automated ticket PDF generation with QR check-in codes.',
         projectId: p1.id,
         assignedToId: member1.id,
         createdById: lead1.id,
@@ -258,28 +272,8 @@ async function main() {
         deadline: in2Days,
       },
       {
-        title: 'Thermal dissipation simulation for 400V accumulator pack',
-        description: 'Run COMSOL heat transfer model at continuous 80A draw through busbars.',
-        projectId: p1.id,
-        assignedToId: member2.id,
-        createdById: lead1.id,
-        priority: 'HIGH',
-        status: 'IN_PROGRESS',
-        deadline: in5Days,
-      },
-      {
-        title: 'Mount driver cockpit telemetry HUD OLED display',
-        description: 'Design and 3D print vibration-damped carbon-PETG steering wheel enclosure.',
-        projectId: p1.id,
-        assignedToId: member4.id,
-        createdById: lead1.id,
-        priority: 'MEDIUM',
-        status: 'TODO',
-        deadline: in12Days,
-      },
-      {
-        title: 'Emergency shutdown circuit bench testing',
-        description: 'Validate dual-relay inertia switch and master disconnect interlocking under fault conditions.',
+        title: 'Coordinate venue Wi-Fi & backup power with college admin',
+        description: 'Submit formal request for 500Mbps dedicated auditorium uplink and 20 power extension distribution boxes.',
         projectId: p1.id,
         assignedToId: member2.id,
         createdById: lead1.id,
@@ -288,125 +282,144 @@ async function main() {
         deadline: past3Days, // OVERDUE
       },
       {
-        title: 'Fabricate IP67 waterproof battery enclosure seal',
-        description: 'Laser cut neoprene gaskets and test hermetic seal under 0.5 bar pressure test.',
+        title: 'Design event badges, sticker packs & sponsor banners',
+        description: 'Figma mockups for 300 participant lanyards, mentor badges, and 6x4 sponsor podium backdrops.',
+        projectId: p1.id,
+        assignedToId: member3.id,
+        createdById: lead1.id,
+        priority: 'HIGH',
+        status: 'COMPLETED',
+        deadline: past3Days,
+        completedAt: past3Days,
+      },
+      {
+        title: 'Set up real-time mentor queue dispatch on WebSocket',
+        description: 'Live queue interface allowing hacker teams to request debugging assistance across Web, AI/ML, and Mobile tracks.',
         projectId: p1.id,
         assignedToId: member4.id,
         createdById: lead1.id,
-        priority: 'LOW',
-        status: 'COMPLETED',
-        deadline: past3Days,
-        completedAt: past3Days,
-      },
-    ],
-  });
-
-  // Tasks for Project 2 (RoboSub AUV)
-  await prisma.task.createMany({
-    data: [
-      {
-        title: 'Train YOLOv8 model on underwater obstacle dataset',
-        description: 'Fine-tune weights on 4,000 labeled pool competition frames for buoy and torpedo target recognition.',
-        projectId: p2.id,
-        assignedToId: member5.id,
-        createdById: lead1.id,
         priority: 'HIGH',
         status: 'IN_PROGRESS',
-        deadline: in5Days,
+        deadline: in6Days,
       },
       {
-        title: 'Hydrophone acoustic pinger triangulation algorithm',
-        description: 'Compute phase difference of arrival (TDOA) across 4 hydrophones at 25kHz sampling.',
-        projectId: p2.id,
+        title: 'Finalize judging criteria & rubric scoring sync',
+        description: 'Publish 5-tier evaluation criteria (Innovation, Technical Depth, UI/UX, Presentation, Feasibility) for judges.',
+        projectId: p1.id,
         assignedToId: member1.id,
         createdById: lead1.id,
-        priority: 'HIGH',
-        status: 'TODO',
-        deadline: in12Days,
-      },
-      {
-        title: 'Thruster PID velocity control calibration in test tank',
-        description: 'Tune yaw and surge response coefficients with IMU sensor fusion feedback.',
-        projectId: p2.id,
-        assignedToId: member4.id,
-        createdById: lead1.id,
         priority: 'MEDIUM',
-        status: 'COMPLETED',
-        deadline: past3Days,
-        completedAt: past3Days,
+        status: 'TODO',
+        deadline: in14Days,
       },
     ],
   });
 
-  // Tasks for Project 3 (HackClub Portal)
+  // Tasks for Project 2 (Club Website Redesign)
   await prisma.task.createMany({
     data: [
       {
-        title: 'Integrate Stripe registration & student deposit refunds',
-        description: 'Secure webhook handling, PDF ticket issuance, and automated discount code validation.',
-        projectId: p3.id,
+        title: 'Implement accessible dark mode theme tokens & navigation',
+        description: 'Refactor Tailwind color palette with Geist font hierarchy and mobile slide-out navigation menu.',
+        projectId: p2.id,
+        assignedToId: member3.id,
+        createdById: lead2.id,
+        priority: 'HIGH',
+        status: 'IN_PROGRESS',
+        deadline: in6Days,
+      },
+      {
+        title: 'Build member directory with search and department filter',
+        description: 'Client-side instant filtering across academic years, sub-teams, and project contribution tags.',
+        projectId: p2.id,
         assignedToId: member1.id,
         createdById: lead2.id,
+        priority: 'HIGH',
+        status: 'IN_PROGRESS',
+        deadline: in2Days,
+      },
+      {
+        title: 'Set up MDX blog engine for student project writeups',
+        description: 'Syntax highlighting with Prism, frontmatter parsing, reading time calculation, and RSS feed.',
+        projectId: p2.id,
+        assignedToId: member4.id,
+        createdById: lead2.id,
+        priority: 'MEDIUM',
+        status: 'TODO',
+        deadline: in14Days,
+      },
+    ],
+  });
+
+  // Tasks for Project 3 (Web Dev Bootcamp)
+  await prisma.task.createMany({
+    data: [
+      {
+        title: 'Prepare hands-on slide deck for Session 2: REST APIs & Express',
+        description: 'Create interactive code sandbox examples for routing, middleware, and CRUD endpoints.',
+        projectId: p3.id,
+        assignedToId: member1.id,
+        createdById: lead1.id,
         priority: 'URGENT',
         status: 'IN_PROGRESS',
         deadline: in2Days,
       },
       {
-        title: 'Build real-time mentor queue dispatch widget',
-        description: 'WebSocket channel alerting volunteer mentors when teams request hardware/software debugging assistance.',
+        title: 'Configure automated attendance bot on club Discord server',
+        description: 'Discord slash command logging attendee check-in timestamps to Google Sheets.',
         projectId: p3.id,
         assignedToId: member5.id,
-        createdById: lead2.id,
+        createdById: lead1.id,
         priority: 'MEDIUM',
         status: 'TODO',
-        deadline: in5Days,
+        deadline: in6Days,
       },
       {
-        title: 'Figma design tokens & responsive schedule grid',
-        description: 'Craft high-contrast dark mode agenda for Keynote, AI workshops, and project expo tracks.',
+        title: 'Publish starter template repo for frontend assignment 1',
+        description: 'Vite + React + Tailwind starter repository with step-by-step README instructions.',
         projectId: p3.id,
-        assignedToId: member3.id,
-        createdById: lead2.id,
+        assignedToId: member6.id,
+        createdById: lead1.id,
         priority: 'HIGH',
         status: 'COMPLETED',
         deadline: past3Days,
         completedAt: past3Days,
       },
-      {
-        title: 'Automate judge rubric scoring sync with Devpost',
-        description: 'Export structured team scores and sponsor prize rankings into CSV and live leaderboard.',
-        projectId: p3.id,
-        assignedToId: member3.id,
-        createdById: lead2.id,
-        priority: 'LOW',
-        status: 'TODO',
-        deadline: in12Days,
-      },
     ],
   });
 
-  // Tasks for Project 4 (Design System)
+  // Tasks for Project 4 (Annual Tech Fest)
   await prisma.task.createMany({
     data: [
       {
-        title: 'Document accessible Keyboard Navigation & ARIA props',
-        description: 'Provide Storybook interactive examples for modal focus traps and command palette.',
+        title: 'Draft guest speaker invitation & travel coordination packet',
+        description: 'Official invitation letter, honorarium policy, and accommodation booking for 4 industry keynote speakers.',
         projectId: p4.id,
-        assignedToId: member3.id,
+        assignedToId: member2.id,
         createdById: lead2.id,
         priority: 'HIGH',
         status: 'TODO',
-        deadline: in25Days,
+        deadline: in28Days,
+      },
+      {
+        title: 'Curate project expo floor plan & booth allocation map',
+        description: 'Allocate 35 hardware & software exhibition tables in the college main convention hall.',
+        projectId: p4.id,
+        assignedToId: member5.id,
+        createdById: lead2.id,
+        priority: 'MEDIUM',
+        status: 'TODO',
+        deadline: in28Days,
       },
     ],
   });
 
-  // Tasks for Project 5 (CubeSat Ground Station Completed)
+  // Tasks for Project 5 (Git Workshop - Completed)
   await prisma.task.createMany({
     data: [
       {
-        title: 'Calibrate Yaesu G-5500 antenna rotator controller',
-        description: 'Zero azimuth calibration with compass and test 180-degree elevation tilt range.',
+        title: 'Publish Git practice repository with merge conflict drills',
+        description: 'Interactive CLI exercises demonstrating cherry-pick, rebase, and conflict resolution.',
         projectId: p5.id,
         assignedToId: member2.id,
         createdById: lead1.id,
@@ -416,8 +429,8 @@ async function main() {
         completedAt: past3Days,
       },
       {
-        title: 'Setup automated NOAA-19 satellite image decoder pipeline',
-        description: 'SDR receiver decoding APT audio into composite false-color cloud imagery.',
+        title: 'Record & edit workshop session video for YouTube archive',
+        description: 'Add chapter timestamps, audio compression, and slide overlay cuts for the club channel.',
         projectId: p5.id,
         assignedToId: member4.id,
         createdById: lead1.id,
@@ -437,53 +450,54 @@ async function main() {
         action: 'CREATE',
         entityType: 'PROJECT',
         entityId: p1.id,
-        description: 'Created initiative "Formula SAE Electric – Telemetry & Battery Pack"',
-        createdAt: past45Days,
+        description: 'Created initiative "HackFest 2026 – Hackathon Operations & Event Portal"',
+        createdAt: past30Days,
       },
       {
         userId: lead1.id,
         action: 'CREATE',
         entityType: 'TASK',
-        description: 'Created task "Calibrate CAN-bus 1Mbps baud rate on STM32F4 MCU"',
-        createdAt: past20Days,
-      },
-      {
-        userId: member4.id,
-        action: 'STATUS_CHANGE',
-        entityType: 'TASK',
-        description: 'Completed milestone "Fabricate IP67 waterproof battery enclosure seal"',
-        createdAt: past3Days,
+        description: 'Assigned "Build event registration form & QR ticket generator" to Rohit Gupta',
+        createdAt: past15Days,
       },
       {
         userId: member3.id,
         action: 'STATUS_CHANGE',
         entityType: 'TASK',
-        description: 'Published "Figma design tokens & responsive schedule grid" for HackClub',
+        description: 'Completed "Design event badges, sticker packs & sponsor banners"',
         createdAt: past3Days,
+      },
+      {
+        userId: lead2.id,
+        action: 'CREATE',
+        entityType: 'PROJECT',
+        entityId: p2.id,
+        description: 'Created initiative "Official Club Website Redesign & CMS Portal"',
+        createdAt: past15Days,
       },
       {
         userId: member1.id,
         action: 'STATUS_CHANGE',
         entityType: 'TASK',
-        description: 'Started work on "Calibrate CAN-bus 1Mbps baud rate on STM32F4 MCU"',
+        description: 'Moved "Prepare hands-on slide deck for Session 2: REST APIs & Express" to In Progress',
         createdAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000),
       },
     ],
   });
 
   console.log('\n=============================================');
-  console.log('🎉 Seed completed successfully!');
+  console.log('🎉 Seed completed successfully with authentic college club data!');
   console.log('=============================================');
   console.log('Default Password for all seeded accounts: Password123!');
   console.log('---------------------------------------------');
-  console.log('ADMIN:        admin@clubflow.local');
-  console.log('PROJECT LEAD: lead@clubflow.local');
-  console.log('PROJECT LEAD: sarah.lead@clubflow.local');
-  console.log('MEMBER 1:     member1@clubflow.local');
-  console.log('MEMBER 2:     member2@clubflow.local');
-  console.log('MEMBER 3:     member3@clubflow.local');
-  console.log('MEMBER 4:     member4@clubflow.local');
-  console.log('MEMBER 5:     member5@clubflow.local');
+  console.log('ADMIN:        admin@clubflow.local (Dr. Rajesh Sharma)');
+  console.log('PROJECT LEAD: lead@clubflow.local (Anurag Pandey)');
+  console.log('PROJECT LEAD: sarah.lead@clubflow.local (Aditya Verma)');
+  console.log('MEMBER 1:     member1@clubflow.local (Rohit Gupta)');
+  console.log('MEMBER 2:     member2@clubflow.local (Sneha Patel)');
+  console.log('MEMBER 3:     member3@clubflow.local (Arjun Nair)');
+  console.log('MEMBER 4:     member4@clubflow.local (Ananya Deshmukh)');
+  console.log('MEMBER 5:     member5@clubflow.local (Harsh Vardhan)');
   console.log('=============================================\n');
 }
 

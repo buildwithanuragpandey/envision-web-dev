@@ -12,10 +12,10 @@ import {
   Users,
   CheckCircle2,
   ArrowRight,
-  Filter,
 } from 'lucide-react';
 import { Button } from '../components/common/Button';
 import { StatusBadge } from '../components/common/Badge';
+import { Avatar } from '../components/common/Avatar';
 import { ProgressBar, Skeleton, EmptyState } from '../components/common/CommonUI';
 import { PageTransition } from '../components/common/PageTransition';
 import { ProjectModal } from '../components/projects/ProjectModal';
@@ -45,7 +45,7 @@ export const ProjectsPage: React.FC = () => {
   const handleCreateProject = async (formData: any) => {
     try {
       await projectApi.createProject(formData);
-      success('Project Created', `Project "${formData.name}" created successfully.`);
+      success('Project Created', `Initiative "${formData.name}" created successfully.`);
       refetch();
     } catch (err: any) {
       error('Creation Failed', err.response?.data?.error || 'Failed to create project');
@@ -56,16 +56,16 @@ export const ProjectsPage: React.FC = () => {
   return (
     <PageTransition>
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-zinc-200/80">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-zinc-200/80">
         <div>
-          <span className="font-mono text-xs uppercase tracking-widest text-zinc-400">
-            Portfolio
+          <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-400 font-semibold">
+            Club Initiatives
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight mt-1.5">
             Club Projects
           </h1>
           <p className="text-xs text-zinc-500 mt-1">
-            Active initiatives, squad lead appointments, and deliverable completion rates.
+            Active committee initiatives, project lead appointments, and deliverable progression.
           </p>
         </div>
 
@@ -82,17 +82,17 @@ export const ProjectsPage: React.FC = () => {
       </div>
 
       {/* Filter & Search Controls */}
-      <div className="bg-white p-3.5 rounded-2xl border border-zinc-200/80 shadow-subtle flex flex-col md:flex-row items-center justify-between gap-3">
+      <div className="bg-white p-3.5 rounded-xl border border-zinc-200/80 shadow-subtle flex flex-col md:flex-row items-center justify-between gap-3">
         <div className="flex flex-1 items-center gap-3 w-full">
           {/* Search Input */}
           <div className="relative flex-1">
             <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3.5 top-3" />
             <input
               type="text"
-              placeholder="Search projects..."
+              placeholder="Search initiatives..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3.5 py-1.5 text-xs bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus-ring"
+              className="w-full pl-9 pr-3.5 py-1.5 text-xs bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 placeholder:text-zinc-400 focus-ring"
             />
           </div>
 
@@ -100,7 +100,7 @@ export const ProjectsPage: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-1.5 text-xs border border-zinc-200 rounded-xl bg-zinc-50 font-medium text-zinc-700 outline-none"
+            className="px-3 py-1.5 text-xs border border-zinc-200 rounded-lg bg-zinc-50 font-medium text-zinc-700 outline-none"
           >
             <option value="">All Statuses</option>
             <option value="ACTIVE">Active</option>
@@ -111,10 +111,10 @@ export const ProjectsPage: React.FC = () => {
         </div>
 
         {/* View Switcher */}
-        <div className="flex items-center gap-1 bg-zinc-100 p-1 rounded-xl self-end md:self-auto">
+        <div className="flex items-center gap-1 bg-zinc-100 p-1 rounded-lg self-end md:self-auto">
           <button
             onClick={() => setViewMode('grid')}
-            className={`p-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`p-1.5 rounded-md text-xs font-semibold transition-all ${
               viewMode === 'grid'
                 ? 'bg-white text-zinc-900 shadow-2xs'
                 : 'text-zinc-400 hover:text-zinc-700'
@@ -125,7 +125,7 @@ export const ProjectsPage: React.FC = () => {
           </button>
           <button
             onClick={() => setViewMode('table')}
-            className={`p-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`p-1.5 rounded-md text-xs font-semibold transition-all ${
               viewMode === 'table'
                 ? 'bg-white text-zinc-900 shadow-2xs'
                 : 'text-zinc-400 hover:text-zinc-700'
@@ -141,14 +141,14 @@ export const ProjectsPage: React.FC = () => {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Skeleton key={i} className="h-56 rounded-2xl" />
+            <Skeleton key={i} className="h-56 rounded-xl" />
           ))}
         </div>
       ) : !projects || projects.length === 0 ? (
         <EmptyState
           icon={<FolderKanban className="w-6 h-6 text-zinc-400" />}
-          title="No projects found"
-          description="Adjust your search criteria or create an initiative."
+          title="No initiatives found"
+          description="Adjust your search criteria or create a project."
           action={
             isAdmin ? (
               <Button
@@ -167,7 +167,7 @@ export const ProjectsPage: React.FC = () => {
           {projects.map((p) => (
             <div
               key={p.id}
-              className="bg-white rounded-2xl border border-zinc-200/80 hover:border-zinc-300 hover:shadow-premium transition-all duration-200 p-5 flex flex-col justify-between group"
+              className="bg-white rounded-xl border border-zinc-200/80 hover:border-zinc-300 transition-all p-5 flex flex-col justify-between group shadow-subtle"
             >
               <div>
                 <div className="flex items-start justify-between gap-2 mb-3">
@@ -194,25 +194,16 @@ export const ProjectsPage: React.FC = () => {
 
               <div className="pt-3 border-t border-zinc-100 space-y-2.5">
                 <div className="flex items-center justify-between text-xs text-zinc-600 font-mono">
-                  <span>Velocity</span>
+                  <span>Progress</span>
                   <span className="font-bold text-zinc-900">{p.progress}%</span>
                 </div>
                 <ProgressBar progress={p.progress} size="sm" />
 
                 <div className="flex items-center justify-between pt-2 text-xs">
                   <div className="flex items-center gap-2">
-                    <img
-                      src={
-                        p.projectLead?.avatar ||
-                        `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                          p.projectLead?.name || 'Lead'
-                        )}&background=18181b&color=fff`
-                      }
-                      alt={p.projectLead?.name || 'Lead'}
-                      className="w-5 h-5 rounded-full object-cover ring-1 ring-zinc-200"
-                    />
+                    <Avatar name={p.projectLead?.name} size="xs" />
                     <span className="text-zinc-700 font-medium text-[11px] truncate max-w-[100px]">
-                      {p.projectLead?.name?.split(' ')[0] || 'No Lead'}
+                      {p.projectLead?.name?.split(' ')[0] || 'Unassigned'}
                     </span>
                   </div>
 
@@ -231,9 +222,9 @@ export const ProjectsPage: React.FC = () => {
                 <div className="pt-1">
                   <Link
                     to={`/projects/${p.id}`}
-                    className="w-full py-1.5 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors border border-zinc-200/60"
+                    className="w-full py-1.5 bg-zinc-50 hover:bg-zinc-100 text-zinc-800 text-xs font-semibold rounded-lg flex items-center justify-center gap-1.5 transition-colors border border-zinc-200/60"
                   >
-                    <span>View Project</span>
+                    <span>Open Workspace</span>
                     <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
@@ -243,7 +234,7 @@ export const ProjectsPage: React.FC = () => {
         </div>
       ) : (
         /* Table View */
-        <div className="bg-white rounded-2xl border border-zinc-200/80 shadow-subtle overflow-hidden">
+        <div className="bg-white rounded-xl border border-zinc-200/80 shadow-subtle overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-zinc-50 text-zinc-500 uppercase text-[10px] font-mono border-b border-zinc-200/80">
@@ -251,7 +242,7 @@ export const ProjectsPage: React.FC = () => {
                   <th className="py-3 px-4">Initiative</th>
                   <th className="py-3 px-4">Status</th>
                   <th className="py-3 px-4">Project Lead</th>
-                  <th className="py-3 px-4">Team</th>
+                  <th className="py-3 px-4">Squad</th>
                   <th className="py-3 px-4">Tasks</th>
                   <th className="py-3 px-4">Progress</th>
                   <th className="py-3 px-4 text-right">Action</th>
@@ -276,16 +267,7 @@ export const ProjectsPage: React.FC = () => {
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
-                        <img
-                          src={
-                            p.projectLead?.avatar ||
-                            `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                              p.projectLead?.name || 'Lead'
-                            )}&background=18181b&color=fff`
-                          }
-                          alt={p.projectLead?.name || 'Lead'}
-                          className="w-5 h-5 rounded-full object-cover"
-                        />
+                        <Avatar name={p.projectLead?.name} size="xs" />
                         <span className="font-medium text-zinc-800">
                           {p.projectLead?.name || 'Unassigned'}
                         </span>
@@ -310,7 +292,7 @@ export const ProjectsPage: React.FC = () => {
                         to={`/projects/${p.id}`}
                         className="px-2.5 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-[11px] font-semibold rounded-lg transition-colors inline-flex items-center gap-1"
                       >
-                        Details
+                        Workspace
                         <ArrowRight className="w-3 h-3" />
                       </Link>
                     </td>
@@ -327,7 +309,7 @@ export const ProjectsPage: React.FC = () => {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSubmit={handleCreateProject}
-        title="Create New Project"
+        title="Create New Initiative"
       />
     </PageTransition>
   );

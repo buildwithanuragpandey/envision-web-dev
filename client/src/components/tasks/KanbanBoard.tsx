@@ -1,14 +1,16 @@
 import React from 'react';
 import { Task, TaskStatus } from '../../types';
 import { PriorityBadge } from '../common/Badge';
-import { Calendar, CheckCircle2, Clock, ArrowRight, ArrowLeft, Edit2, Trash2, Layers } from 'lucide-react';
-import { format } from 'date-fns';
+import { Avatar } from '../common/Avatar';
+import { Calendar, CheckCircle2, Clock, ArrowRight, ArrowLeft, Edit2, Trash2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatTaskDeadline } from './TaskDetailDrawer';
 
 interface KanbanBoardProps {
   tasks: Task[];
   onUpdateStatus: (taskId: string, newStatus: TaskStatus) => void;
+  onSelectTask?: (task: Task) => void;
   onEditTask?: (task: Task) => void;
   onDeleteTask?: (taskId: string) => void;
   canManageTasks?: boolean;
@@ -17,6 +19,7 @@ interface KanbanBoardProps {
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   tasks,
   onUpdateStatus,
+  onSelectTask,
   onEditTask,
   onDeleteTask,
   canManageTasks = false,
@@ -56,7 +59,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
               </span>
             </div>
 
-            {/* Task Cards Column with Framer Motion layout */}
+            {/* Task Cards Column */}
             <div className="flex-1 space-y-2.5 overflow-y-auto">
               <AnimatePresence mode="popLayout">
                 {columnTasks.length === 0 ? (
@@ -67,6 +70,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   columnTasks.map((task) => {
                     const isAssignedToMe = task.assignedToId === user?.id;
                     const canChangeThisStatus = canManageTasks || isAssignedToMe;
+                    const deadlineInfo = formatTaskDeadline(task.deadline);
 
                     return (
                       <motion.div
@@ -76,69 +80,62 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         exit={{ opacity: 0, scale: 0.96 }}
                         transition={{ duration: 0.2, ease: 'easeOut' }}
                         key={task.id}
-                        className="bg-white rounded-xl p-3.5 shadow-subtle border border-zinc-200/80 hover:border-zinc-300 hover:shadow-premium transition-all group"
+                        className="bg-white rounded-xl p-3.5 shadow-subtle border border-zinc-200/80 hover:border-zinc-300 transition-all group"
                       >
-                        {/* Project Tag & Priority */}
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                          <span className="font-mono text-[10px] uppercase font-bold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded truncate max-w-[130px]">
-                            {task.project?.name || 'Project'}
-                          </span>
-                          <PriorityBadge priority={task.priority} size="sm" />
-                        </div>
+                        {/* Clickable Card Body (Opens Drawer) */}
+                        <div
+                          onClick={() => onSelectTask?.(task)}
+                          className="cursor-pointer"
+                        >
+                          {/* Project Tag & Priority */}
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <span className="font-mono text-[10px] uppercase font-semibold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded truncate max-w-[140px]">
+                              {task.project?.name || 'Project'}
+                            </span>
+                            <PriorityBadge priority={task.priority} size="sm" />
+                          </div>
 
-                        {/* Title */}
-                        <h4 className="text-xs font-bold text-zinc-900 group-hover:text-zinc-700 transition-colors leading-snug">
-                          {task.title}
-                        </h4>
+                          {/* Title */}
+                          <h4 className="text-xs font-bold text-zinc-900 group-hover:text-emerald-700 transition-colors leading-snug">
+                            {task.title}
+                          </h4>
 
-                        {/* Description */}
-                        {task.description && (
-                          <p className="text-[11px] text-zinc-500 mt-1 line-clamp-2 leading-relaxed">
-                            {task.description}
-                          </p>
-                        )}
-
-                        {/* Deadline & Assignee */}
-                        <div className="mt-3 pt-2.5 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-500">
-                          {task.deadline ? (
-                            <div
-                              className={`flex items-center gap-1 font-mono text-[10px] ${
-                                task.isOverdue
-                                  ? 'text-rose-600 font-bold'
-                                  : task.isDueToday
-                                  ? 'text-amber-600 font-bold'
-                                  : 'text-zinc-500'
-                              }`}
-                            >
-                              <Calendar className="w-3 h-3" />
-                              <span>
-                                {format(new Date(task.deadline), 'MMM dd')}
-                                {task.isOverdue && ' (Overdue)'}
-                                {task.isDueToday && ' (Today)'}
-                              </span>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-1 text-zinc-400 font-mono text-[10px]">
-                              <Clock className="w-3 h-3" />
-                              <span>Open</span>
-                            </div>
+                          {/* Description */}
+                          {task.description && (
+                            <p className="text-[11px] text-zinc-500 mt-1 line-clamp-2 leading-relaxed">
+                              {task.description}
+                            </p>
                           )}
 
-                          {/* Assignee Avatar */}
-                          <div className="flex items-center gap-1.5" title={task.assignedTo?.name || 'Unassigned'}>
-                            <img
-                              src={
-                                task.assignedTo?.avatar ||
-                                `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                  task.assignedTo?.name || 'U'
-                                )}&background=18181b&color=fff`
-                              }
-                              alt={task.assignedTo?.name || 'Unassigned'}
-                              className="w-5 h-5 rounded-full object-cover ring-1 ring-zinc-200"
-                            />
-                            <span className="text-[10px] text-zinc-600 font-medium truncate max-w-[70px]">
-                              {task.assignedTo?.name?.split(' ')[0] || 'Unassigned'}
-                            </span>
+                          {/* Deadline & Assignee */}
+                          <div className="mt-3 pt-2.5 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-500">
+                            {deadlineInfo ? (
+                              <div
+                                className={`flex items-center gap-1 font-mono text-[10px] ${
+                                  deadlineInfo.isOverdue
+                                    ? 'text-rose-600 font-bold'
+                                    : deadlineInfo.isUrgent
+                                    ? 'text-amber-700 font-semibold'
+                                    : 'text-zinc-500'
+                                }`}
+                              >
+                                <Calendar className="w-3 h-3" />
+                                <span>{deadlineInfo.text}</span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-1 text-zinc-400 font-mono text-[10px]">
+                                <Clock className="w-3 h-3" />
+                                <span>No deadline</span>
+                              </div>
+                            )}
+
+                            {/* Assignee Initials Avatar */}
+                            <div className="flex items-center gap-1.5" title={task.assignedTo?.name || 'Unassigned'}>
+                              <Avatar name={task.assignedTo?.name} size="xs" />
+                              <span className="text-[10px] text-zinc-600 font-medium truncate max-w-[70px]">
+                                {task.assignedTo?.name?.split(' ')[0] || 'Unassigned'}
+                              </span>
+                            </div>
                           </div>
                         </div>
 
@@ -147,6 +144,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                           <div className="flex items-center gap-1">
                             {col.id === 'IN_PROGRESS' && canChangeThisStatus && (
                               <button
+                                type="button"
                                 onClick={() => onUpdateStatus(task.id, 'TODO')}
                                 title="Move back to To Do"
                                 className="p-1 rounded text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
@@ -156,6 +154,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                             )}
                             {col.id === 'COMPLETED' && canChangeThisStatus && (
                               <button
+                                type="button"
                                 onClick={() => onUpdateStatus(task.id, 'IN_PROGRESS')}
                                 title="Move back to In Progress"
                                 className="p-1 rounded text-zinc-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
@@ -166,6 +165,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
                             {col.id === 'TODO' && canChangeThisStatus && (
                               <button
+                                type="button"
                                 onClick={() => onUpdateStatus(task.id, 'IN_PROGRESS')}
                                 className="px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-800 flex items-center gap-1 transition-colors"
                               >
@@ -175,6 +175,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                             )}
                             {col.id === 'IN_PROGRESS' && canChangeThisStatus && (
                               <button
+                                type="button"
                                 onClick={() => onUpdateStatus(task.id, 'COMPLETED')}
                                 className="px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center gap-1 transition-colors border border-emerald-200/60"
                               >
@@ -189,6 +190,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                             <div className="flex items-center gap-1">
                               {onEditTask && (
                                 <button
+                                  type="button"
                                   onClick={() => onEditTask(task)}
                                   className="p-1 text-zinc-400 hover:text-zinc-800 rounded hover:bg-zinc-100"
                                   title="Edit task"
@@ -198,6 +200,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                               )}
                               {onDeleteTask && (
                                 <button
+                                  type="button"
                                   onClick={() => onDeleteTask(task.id)}
                                   className="p-1 text-zinc-400 hover:text-rose-600 rounded hover:bg-rose-50"
                                   title="Delete task"

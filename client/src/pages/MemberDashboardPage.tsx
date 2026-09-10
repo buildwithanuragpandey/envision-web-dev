@@ -1,30 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { dashboardApi, taskApi } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import {
-  FolderKanban,
   CheckSquare,
-  CheckCircle2,
   Clock,
-  AlertCircle,
-  TrendingUp,
-  ArrowRight,
+  CheckCircle2,
+  FolderKanban,
   Calendar,
+  ArrowRight,
+  TrendingUp,
 } from 'lucide-react';
 import { ProgressBar, Skeleton } from '../components/common/CommonUI';
 import { StatusBadge, PriorityBadge } from '../components/common/Badge';
+import { Avatar } from '../components/common/Avatar';
 import { AnimatedCounter } from '../components/common/AnimatedCounter';
 import { DashboardTicker, TickerItem } from '../components/common/DashboardTicker';
 import { PageTransition } from '../components/common/PageTransition';
+import { TaskDetailDrawer, formatTaskDeadline } from '../components/tasks/TaskDetailDrawer';
 import { Link } from 'react-router-dom';
-import { format } from 'date-fns';
 import { useToast } from '../context/ToastContext';
-import { TaskStatus } from '../types';
+import { Task } from '../types';
 
 export const MemberDashboardPage: React.FC = () => {
   const { user } = useAuth();
   const { success, error } = useToast();
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['member-dashboard'],
@@ -34,329 +35,280 @@ export const MemberDashboardPage: React.FC = () => {
     },
   });
 
-  const handleUpdateStatus = async (taskId: string, newStatus: TaskStatus) => {
+  const handleStatusToggle = async (taskId: string, currentStatus: string) => {
+    let nextStatus = 'IN_PROGRESS';
+    if (currentStatus === 'IN_PROGRESS') nextStatus = 'COMPLETED';
+    else if (currentStatus === 'COMPLETED') nextStatus = 'TODO';
+
     try {
-      await taskApi.updateTaskStatus(taskId, newStatus);
-      success('Status Updated', `Task status changed to ${newStatus}`);
+      await taskApi.updateTaskStatus(taskId, nextStatus);
+      success('Status Updated', `Deliverable moved to ${nextStatus.replace('_', ' ')}.`);
       refetch();
     } catch (err: any) {
-      error('Failed to update status', err.response?.data?.error || 'Could not update task');
+      error('Update Failed', err.response?.data?.error || 'Could not update task');
+    }
+  };
+
+  const handleStatusChangeFromDrawer = async (taskId: string, newStatus: any) => {
+    try {
+      await taskApi.updateTaskStatus(taskId, newStatus);
+      success('Status Updated', `Deliverable moved to ${newStatus.replace('_', ' ')}.`);
+      refetch();
+      if (selectedTask && selectedTask.id === taskId) {
+        setSelectedTask({ ...selectedTask, status: newStatus });
+      }
+    } catch (err: any) {
+      error('Update Failed', err.response?.data?.error || 'Could not update task');
     }
   };
 
   if (isLoading || !data) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-32 rounded-2xl" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Skeleton className="h-24 rounded-2xl" />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-24 rounded-2xl" />
+            <Skeleton key={i} className="h-20 rounded-xl" />
           ))}
         </div>
-        <Skeleton className="h-80 rounded-2xl" />
+        <Skeleton className="h-72 rounded-xl" />
       </div>
     );
   }
 
-  const { kpis, projects, assignedTasks, upcomingTasks } = data;
+  const { kpis, assignedTasks, projects } = data;
 
   const tickerItems: TickerItem[] = [
-    { id: '1', category: 'FOCUS', label: `${assignedTasks.length} total deliverables assigned to you` },
-    { id: '2', category: 'COMPLETION', label: `Personal velocity at ${kpis.completionRate}%` },
-    { id: '3', category: 'PROJECTS', label: `Active collaborator across ${projects.length} club squads` },
+    { id: '1', category: 'SQUADS', label: `Member of ${projects.length} club project teams` },
+    { id: '2', category: 'TASKS', label: `${kpis.todoTasks + kpis.inProgressTasks} deliverables assigned to you` },
+    { id: '3', category: 'FULFILLMENT', label: `${kpis.completedTasks} completed milestone deliverables` },
   ];
 
   return (
     <PageTransition>
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-zinc-200/80">
-        <div>
-          <span className="font-mono text-xs uppercase tracking-widest text-zinc-400">
-            Member Workspace
-          </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight mt-1">
-            Welcome back, {user?.name?.split(' ')[0] || 'Member'}
-          </h1>
-          <p className="text-xs text-zinc-500 mt-1">
-            Track your individual project deliverables, upcoming milestones, and personal velocity.
-          </p>
-        </div>
-
-        <Link
-          to="/tasks"
-          className="inline-flex items-center gap-2 px-3.5 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-semibold rounded-xl transition-all self-start sm:self-auto shadow-sm"
-        >
-          <CheckSquare className="w-3.5 h-3.5" />
-          Open Kanban Board
-        </Link>
+      {/* Editorial Header */}
+      <div className="pb-4 border-b border-zinc-200/80">
+        <span className="font-mono text-[11px] uppercase tracking-wider text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">
+          Personal Club Workspace
+        </span>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight mt-1.5">
+          Good morning, {user?.name?.split(' ')[0] || 'Member'}
+        </h1>
+        <p className="text-xs text-zinc-500 mt-1">
+          You have {kpis.todoTasks + kpis.inProgressTasks} assigned deliverables across {projects.length} project committees.
+        </p>
       </div>
 
       {/* Activity Ticker */}
-      <DashboardTicker items={tickerItems} className="-mx-4 sm:-mx-8 rounded-none" />
+      <DashboardTicker items={tickerItems} className="rounded-lg my-2" />
 
-      {/* Metrics Strip */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="p-4 rounded-2xl bg-white border border-zinc-200/80 shadow-subtle flex flex-col justify-between">
-          <div className="flex items-center justify-between text-zinc-400">
-            <span className="text-[11px] font-mono uppercase tracking-wider">My Projects</span>
-            <FolderKanban className="w-4 h-4 text-zinc-400" />
+      {/* Inline Compact Statistics */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 py-2">
+        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-subtle">
+          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+            My Projects
           </div>
-          <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-2xl font-extrabold text-zinc-900">
-              <AnimatedCounter value={kpis.totalProjects} />
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold font-mono text-zinc-900">
+              <AnimatedCounter value={projects.length} />
             </span>
-            <span className="text-[11px] font-mono text-zinc-500">active squads</span>
+            <span className="text-xs text-zinc-400">squads</span>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-zinc-200/80 shadow-subtle flex flex-col justify-between">
-          <div className="flex items-center justify-between text-zinc-400">
-            <span className="text-[11px] font-mono uppercase tracking-wider">Assigned Tasks</span>
-            <CheckSquare className="w-4 h-4 text-zinc-400" />
+        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-subtle">
+          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+            Active Deliverables
           </div>
-          <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-2xl font-extrabold text-zinc-900">
-              <AnimatedCounter value={kpis.totalTasks} />
-            </span>
-            <span className="text-[11px] font-mono text-emerald-600 font-semibold">
-              {kpis.completedTasks} done
-            </span>
-          </div>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-white border border-zinc-200/80 shadow-subtle flex flex-col justify-between">
-          <div className="flex items-center justify-between text-zinc-400">
-            <span className="text-[11px] font-mono uppercase tracking-wider">My Velocity</span>
-            <TrendingUp className="w-4 h-4 text-emerald-600" />
-          </div>
-          <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-2xl font-extrabold text-zinc-900">
-              <AnimatedCounter value={kpis.completionRate} suffix="%" />
-            </span>
-            <span className="text-[11px] font-mono text-zinc-500">completion rate</span>
-          </div>
-        </div>
-
-        <div className="p-4 rounded-2xl bg-white border border-zinc-200/80 shadow-subtle flex flex-col justify-between">
-          <div className="flex items-center justify-between text-zinc-400">
-            <span className="text-[11px] font-mono uppercase tracking-wider">Pending Work</span>
-            <Clock className="w-4 h-4 text-zinc-400" />
-          </div>
-          <div className="mt-3 flex items-baseline justify-between">
-            <span className="text-2xl font-extrabold text-zinc-900">
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold font-mono text-blue-600">
               <AnimatedCounter value={kpis.todoTasks + kpis.inProgressTasks} />
             </span>
+            <span className="text-xs text-zinc-400">pending</span>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-subtle">
+          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+            Completed
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold font-mono text-emerald-600">
+              <AnimatedCounter value={kpis.completedTasks} />
+            </span>
+            <span className="text-xs text-zinc-400">tasks done</span>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-subtle">
+          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+            Completion Rate
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold font-mono text-zinc-900">
+              <AnimatedCounter value={kpis.completionRate} suffix="%" />
+            </span>
             {kpis.overdueTasks > 0 ? (
-              <span className="text-[11px] font-mono text-rose-600 font-bold bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200/60 flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" />
+              <span className="text-[11px] font-mono text-rose-600 font-semibold bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200/60">
                 {kpis.overdueTasks} overdue
               </span>
             ) : (
-              <span className="text-[11px] font-mono text-emerald-600 font-medium">On track</span>
+              <span className="text-[11px] font-mono text-emerald-600">all on time</span>
             )}
           </div>
         </div>
       </div>
 
-      {/* Projects Section */}
-      <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-subtle">
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <span className="font-mono text-[10px] uppercase font-bold tracking-widest text-zinc-400">
-              PARTICIPATION
-            </span>
-            <h3 className="text-base font-bold text-zinc-900 tracking-tight mt-0.5">
-              My Assigned Projects
-            </h3>
-          </div>
-          <Link
-            to="/projects"
-            className="text-xs font-semibold text-zinc-900 hover:text-zinc-600 flex items-center gap-1 group"
-          >
-            <span>All projects</span>
-            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {projects.length === 0 ? (
-            <p className="text-xs text-zinc-400 py-6 text-center col-span-2">
-              You are not currently assigned to any projects.
-            </p>
-          ) : (
-            projects.map((p) => (
-              <div
-                key={p.id}
-                className="p-5 rounded-xl border border-zinc-200/80 hover:border-zinc-300 hover:bg-zinc-50/50 transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <Link
-                      to={`/projects/${p.id}`}
-                      className="text-sm font-bold text-zinc-900 hover:text-emerald-600 transition-colors"
-                    >
-                      {p.name}
-                    </Link>
-                    <StatusBadge status={p.status} size="sm" />
-                  </div>
-                  {p.description && (
-                    <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed mb-3">
-                      {p.description}
-                    </p>
-                  )}
-                </div>
-
-                <div className="pt-3 border-t border-zinc-100">
-                  <div className="flex items-center justify-between text-xs text-zinc-600 mb-2 font-mono">
-                    <span>Lead: {p.projectLead?.name || 'Faculty'}</span>
-                    <span>
-                      My tasks: {p.myCompletedCount}/{p.myTaskCount} ({p.myProgress}%)
-                    </span>
-                  </div>
-                  <ProgressBar progress={p.myProgress} size="sm" />
-
-                  <div className="mt-3 flex items-center justify-between pt-2">
-                    <span className="text-[11px] font-mono text-zinc-400">
-                      Overall: {p.overallProgress}%
-                    </span>
-                    <Link
-                      to={`/projects/${p.id}`}
-                      className="text-xs font-semibold text-zinc-900 hover:text-zinc-600 flex items-center gap-1"
-                    >
-                      <span>View Details</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Deliverables & Deadlines */}
+      {/* Main Grid: My Deliverables & My Project Squads */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Deliverables List */}
-        <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-subtle lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
+        {/* Left 2 Cols: My Assigned Deliverables List */}
+        <div className="lg:col-span-2 rounded-xl border border-zinc-200/80 bg-white p-5 shadow-subtle">
+          <div className="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
             <div>
-              <span className="font-mono text-[10px] uppercase font-bold tracking-widest text-zinc-400">
-                ACTIVE WORK
-              </span>
-              <h3 className="text-base font-bold text-zinc-900 tracking-tight mt-0.5">
+              <h2 className="text-base font-bold text-zinc-900 tracking-tight">
                 My Assigned Deliverables
-              </h3>
+              </h2>
+              <p className="text-xs text-zinc-500 mt-0.5">
+                Click task for details or toggle status directly.
+              </p>
             </div>
             <Link
               to="/tasks"
-              className="text-xs font-semibold text-zinc-900 hover:text-zinc-600 flex items-center gap-1 group"
+              className="text-xs font-semibold text-zinc-700 hover:text-zinc-900 flex items-center gap-1 group"
             >
-              <span>Kanban Board</span>
+              <span>Task board</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>
 
           <div className="space-y-2.5">
             {assignedTasks.length === 0 ? (
-              <p className="text-xs text-zinc-400 py-8 text-center">
-                No tasks currently assigned to you.
-              </p>
+              <div className="p-8 text-center bg-zinc-50 rounded-xl border border-zinc-100">
+                <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
+                <p className="text-sm font-bold text-zinc-900">You are all caught up!</p>
+                <p className="text-xs text-zinc-500 mt-0.5">
+                  No pending deliverables currently assigned to your account.
+                </p>
+              </div>
             ) : (
-              assignedTasks.map((t) => (
-                <div
-                  key={t.id}
-                  className="p-3.5 rounded-xl border border-zinc-100 hover:border-zinc-200 hover:bg-zinc-50/50 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-mono uppercase bg-zinc-100 px-2 py-0.5 rounded text-zinc-600 truncate max-w-[150px]">
-                        {t.project?.name}
-                      </span>
-                      <PriorityBadge priority={t.priority} size="sm" />
-                      {t.deadline && (
+              assignedTasks.map((t: any) => {
+                const deadlineInfo = formatTaskDeadline(t.deadline);
+                return (
+                  <div
+                    key={t.id}
+                    className="p-3.5 rounded-xl border border-zinc-100 hover:border-zinc-200 hover:bg-zinc-50/60 transition-all flex items-center justify-between gap-3 text-xs"
+                  >
+                    <div
+                      onClick={() => setSelectedTask(t)}
+                      className="min-w-0 flex-1 cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2">
                         <span
-                          className={`text-[11px] font-mono flex items-center gap-1 ${
-                            t.isOverdue
-                              ? 'text-rose-600 font-bold'
-                              : t.isDueToday
-                              ? 'text-amber-600 font-bold'
-                              : 'text-zinc-500'
+                          className={`font-semibold transition-colors ${
+                            t.status === 'COMPLETED' ? 'line-through text-zinc-400' : 'text-zinc-900'
                           }`}
                         >
-                          <Calendar className="w-3 h-3" />
-                          {format(new Date(t.deadline), 'MMM dd')}
-                          {t.isOverdue && ' (Overdue)'}
-                          {t.isDueToday && ' (Today)'}
+                          {t.title}
                         </span>
-                      )}
+                        <PriorityBadge priority={t.priority} size="sm" />
+                      </div>
+                      <div className="flex items-center gap-2 mt-1.5 text-[11px] text-zinc-400 font-mono">
+                        <span className="text-zinc-600 font-medium">{t.project?.name}</span>
+                        {deadlineInfo && (
+                          <>
+                            <span>•</span>
+                            <span
+                              className={
+                                deadlineInfo.isOverdue
+                                  ? 'text-rose-600 font-semibold'
+                                  : deadlineInfo.isUrgent
+                                  ? 'text-amber-700 font-semibold'
+                                  : 'text-zinc-500'
+                              }
+                            >
+                              {deadlineInfo.text}
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <p className="font-semibold text-zinc-900 text-sm">{t.title}</p>
-                    {t.description && (
-                      <p className="text-zinc-500 mt-0.5 line-clamp-1">{t.description}</p>
-                    )}
-                  </div>
 
-                  {/* Status Toggle Control */}
-                  <div className="shrink-0 self-end sm:self-center">
-                    <select
-                      value={t.status}
-                      onChange={(e) => handleUpdateStatus(t.id, e.target.value as TaskStatus)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold border outline-none cursor-pointer transition-all ${
+                    {/* 1-Click Status Progression Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleStatusToggle(t.id, t.status)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all shrink-0 ${
                         t.status === 'COMPLETED'
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
                           : t.status === 'IN_PROGRESS'
-                          ? 'bg-blue-50 text-blue-700 border-blue-300'
-                          : 'bg-zinc-100 text-zinc-700 border-zinc-300'
+                          ? 'bg-blue-50 text-blue-800 border-blue-300 hover:bg-blue-100'
+                          : 'bg-zinc-100 text-zinc-700 border-zinc-300 hover:bg-zinc-200'
                       }`}
                     >
-                      <option value="TODO">To Do</option>
-                      <option value="IN_PROGRESS">In Progress</option>
-                      <option value="COMPLETED">Completed</option>
-                    </select>
+                      {t.status === 'COMPLETED'
+                        ? 'Done ✓'
+                        : t.status === 'IN_PROGRESS'
+                        ? 'In Progress →'
+                        : 'Start →'}
+                    </button>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>
 
-        {/* Due Soon Deadlines */}
-        <div className="bg-white rounded-2xl border border-zinc-200/80 p-6 shadow-subtle">
-          <span className="font-mono text-[10px] uppercase font-bold tracking-widest text-zinc-400">
-            DEADLINES
-          </span>
-          <h3 className="text-base font-bold text-zinc-900 tracking-tight mt-0.5 flex items-center gap-2 mb-4">
-            <Calendar className="w-4 h-4 text-zinc-700" />
-            Due Soon
-          </h3>
+        {/* Right 1 Col: My Project Squads */}
+        <div className="rounded-xl border border-zinc-200/80 bg-white p-5 shadow-subtle">
+          <div className="pb-3 border-b border-zinc-100 mb-4">
+            <h2 className="text-base font-bold text-zinc-900 tracking-tight">
+              My Club Squads
+            </h2>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              Active project committees you are enrolled in.
+            </p>
+          </div>
 
-          <div className="space-y-3">
-            {upcomingTasks.length === 0 ? (
-              <p className="text-xs text-zinc-400 py-6 text-center">No upcoming deadlines.</p>
+          <div className="space-y-4">
+            {projects.length === 0 ? (
+              <p className="text-xs text-zinc-400 py-6 text-center">
+                You have not been added to any project committees yet.
+              </p>
             ) : (
-              upcomingTasks.map((t) => (
+              projects.map((p: any) => (
                 <div
-                  key={t.id}
-                  className="p-3 rounded-xl border border-zinc-100 hover:border-zinc-200 transition-all text-xs"
+                  key={p.id}
+                  className="p-3.5 rounded-xl border border-zinc-100 hover:border-zinc-200 transition-all"
                 >
-                  <div className="flex items-start justify-between gap-1 mb-1">
-                    <p className="font-semibold text-zinc-900 leading-snug">{t.title}</p>
-                    <PriorityBadge priority={t.priority} size="sm" />
+                  <div className="flex items-start justify-between gap-2 mb-1.5">
+                    <Link
+                      to={`/projects/${p.id}`}
+                      className="text-xs font-bold text-zinc-900 hover:text-emerald-600 transition-colors line-clamp-1"
+                    >
+                      {p.name}
+                    </Link>
+                    <StatusBadge status={p.status} size="sm" />
                   </div>
-                  <div className="flex items-center justify-between text-[11px] text-zinc-500 mt-2 pt-2 border-t border-zinc-100 font-mono">
-                    <span className="truncate max-w-[130px]">{t.project?.name}</span>
-                    {t.deadline && (
-                      <span className="font-semibold text-zinc-700">
-                        {format(new Date(t.deadline), 'MMM dd')}
-                      </span>
-                    )}
+                  <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 mb-2">
+                    <Avatar name={p.projectLead?.name} size="xs" />
+                    <span>Lead: {p.projectLead?.name || 'Unassigned'}</span>
                   </div>
+                  <ProgressBar progress={p.progress} size="sm" />
                 </div>
               ))
             )}
           </div>
         </div>
       </div>
+
+      {/* Task Detail Slide-over Drawer */}
+      <TaskDetailDrawer
+        task={selectedTask}
+        isOpen={!!selectedTask}
+        onClose={() => setSelectedTask(null)}
+        onStatusChange={handleStatusChangeFromDrawer}
+        canEdit={true}
+      />
     </PageTransition>
   );
 };
