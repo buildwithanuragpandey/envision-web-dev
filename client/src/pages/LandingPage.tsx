@@ -26,25 +26,79 @@ import {
   Target,
   Shield,
   Terminal,
+  Lock,
+  Mail,
+  Eye,
+  EyeOff,
+  LogOut,
+  UserCheck,
 } from 'lucide-react';
 import { AnimatedCounter } from '../components/common/AnimatedCounter';
 
 export const LandingPage: React.FC = () => {
-  const { role, isAuthenticated } = useAuth();
+  const { role, user, isAuthenticated, login, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
+  // Authentication State
+  const [authTab, setAuthTab] = useState<'telemetry' | 'signin'>('signin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
   // Target dashboard destination if authenticated
   const getDestination = () => {
-    if (!isAuthenticated) return '/login';
+    if (!isAuthenticated) return '#access';
     if (role === 'ADMIN') return '/admin/dashboard';
     if (role === 'PROJECT_LEAD') return '/lead/dashboard';
     return '/member/dashboard';
   };
 
   const handleCtaClick = () => {
-    navigate(getDestination());
+    if (isAuthenticated) {
+      navigate(getDestination());
+    } else {
+      setAuthTab('signin');
+      scrollToSection('access');
+    }
+  };
+
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      setErrorMessage('Please fill in both email and password');
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMessage('');
+
+    try {
+      await login(email, password);
+    } catch (err: any) {
+      setErrorMessage(
+        err.response?.data?.error || 'Invalid credentials. Please check your email and password.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fillCredentialsAndLogin = async (demoEmail: string) => {
+    setEmail(demoEmail);
+    setPassword('Password123!');
+    setErrorMessage('');
+    setIsLoading(true);
+    try {
+      await login(demoEmail, 'Password123!');
+    } catch (err: any) {
+      setErrorMessage(err.response?.data?.error || 'Sign in failed');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -148,7 +202,7 @@ export const LandingPage: React.FC = () => {
           </Link>
 
           {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8 text-xs font-bold tracking-wide text-[#8C8A84]">
+          <nav className="hidden md:flex items-center space-x-8 text-xs font-mono tracking-wider text-[#8C8A84]">
             <button
               onClick={() => scrollToSection('problem')}
               className="hover:text-[#F5F2EA] transition-colors"
@@ -179,29 +233,42 @@ export const LandingPage: React.FC = () => {
             >
               Architecture
             </button>
+            <button
+              onClick={() => scrollToSection('access')}
+              className="hover:text-[#FF6A16] transition-colors font-bold"
+            >
+              Access Portal
+            </button>
           </nav>
 
           {/* Right Action Buttons */}
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
-              <button
-                onClick={handleCtaClick}
-                className="px-4 py-2 rounded-lg bg-[#FF6A16] hover:bg-[#FF9D00] text-black text-xs font-bold transition-all shadow-lg hover:shadow-[#FF6A16]/25 flex items-center gap-1.5"
-              >
-                <span>Enter Workspace</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="px-3.5 py-1.5 text-xs font-bold text-[#F5F2EA] hover:text-[#FF6A16] transition-colors"
-                >
-                  Sign In
-                </Link>
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-mono text-[#8C8A84]">
+                  {user?.name} <span className="text-[#FF6A16]">({role})</span>
+                </span>
                 <button
                   onClick={handleCtaClick}
-                  className="px-4 py-2 rounded-lg bg-[#FF6A16] hover:bg-[#FF9D00] text-black text-xs font-bold transition-all shadow-lg hover:shadow-[#FF6A16]/25 flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-lg bg-[#FF6A16] hover:bg-[#FF9D00] text-black text-xs font-extrabold transition-all shadow-md shadow-[#FF6A16]/20 flex items-center gap-1.5"
+                >
+                  <span>Dashboard →</span>
+                </button>
+              </div>
+            ) : (
+              <>
+                <button
+                  onClick={() => {
+                    setAuthTab('signin');
+                    scrollToSection('access');
+                  }}
+                  className="text-xs font-mono font-medium text-[#8C8A84] hover:text-[#F5F2EA] transition-colors px-3 py-1.5"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={handleCtaClick}
+                  className="px-4 py-2 rounded-lg bg-[#FF6A16] hover:bg-[#FF9D00] text-black text-xs font-extrabold transition-all shadow-md shadow-[#FF6A16]/20 flex items-center gap-1.5 hover:-translate-y-0.5"
                 >
                   <span>Enter ClubFlow →</span>
                 </button>
@@ -221,8 +288,8 @@ export const LandingPage: React.FC = () => {
 
         {/* Mobile Drawer */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-[#0D0D0F] border-b border-white/10 px-6 py-5 space-y-4">
-            <nav className="flex flex-col space-y-3 text-sm font-bold text-[#8C8A84]">
+          <div className="md:hidden bg-[#0D0D0F] border-b border-white/10 px-6 py-5 space-y-4 shadow-2xl">
+            <nav className="flex flex-col space-y-3 font-mono text-xs text-[#8C8A84]">
               <button
                 onClick={() => scrollToSection('problem')}
                 className="text-left hover:text-[#F5F2EA]"
@@ -253,14 +320,24 @@ export const LandingPage: React.FC = () => {
               >
                 Architecture
               </button>
+              <button
+                onClick={() => scrollToSection('access')}
+                className="text-left text-[#FF6A16] font-bold"
+              >
+                Access Portal
+              </button>
             </nav>
             <div className="pt-3 border-t border-white/10 flex flex-col gap-2.5">
-              <Link
-                to="/login"
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setAuthTab('signin');
+                  scrollToSection('access');
+                }}
                 className="w-full py-2.5 rounded-lg bg-[#141416] text-[#F5F2EA] text-xs font-bold text-center border border-white/10"
               >
                 Sign In
-              </Link>
+              </button>
               <button
                 onClick={handleCtaClick}
                 className="w-full py-2.5 rounded-lg bg-[#FF6A16] text-black text-xs font-bold flex items-center justify-center gap-1.5"
@@ -273,9 +350,10 @@ export const LandingPage: React.FC = () => {
       </header>
 
       {/* ========================================================
-          SECTION 01: CINEMATIC HERO (01_vision_atrium.jpg)
+          SECTION 01: CINEMATIC HERO & INTERACTIVE COMMAND ACCESS
       ======================================================== */}
       <section
+        id="access"
         ref={heroRef}
         className="relative min-h-screen flex items-center justify-center pt-24 pb-16 overflow-hidden border-b border-white/8"
       >
@@ -304,7 +382,7 @@ export const LandingPage: React.FC = () => {
         {/* Continuous Traveling Orange Laser Line */}
         <div className="absolute top-0 left-0 h-[2px] w-full bg-gradient-to-r from-transparent via-[#FF6A16] to-transparent animate-travel-line z-10" />
 
-        {/* Hero Content & HUD Overlays */}
+        {/* Hero Content & Dual-Mode Access HUD */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7 space-y-6">
@@ -331,7 +409,7 @@ export const LandingPage: React.FC = () => {
                   onClick={handleCtaClick}
                   className="px-7 py-3.5 rounded-xl bg-[#FF6A16] hover:bg-[#FF9D00] text-black text-sm font-extrabold transition-all shadow-xl hover:shadow-[#FF6A16]/30 flex items-center gap-2 hover:-translate-y-0.5"
                 >
-                  <span>ENTER CLUBFLOW →</span>
+                  <span>{isAuthenticated ? 'GO TO WORKSPACE →' : 'ENTER CLUBFLOW →'}</span>
                 </button>
 
                 <button
@@ -343,68 +421,219 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Side: Floating Live ClubFlow OS Telemetry Glass Card */}
+            {/* Right Side: Dual-Mode Interactive Command Access Deck */}
             <div className="lg:col-span-5 space-y-4">
-              <div className="p-6 rounded-2xl bg-[#0D0D0F]/90 backdrop-blur-xl border border-white/10 shadow-2xl space-y-4 relative overflow-hidden group hover:border-[#FF6A16]/40 transition-all">
+              <div className="p-6 rounded-2xl bg-[#0D0D0F]/95 backdrop-blur-xl border border-white/15 shadow-2xl space-y-4 relative overflow-hidden group hover:border-[#FF6A16]/40 transition-all">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#FF6A16]/10 rounded-full blur-2xl pointer-events-none" />
                 
-                {/* Header HUD */}
+                {/* Header with Mode Switcher */}
                 <div className="flex items-center justify-between pb-3 border-b border-white/8">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                     <span className="font-mono text-xs font-bold text-[#F5F2EA]">CENTRAL COMMAND DECK</span>
                   </div>
-                  <span className="font-mono text-[10px] text-[#FF6A16] bg-[#FF6A16]/10 px-2 py-0.5 rounded border border-[#FF6A16]/20">
-                    LIVE SPRINT
-                  </span>
-                </div>
-
-                {/* Active Initiatives Stream */}
-                <div className="space-y-3">
-                  <div className="p-3 rounded-xl bg-[#141416] border border-white/5 space-y-1.5">
-                    <div className="flex justify-between text-xs font-bold">
-                      <span className="text-[#F5F2EA]">HackFest 2026 Arena</span>
-                      <span className="font-mono text-[#FF6A16]">82%</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-[#050505] rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-[#FF6A16] to-[#FFD400] w-[82%] rounded-full" />
-                    </div>
-                    <div className="flex justify-between text-[10px] font-mono text-[#8C8A84] pt-0.5">
-                      <span>Lead: Rahul V.</span>
-                      <span>4 Tasks In Progress</span>
-                    </div>
-                  </div>
-
-                  <div className="p-3 rounded-xl bg-[#141416] border border-white/5 space-y-1.5">
-                    <div className="flex justify-between text-xs font-bold">
-                      <span className="text-[#F5F2EA]">Autonomous Flight Core</span>
-                      <span className="font-mono text-[#FFD400]">67%</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-[#050505] rounded-full overflow-hidden">
-                      <div className="h-full bg-[#FFD400] w-[67%] rounded-full" />
-                    </div>
-                    <div className="flex justify-between text-[10px] font-mono text-[#8C8A84] pt-0.5">
-                      <span>Lead: Sarah C.</span>
-                      <span>Sprint #14</span>
-                    </div>
+                  
+                  {/* Mode Tabs */}
+                  <div className="flex items-center bg-[#050505] p-0.5 rounded-lg border border-white/10 text-[10px] font-mono">
+                    <button
+                      onClick={() => setAuthTab('signin')}
+                      className={`px-2.5 py-1 rounded transition-colors ${
+                        authTab === 'signin'
+                          ? 'bg-[#FF6A16] text-black font-bold'
+                          : 'text-[#8C8A84] hover:text-[#F5F2EA]'
+                      }`}
+                    >
+                      ACCESS
+                    </button>
+                    <button
+                      onClick={() => setAuthTab('telemetry')}
+                      className={`px-2.5 py-1 rounded transition-colors ${
+                        authTab === 'telemetry'
+                          ? 'bg-[#FF6A16] text-black font-bold'
+                          : 'text-[#8C8A84] hover:text-[#F5F2EA]'
+                      }`}
+                    >
+                      TELEMETRY
+                    </button>
                   </div>
                 </div>
 
-                {/* Live Node Badges */}
-                <div className="grid grid-cols-3 gap-2 pt-1 text-center font-mono text-xs">
-                  <div className="p-2 rounded-lg bg-[#050505] border border-white/5">
-                    <div className="text-[9px] text-[#8C8A84]">TEAMS</div>
-                    <div className="font-bold text-[#F5F2EA] mt-0.5">14 Synced</div>
+                {/* TAB 1: WORKSPACE ACCESS / DIRECT SIGN IN */}
+                {authTab === 'signin' && (
+                  <div className="space-y-3.5">
+                    {isAuthenticated ? (
+                      /* Authenticated User Quick Jump */
+                      <div className="space-y-4 py-2">
+                        <div className="p-3.5 rounded-xl bg-[#141416] border border-white/10 space-y-2">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#FF6A16] to-[#FFD400] text-black flex items-center justify-center font-bold text-sm">
+                              {user?.name?.charAt(0) || 'U'}
+                            </div>
+                            <div>
+                              <div className="font-bold text-xs text-[#F5F2EA]">{user?.name}</div>
+                              <div className="font-mono text-[10px] text-[#8C8A84]">{user?.email}</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between pt-1 border-t border-white/5 font-mono text-[10px]">
+                            <span className="text-[#8C8A84]">ACTIVE ROLE</span>
+                            <span className="text-[#FF6A16] font-bold">{role}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <button
+                            onClick={handleCtaClick}
+                            className="flex-1 py-2.5 rounded-xl bg-[#FF6A16] hover:bg-[#FF9D00] text-black font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 shadow-md"
+                          >
+                            <span>Open Dashboard</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => logout()}
+                            className="px-3 py-2.5 rounded-xl bg-[#141416] hover:bg-[#1C1C20] text-[#8C8A84] hover:text-rose-400 border border-white/10 text-xs transition-colors"
+                            title="Sign Out"
+                          >
+                            <LogOut className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      /* Unauthenticated Login Form */
+                      <form onSubmit={handleAuthSubmit} className="space-y-3">
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-mono uppercase tracking-wider text-[#8C8A84] block">
+                            QUICK DEMO ACCESS (1-CLICK)
+                          </span>
+                          <div className="grid grid-cols-3 gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => fillCredentialsAndLogin('admin@clubflow.local')}
+                              className="p-1.5 rounded-lg bg-[#141416] hover:bg-[#1C1C20] border border-white/5 hover:border-[#FF6A16]/50 text-center font-mono text-[10px] transition-all"
+                            >
+                              <span className="text-[#FF6A16] font-bold block">ADMIN</span>
+                              <span className="text-[8px] text-[#8C8A84]">President</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => fillCredentialsAndLogin('lead.web@clubflow.local')}
+                              className="p-1.5 rounded-lg bg-[#141416] hover:bg-[#1C1C20] border border-white/5 hover:border-[#FFD400]/50 text-center font-mono text-[10px] transition-all"
+                            >
+                              <span className="text-[#FFD400] font-bold block">LEAD</span>
+                              <span className="text-[8px] text-[#8C8A84]">Sprint Lead</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => fillCredentialsAndLogin('alex.member@clubflow.local')}
+                              className="p-1.5 rounded-lg bg-[#141416] hover:bg-[#1C1C20] border border-white/5 hover:border-white/20 text-center font-mono text-[10px] transition-all"
+                            >
+                              <span className="text-[#F5F2EA] font-bold block">MEMBER</span>
+                              <span className="text-[8px] text-[#8C8A84]">Contributor</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {errorMessage && (
+                          <div className="p-2 rounded-lg bg-rose-950/40 border border-rose-800/60 text-rose-400 text-[10px] font-medium">
+                            {errorMessage}
+                          </div>
+                        )}
+
+                        <div className="space-y-2">
+                          <div className="relative">
+                            <Mail className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-2.5" />
+                            <input
+                              type="email"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              placeholder="admin@clubflow.local"
+                              className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#141416] border border-white/10 rounded-lg text-[#F5F2EA] placeholder:text-zinc-600 focus:outline-none focus:border-[#FF6A16]"
+                            />
+                          </div>
+                          <div className="relative">
+                            <Lock className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-2.5" />
+                            <input
+                              type={showPassword ? 'text' : 'password'}
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              placeholder="Password123!"
+                              className="w-full pl-8 pr-8 py-1.5 text-xs bg-[#141416] border border-white/10 rounded-lg text-[#F5F2EA] placeholder:text-zinc-600 focus:outline-none focus:border-[#FF6A16]"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute right-2.5 top-2.5 text-zinc-500 hover:text-zinc-300"
+                            >
+                              {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                            </button>
+                          </div>
+                        </div>
+
+                        <button
+                          type="submit"
+                          disabled={isLoading}
+                          className="w-full py-2.5 rounded-xl bg-[#FF6A16] hover:bg-[#FF9D00] text-black font-extrabold text-xs transition-all shadow-md flex items-center justify-center gap-1.5 disabled:opacity-50"
+                        >
+                          {isLoading ? (
+                            <span className="animate-pulse">Authenticating...</span>
+                          ) : (
+                            <>
+                              <span>Sign In to Workspace</span>
+                              <ArrowRight className="w-3.5 h-3.5" />
+                            </>
+                          )}
+                        </button>
+                      </form>
+                    )}
                   </div>
-                  <div className="p-2 rounded-lg bg-[#050505] border border-white/5">
-                    <div className="text-[9px] text-[#8C8A84]">MEMBERS</div>
-                    <div className="font-bold text-[#FF6A16] mt-0.5">12 Online</div>
+                )}
+
+                {/* TAB 2: LIVE TELEMETRY STREAM */}
+                {authTab === 'telemetry' && (
+                  <div className="space-y-3">
+                    <div className="p-3 rounded-xl bg-[#141416] border border-white/5 space-y-1.5">
+                      <div className="flex justify-between text-xs font-bold">
+                        <span className="text-[#F5F2EA]">HackFest 2026 Arena</span>
+                        <span className="font-mono text-[#FF6A16]">82%</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-[#050505] rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-[#FF6A16] to-[#FFD400] w-[82%] rounded-full" />
+                      </div>
+                      <div className="flex justify-between text-[10px] font-mono text-[#8C8A84] pt-0.5">
+                        <span>Lead: Rahul V.</span>
+                        <span>4 Tasks In Progress</span>
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-[#141416] border border-white/5 space-y-1.5">
+                      <div className="flex justify-between text-xs font-bold">
+                        <span className="text-[#F5F2EA]">Autonomous Flight Core</span>
+                        <span className="font-mono text-[#FFD400]">67%</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-[#050505] rounded-full overflow-hidden">
+                        <div className="h-full bg-[#FFD400] w-[67%] rounded-full" />
+                      </div>
+                      <div className="flex justify-between text-[10px] font-mono text-[#8C8A84] pt-0.5">
+                        <span>Lead: Sarah C.</span>
+                        <span>Sprint #14</span>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 pt-1 text-center font-mono text-xs">
+                      <div className="p-2 rounded-lg bg-[#050505] border border-white/5">
+                        <div className="text-[9px] text-[#8C8A84]">TEAMS</div>
+                        <div className="font-bold text-[#F5F2EA] mt-0.5">14 Synced</div>
+                      </div>
+                      <div className="p-2 rounded-lg bg-[#050505] border border-white/5">
+                        <div className="text-[9px] text-[#8C8A84]">MEMBERS</div>
+                        <div className="font-bold text-[#FF6A16] mt-0.5">12 Online</div>
+                      </div>
+                      <div className="p-2 rounded-lg bg-[#050505] border border-white/5">
+                        <div className="text-[9px] text-[#8C8A84]">HEALTH</div>
+                        <div className="font-bold text-emerald-400 mt-0.5">99.8%</div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="p-2 rounded-lg bg-[#050505] border border-white/5">
-                    <div className="text-[9px] text-[#8C8A84]">HEALTH</div>
-                    <div className="font-bold text-emerald-400 mt-0.5">99.8%</div>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -1121,6 +1350,168 @@ export const LandingPage: React.FC = () => {
                 <CheckCircle2 className="w-5 h-5 text-[#FFD400]" />
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ========================================================
+          SECTION 10.5: CAMPUS ACCESS & AUTHENTICATION PORTAL
+      ======================================================== */}
+      <section id="access-portal" className="py-28 px-6 sm:px-8 border-b border-white/8 bg-[#0D0D0F]">
+        <div className="max-w-6xl mx-auto space-y-12">
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <span className="font-mono text-xs uppercase tracking-widest text-[#FF6A16] font-bold flex items-center justify-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#FF6A16] animate-pulse" />
+              INTEGRATED ACCESS TERMINAL
+            </span>
+            <h2 className="text-3xl sm:text-5xl font-extrabold text-[#F5F2EA] tracking-tight">
+              ENTER THE WORKSPACE
+            </h2>
+            <p className="text-xs sm:text-sm text-[#8C8A84] leading-relaxed">
+              Experience ClubFlow instantly with 1-click role presets, or authenticate with your club credentials.
+            </p>
+          </div>
+
+          {/* 3 Quick Role Demo Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Admin Card */}
+            <div className="p-6 rounded-2xl bg-[#050505] border border-white/10 hover:border-[#FF6A16]/50 transition-all space-y-4 flex flex-col justify-between group">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-[#FF6A16]/10 text-[#FF6A16] border border-[#FF6A16]/20 font-bold">
+                    PRESIDENT
+                  </span>
+                  <span className="font-mono text-xs text-[#8C8A84]">FULL GOVERNANCE</span>
+                </div>
+                <h3 className="text-lg font-bold text-[#F5F2EA]">Club Admin Portal</h3>
+                <p className="text-xs text-[#8C8A84] leading-relaxed">
+                  Manage roster approvals, create initiative charters, and monitor cross-squad velocity telemetry.
+                </p>
+              </div>
+
+              <button
+                onClick={() => fillCredentialsAndLogin('admin@clubflow.local')}
+                className="w-full py-2.5 rounded-xl bg-[#141416] group-hover:bg-[#FF6A16] text-[#F5F2EA] group-hover:text-black font-extrabold text-xs transition-all border border-white/10 group-hover:border-[#FF6A16] flex items-center justify-center gap-2 shadow-md"
+              >
+                <span>Launch as Admin</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Lead Card */}
+            <div className="p-6 rounded-2xl bg-[#050505] border border-white/10 hover:border-[#FFD400]/50 transition-all space-y-4 flex flex-col justify-between group">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-[#FFD400]/10 text-[#FFD400] border border-[#FFD400]/20 font-bold">
+                    SPRINT LEAD
+                  </span>
+                  <span className="font-mono text-xs text-[#8C8A84]">SQUAD COMMAND</span>
+                </div>
+                <h3 className="text-lg font-bold text-[#F5F2EA]">Project Lead Portal</h3>
+                <p className="text-xs text-[#8C8A84] leading-relaxed">
+                  Assign sprint deliverables, manage Kanban column workflows, and verify completed PRs.
+                </p>
+              </div>
+
+              <button
+                onClick={() => fillCredentialsAndLogin('lead.web@clubflow.local')}
+                className="w-full py-2.5 rounded-xl bg-[#141416] group-hover:bg-[#FFD400] text-[#F5F2EA] group-hover:text-black font-extrabold text-xs transition-all border border-white/10 group-hover:border-[#FFD400] flex items-center justify-center gap-2 shadow-md"
+              >
+                <span>Launch as Project Lead</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Member Card */}
+            <div className="p-6 rounded-2xl bg-[#050505] border border-white/10 hover:border-white/30 transition-all space-y-4 flex flex-col justify-between group">
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded bg-white/10 text-white border border-white/20 font-bold">
+                    CONTRIBUTOR
+                  </span>
+                  <span className="font-mono text-xs text-[#8C8A84]">DELIVERABLES</span>
+                </div>
+                <h3 className="text-lg font-bold text-[#F5F2EA]">Member Portal</h3>
+                <p className="text-xs text-[#8C8A84] leading-relaxed">
+                  View assigned tasks, update milestone progress with 1-click status toggles, and collaborate.
+                </p>
+              </div>
+
+              <button
+                onClick={() => fillCredentialsAndLogin('alex.member@clubflow.local')}
+                className="w-full py-2.5 rounded-xl bg-[#141416] group-hover:bg-[#F5F2EA] text-[#F5F2EA] group-hover:text-black font-extrabold text-xs transition-all border border-white/10 group-hover:border-white flex items-center justify-center gap-2 shadow-md"
+              >
+                <span>Launch as Member</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Direct Custom Credentials Form Box */}
+          <div className="max-w-xl mx-auto p-8 rounded-2xl bg-[#050505] border border-white/10 shadow-2xl space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-white/8">
+              <div className="flex items-center gap-2">
+                <Lock className="w-4 h-4 text-[#FF6A16]" />
+                <span className="font-mono text-xs font-bold text-[#F5F2EA]">AUTHENTICATE WITH CREDENTIALS</span>
+              </div>
+              <span className="font-mono text-[10px] text-[#8C8A84]">SESSION ENCRYPTED</span>
+            </div>
+
+            <form onSubmit={handleAuthSubmit} className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8C8A84] mb-1.5">
+                  College Email
+                </label>
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-zinc-500 absolute left-3.5 top-3" />
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="admin@clubflow.local"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-xs bg-[#141416] border border-white/10 rounded-xl text-[#F5F2EA] placeholder:text-zinc-600 focus:outline-none focus:border-[#FF6A16]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-mono uppercase tracking-wider text-[#8C8A84] mb-1.5">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-zinc-500 absolute left-3.5 top-3" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password123!"
+                    className="w-full pl-10 pr-10 py-2.5 text-xs bg-[#141416] border border-white/10 rounded-xl text-[#F5F2EA] placeholder:text-zinc-600 focus:outline-none focus:border-[#FF6A16]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3 rounded-xl bg-[#FF6A16] hover:bg-[#FF9D00] text-black font-extrabold text-xs transition-all shadow-xl hover:shadow-[#FF6A16]/30 flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isLoading ? (
+                  <span className="animate-pulse">Authenticating Session...</span>
+                ) : (
+                  <>
+                    <span>Enter Club Workspace</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </form>
           </div>
         </div>
       </section>

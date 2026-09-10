@@ -33,9 +33,9 @@ const RootRedirect: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <Routes>
-      {/* Public Routes */}
+      {/* Public Routes - Unified Landing & Access */}
       <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/login" element={<LandingPage />} />
 
       {/* Protected Routes Container */}
       <Route element={<ProtectedRoute />}>
