@@ -17,7 +17,7 @@ async function runTests() {
 
   try {
     // Helper fetch wrapper
-    const req = async (path: string, options: any = {}) => {
+    const req = async (path: string, options: any = {}): Promise<{ status: number; data: any }> => {
       const url = `${API_URL}${path}`;
       const res = await fetch(url, {
         ...options,
@@ -26,7 +26,7 @@ async function runTests() {
           ...(options.headers || {}),
         },
       });
-      const data = await res.json().catch(() => null);
+      const data: any = await res.json().catch(() => null);
       return { status: res.status, data };
     };
 

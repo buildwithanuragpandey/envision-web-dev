@@ -6,22 +6,21 @@ import {
   Users,
   Search,
   Plus,
-  Filter,
   Edit2,
   Trash2,
   CheckCircle2,
   XCircle,
   FolderKanban,
   Mail,
-  Building,
 } from 'lucide-react';
 import { Button } from '../components/common/Button';
 import { RoleBadge } from '../components/common/Badge';
 import { Skeleton, EmptyState, ConfirmDialog } from '../components/common/CommonUI';
+import { PageTransition } from '../components/common/PageTransition';
 import { MemberModal } from '../components/members/MemberModal';
 import { format } from 'date-fns';
 import { useToast } from '../context/ToastContext';
-import { User, UserRole } from '../types';
+import { User } from '../types';
 
 export const MembersPage: React.FC = () => {
   const { isAdmin } = useAuth();
@@ -31,7 +30,6 @@ export const MembersPage: React.FC = () => {
   const [roleFilter, setRoleFilter] = useState<string>('');
   const [statusFilter, setStatusFilter] = useState<string>('');
 
-  // Modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<User | null>(null);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
@@ -85,47 +83,51 @@ export const MembersPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <PageTransition>
       {/* Header */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-zinc-200/80">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">Club Directory</h2>
-          <p className="text-xs text-slate-500 mt-1">
+          <span className="font-mono text-xs uppercase tracking-widest text-zinc-400">
+            Community & Team
+          </span>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight mt-1">
+            Club Directory
+          </h1>
+          <p className="text-xs text-zinc-500 mt-1">
             Browse members, manage permissions, assign roles, and view organizational involvement.
           </p>
         </div>
+
         {isAdmin && (
           <Button
             variant="primary"
-            size="md"
+            size="sm"
             onClick={() => setIsAddModalOpen(true)}
-            leftIcon={<Plus className="w-4 h-4" />}
+            leftIcon={<Plus className="w-3.5 h-3.5" />}
           >
             Add Member
           </Button>
         )}
       </div>
 
-      {/* Search & Filters */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-subtle flex flex-col md:flex-row items-center justify-between gap-4">
+      {/* Search & Filter Bar */}
+      <div className="bg-white p-3.5 rounded-2xl border border-zinc-200/80 shadow-subtle flex flex-col md:flex-row items-center justify-between gap-3">
         <div className="flex flex-1 items-center gap-3 w-full">
-          {/* Search */}
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3.5 top-3" />
             <input
               type="text"
               placeholder="Search members by name, email, or department..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+              className="w-full pl-9 pr-3.5 py-1.5 text-xs bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus-ring"
             />
           </div>
 
-          {/* Role Filter */}
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none bg-white font-medium text-slate-700"
+            className="px-3 py-1.5 text-xs border border-zinc-200 rounded-xl bg-zinc-50 font-medium text-zinc-700 outline-none"
           >
             <option value="">All Roles</option>
             <option value="ADMIN">Admin</option>
@@ -133,11 +135,10 @@ export const MembersPage: React.FC = () => {
             <option value="MEMBER">Member</option>
           </select>
 
-          {/* Status Filter */}
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none bg-white font-medium text-slate-700"
+            className="px-3 py-1.5 text-xs border border-zinc-200 rounded-xl bg-zinc-50 font-medium text-zinc-700 outline-none"
           >
             <option value="">All Statuses</option>
             <option value="active">Active</option>
@@ -148,23 +149,23 @@ export const MembersPage: React.FC = () => {
 
       {/* Members Table */}
       {isLoading ? (
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {[1, 2, 3, 4, 5].map((i) => (
             <Skeleton key={i} className="h-16 rounded-xl" />
           ))}
         </div>
       ) : !users || users.length === 0 ? (
         <EmptyState
-          icon={<Users className="w-8 h-8 text-slate-400" />}
+          icon={<Users className="w-6 h-6 text-zinc-400" />}
           title="No members found"
-          description="Try modifying your search criteria or add a new member."
+          description="Adjust your search criteria or enroll a new contributor."
           action={
             isAdmin ? (
               <Button
                 variant="primary"
                 size="sm"
                 onClick={() => setIsAddModalOpen(true)}
-                leftIcon={<Plus className="w-4 h-4" />}
+                leftIcon={<Plus className="w-3.5 h-3.5" />}
               >
                 Add Member
               </Button>
@@ -172,10 +173,10 @@ export const MembersPage: React.FC = () => {
           }
         />
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-subtle overflow-hidden">
+        <div className="bg-white rounded-2xl border border-zinc-200/80 shadow-subtle overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-semibold border-b border-slate-200">
+              <thead className="bg-zinc-50 text-zinc-500 uppercase text-[10px] font-mono border-b border-zinc-200/80">
                 <tr>
                   <th className="py-3 px-4">Member</th>
                   <th className="py-3 px-4">Role</th>
@@ -186,87 +187,80 @@ export const MembersPage: React.FC = () => {
                   {isAdmin && <th className="py-3 px-4 text-right">Actions</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-zinc-100">
                 {users.map((u) => (
-                  <tr key={u.id} className="hover:bg-slate-50/60 transition-colors">
-                    {/* User Card */}
-                    <td className="py-3.5 px-4">
+                  <tr key={u.id} className="hover:bg-zinc-50/60 transition-colors group">
+                    <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <img
                           src={
                             u.avatar ||
                             `https://ui-avatars.com/api/?name=${encodeURIComponent(
                               u.name
-                            )}&background=10b981&color=fff`
+                            )}&background=18181b&color=fff`
                           }
                           alt={u.name}
-                          className="w-9 h-9 rounded-full object-cover ring-1 ring-slate-200"
+                          className="w-8 h-8 rounded-lg object-cover ring-1 ring-zinc-200 shrink-0 group-hover:scale-105 transition-transform"
                         />
                         <div className="min-w-0">
-                          <p className="font-bold text-slate-900 text-xs truncate">{u.name}</p>
-                          <p className="text-[11px] text-slate-500 truncate flex items-center gap-1">
-                            <Mail className="w-3 h-3 text-slate-400" />
+                          <p className="font-bold text-zinc-900 text-xs truncate">{u.name}</p>
+                          <p className="text-[11px] text-zinc-400 truncate flex items-center gap-1 font-mono">
+                            <Mail className="w-3 h-3 text-zinc-400" />
                             {u.email}
                           </p>
                         </div>
                       </div>
                     </td>
 
-                    {/* Role */}
-                    <td className="py-3.5 px-4">
+                    <td className="py-3 px-4">
                       <RoleBadge role={u.role} size="sm" />
                     </td>
 
-                    {/* Department & Year */}
-                    <td className="py-3.5 px-4">
-                      <span className="font-medium text-slate-800 block">
+                    <td className="py-3 px-4">
+                      <span className="font-medium text-zinc-800 block">
                         {u.department || 'General'}
                       </span>
-                      <span className="text-[11px] text-slate-400">{u.year || 'Member'}</span>
+                      <span className="text-[11px] text-zinc-400 font-mono">{u.year || 'Member'}</span>
                     </td>
 
-                    {/* Projects Count */}
-                    <td className="py-3.5 px-4 font-semibold text-slate-700">
-                      <span className="inline-flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded-md text-[11px]">
-                        <FolderKanban className="w-3 h-3 text-slate-500" />
-                        {u._count?.projectMembers || 0} projects
+                    <td className="py-3 px-4 font-semibold text-zinc-700">
+                      <span className="inline-flex items-center gap-1 bg-zinc-100 px-2 py-0.5 rounded text-[11px] font-mono">
+                        <FolderKanban className="w-3 h-3 text-zinc-500" />
+                        {u._count?.projectMembers || 0} squads
                       </span>
                     </td>
 
-                    {/* Status */}
-                    <td className="py-3.5 px-4">
+                    <td className="py-3 px-4">
                       {u.isActive ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
                           <CheckCircle2 className="w-3 h-3" />
                           Active
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
-                          <XCircle className="w-3 h-3 text-slate-400" />
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded-full border border-zinc-200">
+                          <XCircle className="w-3 h-3 text-zinc-400" />
                           Inactive
                         </span>
                       )}
                     </td>
 
-                    {/* Joined Date */}
-                    <td className="py-3.5 px-4 text-slate-500">
+                    <td className="py-3 px-4 text-zinc-400 font-mono text-[11px]">
                       {format(new Date(u.createdAt), 'MMM dd, yyyy')}
                     </td>
 
-                    {/* Actions */}
                     {isAdmin && (
-                      <td className="py-3.5 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1">
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => setEditingMember(u)}
-                            className="p-1.5 text-slate-400 hover:text-slate-700 rounded hover:bg-slate-100 transition-colors"
+                            className="p-1.5 text-zinc-400 hover:text-zinc-800 rounded hover:bg-zinc-100 transition-colors"
                             title="Edit Member"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => setDeletingUserId(u.id)}
-                            className="p-1.5 text-slate-400 hover:text-rose-600 rounded hover:bg-rose-50 transition-colors"
+                            className="p-1.5 text-zinc-400 hover:text-rose-600 rounded hover:bg-rose-50 transition-colors"
                             title="Delete Member"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -307,6 +301,6 @@ export const MembersPage: React.FC = () => {
         confirmText="Delete Account"
         variant="danger"
       />
-    </div>
+    </PageTransition>
   );
 };

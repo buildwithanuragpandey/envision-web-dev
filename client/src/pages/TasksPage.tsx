@@ -13,11 +13,11 @@ import {
   Clock,
   Edit2,
   Trash2,
-  AlertCircle,
 } from 'lucide-react';
 import { Button } from '../components/common/Button';
 import { PriorityBadge, StatusBadge } from '../components/common/Badge';
 import { Skeleton, EmptyState, ConfirmDialog } from '../components/common/CommonUI';
+import { PageTransition } from '../components/common/PageTransition';
 import { KanbanBoard } from '../components/tasks/KanbanBoard';
 import { TaskModal } from '../components/tasks/TaskModal';
 import { format } from 'date-fns';
@@ -41,7 +41,6 @@ export const TasksPage: React.FC = () => {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
 
-  // Fetch projects for filter dropdown
   const { data: projects } = useQuery({
     queryKey: ['projects-list'],
     queryFn: async () => {
@@ -50,7 +49,6 @@ export const TasksPage: React.FC = () => {
     },
   });
 
-  // Fetch tasks
   const { data: tasks, isLoading, refetch } = useQuery({
     queryKey: ['tasks', search, projectIdFilter, priorityFilter, statusFilter, dueFilter, assignedToMe],
     queryFn: async () => {
@@ -69,7 +67,7 @@ export const TasksPage: React.FC = () => {
   const handleCreateTask = async (formData: any) => {
     try {
       await taskApi.createTask(formData);
-      success('Task Created', `Task "${formData.title}" created successfully.`);
+      success('Task Created', `Task "${formData.title}" created.`);
       refetch();
     } catch (err: any) {
       error('Creation Failed', err.response?.data?.error || 'Failed to create task');
@@ -115,76 +113,80 @@ export const TasksPage: React.FC = () => {
   const canManage = isAdmin || isProjectLead;
 
   return (
-    <div className="space-y-6">
+    <PageTransition>
       {/* Header */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-zinc-200/80">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">Task Center</h2>
-          <p className="text-xs text-slate-500 mt-1">
-            Track individual work items, priorities, deadlines, and status across club initiatives.
+          <span className="font-mono text-xs uppercase tracking-widest text-zinc-400">
+            Sprint Execution
+          </span>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight mt-1">
+            Task Center
+          </h1>
+          <p className="text-xs text-zinc-500 mt-1">
+            Real-time deliverable tracking, priority queues, and sprint statuses.
           </p>
         </div>
+
         {canManage && (
           <Button
             variant="primary"
-            size="md"
+            size="sm"
             onClick={() => setIsCreateModalOpen(true)}
-            leftIcon={<Plus className="w-4 h-4" />}
+            leftIcon={<Plus className="w-3.5 h-3.5" />}
           >
             Create Task
           </Button>
         )}
       </div>
 
-      {/* Filter Controls Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-subtle space-y-3">
+      {/* Filter Strip */}
+      <div className="bg-white p-3.5 rounded-2xl border border-zinc-200/80 shadow-subtle space-y-3">
         <div className="flex flex-col md:flex-row items-center justify-between gap-3">
-          {/* Search Input */}
           <div className="relative flex-1 w-full">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
+            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3.5 top-3" />
             <input
               type="text"
-              placeholder="Search tasks by title or details..."
+              placeholder="Search tasks..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-3.5 py-2 text-sm border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none"
+              className="w-full pl-9 pr-3.5 py-1.5 text-xs bg-zinc-50 border border-zinc-200 rounded-xl text-zinc-900 placeholder:text-zinc-400 focus-ring"
             />
           </div>
 
           {/* View Switcher */}
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl self-end md:self-auto">
+          <div className="flex items-center gap-1 bg-zinc-100 p-1 rounded-xl self-end md:self-auto">
             <button
               onClick={() => setViewMode('board')}
               className={`p-1.5 rounded-lg text-xs font-semibold transition-all ${
                 viewMode === 'board'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-900'
+                  ? 'bg-white text-zinc-900 shadow-2xs'
+                  : 'text-zinc-400 hover:text-zinc-700'
               }`}
               title="Kanban Board View"
             >
-              <LayoutGrid className="w-4 h-4" />
+              <LayoutGrid className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => setViewMode('table')}
               className={`p-1.5 rounded-lg text-xs font-semibold transition-all ${
                 viewMode === 'table'
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-900'
+                  ? 'bg-white text-zinc-900 shadow-2xs'
+                  : 'text-zinc-400 hover:text-zinc-700'
               }`}
               title="Table View"
             >
-              <List className="w-4 h-4" />
+              <List className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
 
-        {/* Filters Row */}
-        <div className="flex flex-wrap items-center gap-2.5 pt-2 border-t border-slate-100 text-xs">
-          {/* Project Filter */}
+        {/* Filter Pills */}
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-zinc-100 text-xs">
           <select
             value={projectIdFilter}
             onChange={(e) => setProjectIdFilter(e.target.value)}
-            className="px-3 py-1.5 border border-slate-300 rounded-lg outline-none bg-white font-medium text-slate-700"
+            className="px-2.5 py-1 text-xs border border-zinc-200 rounded-xl bg-zinc-50 font-medium text-zinc-700 outline-none"
           >
             <option value="">All Projects</option>
             {projects?.map((p) => (
@@ -194,11 +196,10 @@ export const TasksPage: React.FC = () => {
             ))}
           </select>
 
-          {/* Priority Filter */}
           <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
-            className="px-3 py-1.5 border border-slate-300 rounded-lg outline-none bg-white font-medium text-slate-700"
+            className="px-2.5 py-1 text-xs border border-zinc-200 rounded-xl bg-zinc-50 font-medium text-zinc-700 outline-none"
           >
             <option value="">All Priorities</option>
             <option value="URGENT">Urgent</option>
@@ -207,11 +208,10 @@ export const TasksPage: React.FC = () => {
             <option value="LOW">Low</option>
           </select>
 
-          {/* Status Filter */}
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-1.5 border border-slate-300 rounded-lg outline-none bg-white font-medium text-slate-700"
+            className="px-2.5 py-1 text-xs border border-zinc-200 rounded-xl bg-zinc-50 font-medium text-zinc-700 outline-none"
           >
             <option value="">All Statuses</option>
             <option value="TODO">To Do</option>
@@ -219,11 +219,10 @@ export const TasksPage: React.FC = () => {
             <option value="COMPLETED">Completed</option>
           </select>
 
-          {/* Due Filter */}
           <select
             value={dueFilter}
             onChange={(e) => setDueFilter(e.target.value)}
-            className="px-3 py-1.5 border border-slate-300 rounded-lg outline-none bg-white font-medium text-slate-700"
+            className="px-2.5 py-1 text-xs border border-zinc-200 rounded-xl bg-zinc-50 font-medium text-zinc-700 outline-none"
           >
             <option value="">Any Deadline</option>
             <option value="overdue">Overdue</option>
@@ -231,38 +230,37 @@ export const TasksPage: React.FC = () => {
             <option value="upcoming">Upcoming</option>
           </select>
 
-          {/* Assigned To Me Toggle */}
-          <label className="flex items-center gap-2 px-3 py-1.5 border border-slate-300 rounded-lg cursor-pointer bg-white hover:bg-slate-50 transition-colors font-medium text-slate-700">
+          <label className="flex items-center gap-1.5 px-2.5 py-1 border border-zinc-200 rounded-xl cursor-pointer bg-zinc-50 hover:bg-zinc-100 transition-colors font-medium text-zinc-700 text-xs">
             <input
               type="checkbox"
               checked={assignedToMe}
               onChange={(e) => setAssignedToMe(e.target.checked)}
-              className="rounded text-brand-600 focus:ring-brand-500 w-3.5 h-3.5"
+              className="rounded text-zinc-900 focus:ring-zinc-500 w-3 h-3"
             />
             <span>Assigned to me</span>
           </label>
         </div>
       </div>
 
-      {/* Main Task Content */}
+      {/* Main Content */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           <Skeleton className="h-96 rounded-2xl" />
           <Skeleton className="h-96 rounded-2xl" />
           <Skeleton className="h-96 rounded-2xl" />
         </div>
       ) : !tasks || tasks.length === 0 ? (
         <EmptyState
-          icon={<CheckSquare className="w-8 h-8 text-slate-400" />}
+          icon={<CheckSquare className="w-6 h-6 text-zinc-400" />}
           title="No tasks match the criteria"
-          description="Adjust your search filters or create a new task."
+          description="Adjust your search filters or dispatch a new task."
           action={
             canManage ? (
               <Button
                 variant="primary"
                 size="sm"
                 onClick={() => setIsCreateModalOpen(true)}
-                leftIcon={<Plus className="w-4 h-4" />}
+                leftIcon={<Plus className="w-3.5 h-3.5" />}
               >
                 Create Task
               </Button>
@@ -278,11 +276,10 @@ export const TasksPage: React.FC = () => {
           canManageTasks={canManage}
         />
       ) : (
-        /* Table View */
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-subtle overflow-hidden">
+        <div className="bg-white rounded-2xl border border-zinc-200/80 shadow-subtle overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-semibold border-b border-slate-200">
+              <thead className="bg-zinc-50 text-zinc-500 uppercase text-[10px] font-mono border-b border-zinc-200/80">
                 <tr>
                   <th className="py-3 px-4">Task</th>
                   <th className="py-3 px-4">Project</th>
@@ -293,19 +290,19 @@ export const TasksPage: React.FC = () => {
                   {canManage && <th className="py-3 px-4 text-right">Actions</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-zinc-100">
                 {tasks.map((t) => (
-                  <tr key={t.id} className="hover:bg-slate-50/60">
-                    <td className="py-3 px-4 font-semibold text-slate-900">
+                  <tr key={t.id} className="hover:bg-zinc-50/60">
+                    <td className="py-3 px-4 font-semibold text-zinc-900">
                       {t.title}
                       {t.description && (
-                        <span className="block text-[11px] font-normal text-slate-500 line-clamp-1">
+                        <span className="block text-[11px] font-normal text-zinc-500 line-clamp-1">
                           {t.description}
                         </span>
                       )}
                     </td>
-                    <td className="py-3 px-4 font-medium text-slate-700">
-                      <span className="bg-slate-100 px-2 py-0.5 rounded text-[11px]">
+                    <td className="py-3 px-4 font-medium text-zinc-700">
+                      <span className="bg-zinc-100 px-2 py-0.5 rounded text-[11px] font-mono">
                         {t.project?.name || 'Project'}
                       </span>
                     </td>
@@ -316,12 +313,12 @@ export const TasksPage: React.FC = () => {
                             t.assignedTo?.avatar ||
                             `https://ui-avatars.com/api/?name=${encodeURIComponent(
                               t.assignedTo?.name || 'U'
-                            )}&background=10b981&color=fff`
+                            )}&background=18181b&color=fff`
                           }
                           alt={t.assignedTo?.name || 'U'}
-                          className="w-6 h-6 rounded-full object-cover"
+                          className="w-5 h-5 rounded-full object-cover"
                         />
-                        <span className="font-medium text-slate-700">
+                        <span className="font-medium text-zinc-700">
                           {t.assignedTo?.name || 'Unassigned'}
                         </span>
                       </div>
@@ -329,15 +326,15 @@ export const TasksPage: React.FC = () => {
                     <td className="py-3 px-4">
                       <PriorityBadge priority={t.priority} size="sm" />
                     </td>
-                    <td className="py-3 px-4">
+                    <td className="py-3 px-4 font-mono text-[11px]">
                       {t.deadline ? (
                         <span
-                          className={`font-medium ${
+                          className={`font-semibold ${
                             t.isOverdue
-                              ? 'text-rose-600 font-bold'
+                              ? 'text-rose-600'
                               : t.isDueToday
-                              ? 'text-amber-600 font-bold'
-                              : 'text-slate-600'
+                              ? 'text-amber-600'
+                              : 'text-zinc-600'
                           }`}
                         >
                           {format(new Date(t.deadline), 'MMM dd, yyyy')}
@@ -345,7 +342,7 @@ export const TasksPage: React.FC = () => {
                           {t.isDueToday && ' (Today)'}
                         </span>
                       ) : (
-                        <span className="text-slate-400">-</span>
+                        <span className="text-zinc-400">-</span>
                       )}
                     </td>
                     <td className="py-3 px-4">
@@ -353,12 +350,12 @@ export const TasksPage: React.FC = () => {
                         value={t.status}
                         onChange={(e) => handleUpdateStatus(t.id, e.target.value as TaskStatus)}
                         disabled={!canManage && t.assignedToId !== user?.id}
-                        className={`px-2.5 py-1 rounded-md text-xs font-semibold border outline-none cursor-pointer ${
+                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold border outline-none cursor-pointer ${
                           t.status === 'COMPLETED'
                             ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
                             : t.status === 'IN_PROGRESS'
                             ? 'bg-blue-50 text-blue-700 border-blue-300'
-                            : 'bg-amber-50 text-amber-700 border-amber-300'
+                            : 'bg-zinc-100 text-zinc-700 border-zinc-300'
                         }`}
                       >
                         <option value="TODO">To Do</option>
@@ -371,13 +368,13 @@ export const TasksPage: React.FC = () => {
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => setEditingTask(t)}
-                            className="p-1.5 text-slate-400 hover:text-slate-700 rounded hover:bg-slate-100"
+                            className="p-1.5 text-zinc-400 hover:text-zinc-700 rounded hover:bg-zinc-100"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => setDeletingTaskId(t.id)}
-                            className="p-1.5 text-slate-400 hover:text-rose-600 rounded hover:bg-rose-50"
+                            className="p-1.5 text-zinc-400 hover:text-rose-600 rounded hover:bg-rose-50"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -417,6 +414,6 @@ export const TasksPage: React.FC = () => {
         confirmText="Delete Task"
         variant="danger"
       />
-    </div>
+    </PageTransition>
   );
 };
