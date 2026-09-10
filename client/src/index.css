@@ -22,6 +22,21 @@
   }
 }
 
+@layer components {
+  /* Layered subtle borders & surfaces */
+  .surface-card {
+    @apply bg-white border border-zinc-200/80 shadow-subtle transition-all duration-200;
+  }
+  .surface-card:hover {
+    @apply border-zinc-300 shadow-premium;
+  }
+
+  /* Subtle focus rings */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all;
+  }
+}
+
 /* Linear-grade ultra-clean scrollbars */
 ::-webkit-scrollbar {
   width: 5px;
@@ -64,17 +79,4 @@
   .animate-marquee-fast {
     animation: none !important;
   }
-}
-
-/* Layered subtle borders & surfaces */
-.surface-card {
-  @apply bg-white border border-zinc-200/80 shadow-subtle transition-all duration-200;
-}
-.surface-card:hover {
-  @apply border-zinc-300 shadow-premium;
-}
-
-/* Subtle focus rings */
-.focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all;
 }
