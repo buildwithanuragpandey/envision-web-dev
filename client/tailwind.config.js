@@ -8,45 +8,45 @@ export default {
   theme: {
     extend: {
       colors: {
+        obsidian: '#050505',
+        charcoal: '#0D0D0F',
+        surface: {
+          DEFAULT: '#141416',
+          50: '#F5F2EA',
+          100: '#E6E4DC',
+          200: '#2A2A2E',
+          700: '#1C1C20',
+          800: '#141416',
+          900: '#0D0D0F',
+          950: '#050505',
+        },
         brand: {
-          50: '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          300: '#fdba74',
-          400: '#ff8540',
-          500: '#FF6814', // Primary Brand Orange
-          600: '#ea580c',
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
-          950: '#431407',
+          DEFAULT: '#FF6A16',
+          orange: '#FF6A16',
+          amber: '#FF9D00',
+          yellow: '#FFD400',
+          50: '#FFF7ED',
+          100: '#FFEDD5',
+          200: '#FED7AA',
+          300: '#FDBA74',
+          400: '#FF8540',
+          500: '#FF6A16',
+          600: '#EA580C',
+          700: '#C2410C',
+          800: '#9A3412',
+          900: '#7C2D12',
         },
         accent: {
-          300: '#fff080',
-          400: '#ffe640',
-          500: '#FFDD00', // Primary Brand Yellow
-          600: '#e6c700',
-          700: '#bfa500',
+          amber: '#FF9D00',
+          yellow: '#FFD400',
+          500: '#FFD400',
         },
-        surface: {
-          50: '#fbfbfb',
-          100: '#f4f4f5',
-          200: '#27272a',
-          700: '#16161a',
-          800: '#111114', // Muted dark surface
-          900: '#0A0A0C', // Secondary dark surface
-          950: '#030304', // Main background
-        },
+        warm: '#F5F2EA',
+        muted: '#8C8A84',
         border: {
           DEFAULT: 'rgba(255, 255, 255, 0.08)',
           subtle: 'rgba(255, 255, 255, 0.05)',
-          hover: 'rgba(255, 104, 20, 0.28)',
-          glow: 'rgba(255, 221, 0, 0.3)',
-        },
-        text: {
-          primary: '#F5F5F0',
-          secondary: '#A1A1A1',
-          muted: '#686868',
+          glow: 'rgba(255, 106, 22, 0.4)',
         },
       },
       borderRadius: {
@@ -62,19 +62,21 @@ export default {
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
-        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.5)',
-        'premium': '0 4px 20px -2px rgba(0, 0, 0, 0.7), 0 0 1px 1px rgba(255, 255, 255, 0.05)',
-        'glow-orange': '0 0 30px rgba(255, 104, 20, 0.14)',
-        'glow-yellow': '0 0 25px rgba(255, 221, 0, 0.12)',
-        'elevated': '0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(255, 255, 255, 0.06)',
-        'dropdown': '0 16px 40px -4px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.08)',
+        'subtle': '0 1px 3px 0 rgba(0, 0, 0, 0.6)',
+        'premium': '0 8px 30px -4px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(255, 255, 255, 0.06)',
+        'glow-orange': '0 0 25px rgba(255, 106, 22, 0.25)',
+        'glow-amber': '0 0 25px rgba(255, 157, 0, 0.2)',
+        'glow-yellow': '0 0 25px rgba(255, 212, 0, 0.2)',
+        'dropdown': '0 20px 40px -4px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.08)',
       },
       animation: {
-        'marquee': 'marquee 35s linear infinite',
-        'marquee-reverse': 'marquee-reverse 35s linear infinite',
-        'marquee-fast': 'marquee 20s linear infinite',
+        'marquee': 'marquee 40s linear infinite',
+        'marquee-reverse': 'marquee-reverse 40s linear infinite',
+        'marquee-fast': 'marquee 22s linear infinite',
         'pulse-subtle': 'pulseSubtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'shimmer': 'shimmer 2s infinite',
+        'travel-border': 'travelBorder 6s linear infinite',
+        'slow-pan': 'slowPan 18s ease-in-out infinite alternate',
       },
       keyframes: {
         marquee: {
@@ -87,10 +89,14 @@ export default {
         },
         pulseSubtle: {
           '0%, 100%': { opacity: '1' },
-          '50%': { opacity: '0.6' },
+          '50%': { opacity: '0.5' },
         },
         shimmer: {
           '100%': { transform: 'translateX(100%)' },
+        },
+        slowPan: {
+          '0%': { transform: 'scale(1) translate(0, 0)' },
+          '100%': { transform: 'scale(1.04) translate(-1%, -1%)' },
         },
       },
     },

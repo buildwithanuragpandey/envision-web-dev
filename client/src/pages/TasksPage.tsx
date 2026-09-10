@@ -123,14 +123,14 @@ export const TasksPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-white/8">
         <div>
-          <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">
-            SPRINT EXECUTION
+          <span className="font-mono text-[10px] uppercase tracking-wider text-[#FF6A16] font-bold">
+            SPRINT EXECUTION • WORKSPACE
           </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F5F5F0] tracking-tight mt-1.5">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F5F2EA] tracking-tight mt-1.5">
             Deliverables & Task Board
           </h1>
-          <p className="text-xs text-zinc-400 mt-1">
-            Kanban workflow, urgency priorities, and milestone deadline tracking.
+          <p className="text-xs text-[#8C8A84] mt-1">
+            Interactive Kanban workflow, priority tracking, and milestone deadline management.
           </p>
         </div>
 
@@ -147,27 +147,27 @@ export const TasksPage: React.FC = () => {
       </div>
 
       {/* Filter Strip */}
-      <div className="bg-[#0A0A0C] p-3 rounded-lg border border-white/8 shadow-subtle space-y-3">
+      <div className="bg-[#0D0D0F] p-4 rounded-xl border border-white/8 shadow-subtle space-y-3">
         <div className="flex flex-col md:flex-row items-center justify-between gap-3">
           <div className="relative flex-1 w-full">
-            <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3.5 top-3" />
+            <Search className="w-3.5 h-3.5 text-[#8C8A84] absolute left-3.5 top-3" />
             <input
               type="text"
               placeholder="Search deliverables by keyword..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3.5 py-1.5 text-xs bg-[#111114] border border-white/8 rounded-lg text-[#F5F5F0] placeholder:text-zinc-500 focus-ring"
+              className="w-full pl-9 pr-3.5 py-1.5 text-xs bg-[#141416] border border-white/8 rounded-lg text-[#F5F2EA] placeholder:text-[#8C8A84] focus-ring"
             />
           </div>
 
           {/* View Switcher */}
-          <div className="flex items-center gap-1 bg-[#111114] p-1 rounded-lg self-end md:self-auto border border-white/5">
+          <div className="flex items-center gap-1 bg-[#141416] p-1 rounded-lg self-end md:self-auto border border-white/5">
             <button
               onClick={() => setViewMode('board')}
               className={`p-1.5 rounded-md text-xs font-semibold transition-all ${
                 viewMode === 'board'
-                  ? 'bg-[#16161A] text-[#FF6814] shadow-sm'
-                  : 'text-zinc-500 hover:text-zinc-300'
+                  ? 'bg-[#1C1C20] text-[#FF6A16] shadow-sm'
+                  : 'text-[#8C8A84] hover:text-[#F5F2EA]'
               }`}
               title="Kanban Board View"
             >
@@ -177,8 +177,8 @@ export const TasksPage: React.FC = () => {
               onClick={() => setViewMode('table')}
               className={`p-1.5 rounded-md text-xs font-semibold transition-all ${
                 viewMode === 'table'
-                  ? 'bg-[#16161A] text-[#FF6814] shadow-sm'
-                  : 'text-zinc-500 hover:text-zinc-300'
+                  ? 'bg-[#1C1C20] text-[#FF6A16] shadow-sm'
+                  : 'text-[#8C8A84] hover:text-[#F5F2EA]'
               }`}
               title="Table View"
             >
@@ -192,7 +192,7 @@ export const TasksPage: React.FC = () => {
           <select
             value={projectIdFilter}
             onChange={(e) => setProjectIdFilter(e.target.value)}
-            className="px-2.5 py-1 text-xs border border-white/8 rounded-lg bg-[#111114] font-medium text-zinc-300 outline-none"
+            className="px-2.5 py-1 text-xs border border-white/8 rounded-lg bg-[#141416] font-medium text-[#F5F2EA] outline-none"
           >
             <option value="">All Projects</option>
             {projects?.map((p) => (
@@ -205,7 +205,7 @@ export const TasksPage: React.FC = () => {
           <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
-            className="px-2.5 py-1 text-xs border border-white/8 rounded-lg bg-[#111114] font-medium text-zinc-300 outline-none"
+            className="px-2.5 py-1 text-xs border border-white/8 rounded-lg bg-[#141416] font-medium text-[#F5F2EA] outline-none"
           >
             <option value="">All Priorities</option>
             <option value="URGENT">Urgent</option>
@@ -217,7 +217,7 @@ export const TasksPage: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-2.5 py-1 text-xs border border-white/8 rounded-lg bg-[#111114] font-medium text-zinc-300 outline-none"
+            className="px-2.5 py-1 text-xs border border-white/8 rounded-lg bg-[#141416] font-medium text-[#F5F2EA] outline-none"
           >
             <option value="">All Statuses</option>
             <option value="TODO">To Do</option>
@@ -228,7 +228,7 @@ export const TasksPage: React.FC = () => {
           <select
             value={dueFilter}
             onChange={(e) => setDueFilter(e.target.value)}
-            className="px-2.5 py-1 text-xs border border-white/8 rounded-lg bg-[#111114] font-medium text-zinc-300 outline-none"
+            className="px-2.5 py-1 text-xs border border-white/8 rounded-lg bg-[#141416] font-medium text-[#F5F2EA] outline-none"
           >
             <option value="">Any Deadline</option>
             <option value="overdue">Overdue</option>
@@ -236,12 +236,12 @@ export const TasksPage: React.FC = () => {
             <option value="upcoming">Upcoming</option>
           </select>
 
-          <label className="flex items-center gap-1.5 px-2.5 py-1 border border-white/8 rounded-lg cursor-pointer bg-[#111114] hover:bg-[#16161A] transition-colors font-medium text-zinc-300 text-xs">
+          <label className="flex items-center gap-1.5 px-2.5 py-1 border border-white/8 rounded-lg cursor-pointer bg-[#141416] hover:bg-[#1C1C20] transition-colors font-medium text-[#F5F2EA] text-xs">
             <input
               type="checkbox"
               checked={assignedToMe}
               onChange={(e) => setAssignedToMe(e.target.checked)}
-              className="rounded text-[#FF6814] focus:ring-[#FF6814] w-3 h-3 bg-[#0A0A0C]"
+              className="rounded text-[#FF6A16] focus:ring-[#FF6A16] w-3 h-3 bg-[#050505]"
             />
             <span>Assigned to me</span>
           </label>
@@ -283,10 +283,10 @@ export const TasksPage: React.FC = () => {
           canManageTasks={canManage}
         />
       ) : (
-        <div className="bg-[#0A0A0C] rounded-lg border border-white/8 shadow-subtle overflow-hidden">
+        <div className="bg-[#0D0D0F] rounded-xl border border-white/8 shadow-subtle overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#050506] text-zinc-400 uppercase text-[10px] font-mono border-b border-white/8">
+              <thead className="bg-[#050505] text-[#8C8A84] uppercase text-[10px] font-mono border-b border-white/8">
                 <tr>
                   <th className="py-3 px-4">Task</th>
                   <th className="py-3 px-4">Project</th>
@@ -304,25 +304,25 @@ export const TasksPage: React.FC = () => {
                     <tr
                       key={t.id}
                       onClick={() => setInspectingTask(t)}
-                      className="hover:bg-[#111114]/60 cursor-pointer"
+                      className="hover:bg-[#141416]/60 cursor-pointer transition-colors"
                     >
-                      <td className="py-3 px-4 font-medium text-[#F5F5F0]">
+                      <td className="py-3 px-4 font-semibold text-[#F5F2EA]">
                         {t.title}
                         {t.description && (
-                          <span className="block text-[11px] font-normal text-zinc-500 line-clamp-1">
+                          <span className="block text-[11px] font-normal text-[#8C8A84] line-clamp-1">
                             {t.description}
                           </span>
                         )}
                       </td>
-                      <td className="py-3 px-4 font-medium text-zinc-300">
-                        <span className="bg-[#111114] border border-white/5 px-2 py-0.5 rounded text-[11px] font-mono">
+                      <td className="py-3 px-4 font-medium text-[#F5F2EA]">
+                        <span className="bg-[#141416] border border-white/5 px-2 py-0.5 rounded text-[11px] font-mono">
                           {t.project?.name || 'Project'}
                         </span>
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
                           <Avatar name={t.assignedTo?.name} size="xs" />
-                          <span className="text-zinc-300">
+                          <span className="text-[#F5F2EA]">
                             {t.assignedTo?.name || 'Unassigned'}
                           </span>
                         </div>
@@ -337,8 +337,8 @@ export const TasksPage: React.FC = () => {
                               deadlineInfo.isOverdue
                                 ? 'text-rose-400'
                                 : deadlineInfo.isUrgent
-                                ? 'text-[#FFDD00]'
-                                : 'text-zinc-400'
+                                ? 'text-[#FFD400]'
+                                : 'text-[#8C8A84]'
                             }`}
                           >
                             {deadlineInfo.text}
@@ -352,7 +352,7 @@ export const TasksPage: React.FC = () => {
                           value={t.status}
                           onChange={(e) => handleUpdateStatus(t.id, e.target.value as TaskStatus)}
                           disabled={!canManage && t.assignedToId !== user?.id}
-                          className="px-2.5 py-1 rounded-lg text-xs font-semibold border border-white/10 bg-[#111114] text-zinc-300 outline-none cursor-pointer"
+                          className="px-2.5 py-1 rounded-lg text-xs font-semibold border border-white/10 bg-[#141416] text-[#F5F2EA] outline-none cursor-pointer"
                         >
                           <option value="TODO">To Do</option>
                           <option value="IN_PROGRESS">In Progress</option>
@@ -365,14 +365,14 @@ export const TasksPage: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => setEditingTask(t)}
-                              className="p-1.5 text-zinc-500 hover:text-white rounded hover:bg-[#16161A]"
+                              className="p-1.5 text-[#8C8A84] hover:text-[#F5F2EA] rounded hover:bg-[#141416]"
                             >
                               <Edit2 className="w-3.5 h-3.5" />
                             </button>
                             <button
                               type="button"
                               onClick={() => setDeletingTaskId(t.id)}
-                              className="p-1.5 text-zinc-500 hover:text-rose-400 rounded hover:bg-rose-950/40"
+                              className="p-1.5 text-[#8C8A84] hover:text-rose-400 rounded hover:bg-rose-950/40"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
