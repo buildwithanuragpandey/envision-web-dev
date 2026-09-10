@@ -51,18 +51,26 @@ export const LandingPage: React.FC = () => {
 
   // Target dashboard destination if authenticated
   const getDestination = () => {
-    if (!isAuthenticated) return '#access';
     if (role === 'ADMIN') return '/admin/dashboard';
     if (role === 'PROJECT_LEAD') return '/lead/dashboard';
     return '/member/dashboard';
   };
 
-  const handleCtaClick = () => {
+  // Automatically navigate once user is logged in
+  useEffect(() => {
+    if (isAuthenticated && role) {
+      if (role === 'ADMIN') navigate('/admin/dashboard', { replace: true });
+      else if (role === 'PROJECT_LEAD') navigate('/lead/dashboard', { replace: true });
+      else navigate('/member/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, role, navigate]);
+
+  const handleCtaClick = async () => {
     if (isAuthenticated) {
       navigate(getDestination());
     } else {
-      setAuthTab('signin');
-      scrollToSection('access');
+      // 1-Click Instant Enter ClubFlow with Admin Demo
+      await fillCredentialsAndLogin('admin@clubflow.local');
     }
   };
 
@@ -234,7 +242,7 @@ export const LandingPage: React.FC = () => {
               Architecture
             </button>
             <button
-              onClick={() => scrollToSection('access')}
+              onClick={() => scrollToSection('access-portal')}
               className="hover:text-[#FF6A16] transition-colors font-bold"
             >
               Access Portal
@@ -258,19 +266,17 @@ export const LandingPage: React.FC = () => {
             ) : (
               <>
                 <button
-                  onClick={() => {
-                    setAuthTab('signin');
-                    scrollToSection('access');
-                  }}
+                  onClick={() => scrollToSection('access-portal')}
                   className="text-xs font-mono font-medium text-[#8C8A84] hover:text-[#F5F2EA] transition-colors px-3 py-1.5"
                 >
                   Sign In
                 </button>
                 <button
                   onClick={handleCtaClick}
-                  className="px-4 py-2 rounded-lg bg-[#FF6A16] hover:bg-[#FF9D00] text-black text-xs font-extrabold transition-all shadow-md shadow-[#FF6A16]/20 flex items-center gap-1.5 hover:-translate-y-0.5"
+                  disabled={isLoading}
+                  className="px-4 py-2 rounded-lg bg-[#FF6A16] hover:bg-[#FF9D00] text-black text-xs font-extrabold transition-all shadow-md shadow-[#FF6A16]/20 flex items-center gap-1.5 hover:-translate-y-0.5 disabled:opacity-50"
                 >
-                  <span>Enter ClubFlow →</span>
+                  <span>{isLoading ? 'Connecting...' : 'Enter ClubFlow →'}</span>
                 </button>
               </>
             )}
@@ -321,7 +327,7 @@ export const LandingPage: React.FC = () => {
                 Architecture
               </button>
               <button
-                onClick={() => scrollToSection('access')}
+                onClick={() => scrollToSection('access-portal')}
                 className="text-left text-[#FF6A16] font-bold"
               >
                 Access Portal
@@ -331,8 +337,7 @@ export const LandingPage: React.FC = () => {
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  setAuthTab('signin');
-                  scrollToSection('access');
+                  scrollToSection('access-portal');
                 }}
                 className="w-full py-2.5 rounded-lg bg-[#141416] text-[#F5F2EA] text-xs font-bold text-center border border-white/10"
               >
@@ -350,10 +355,9 @@ export const LandingPage: React.FC = () => {
       </header>
 
       {/* ========================================================
-          SECTION 01: CINEMATIC HERO & INTERACTIVE COMMAND ACCESS
+          SECTION 01: CINEMATIC HERO & LIVE COMMAND LAUNCHER
       ======================================================== */}
       <section
-        id="access"
         ref={heroRef}
         className="relative min-h-screen flex items-center justify-center pt-24 pb-16 overflow-hidden border-b border-white/8"
       >
@@ -382,7 +386,7 @@ export const LandingPage: React.FC = () => {
         {/* Continuous Traveling Orange Laser Line */}
         <div className="absolute top-0 left-0 h-[2px] w-full bg-gradient-to-r from-transparent via-[#FF6A16] to-transparent animate-travel-line z-10" />
 
-        {/* Hero Content & Dual-Mode Access HUD */}
+        {/* Hero Content & Command HUD */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7 space-y-6">
@@ -407,9 +411,10 @@ export const LandingPage: React.FC = () => {
               <div className="pt-4 flex flex-wrap items-center gap-4">
                 <button
                   onClick={handleCtaClick}
-                  className="px-7 py-3.5 rounded-xl bg-[#FF6A16] hover:bg-[#FF9D00] text-black text-sm font-extrabold transition-all shadow-xl hover:shadow-[#FF6A16]/30 flex items-center gap-2 hover:-translate-y-0.5"
+                  disabled={isLoading}
+                  className="px-7 py-3.5 rounded-xl bg-[#FF6A16] hover:bg-[#FF9D00] text-black text-sm font-extrabold transition-all shadow-xl hover:shadow-[#FF6A16]/30 flex items-center gap-2 hover:-translate-y-0.5 disabled:opacity-50"
                 >
-                  <span>{isAuthenticated ? 'GO TO WORKSPACE →' : 'ENTER CLUBFLOW →'}</span>
+                  <span>{isLoading ? 'Launching...' : isAuthenticated ? 'GO TO WORKSPACE →' : 'ENTER CLUBFLOW →'}</span>
                 </button>
 
                 <button
@@ -421,219 +426,109 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Side: Dual-Mode Interactive Command Access Deck */}
+            {/* Right Side: Clean Futuristic Command & 1-Click Launch Deck */}
             <div className="lg:col-span-5 space-y-4">
-              <div className="p-6 rounded-2xl bg-[#0D0D0F]/95 backdrop-blur-xl border border-white/15 shadow-2xl space-y-4 relative overflow-hidden group hover:border-[#FF6A16]/40 transition-all">
+              <div className="p-6 rounded-2xl bg-[#0D0D0F]/95 backdrop-blur-xl border border-white/15 shadow-2xl space-y-5 relative overflow-hidden group hover:border-[#FF6A16]/40 transition-all">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-[#FF6A16]/10 rounded-full blur-2xl pointer-events-none" />
                 
-                {/* Header with Mode Switcher */}
+                {/* Header HUD */}
                 <div className="flex items-center justify-between pb-3 border-b border-white/8">
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                     <span className="font-mono text-xs font-bold text-[#F5F2EA]">CENTRAL COMMAND DECK</span>
                   </div>
+                  <span className="font-mono text-[10px] text-[#FF6A16] bg-[#FF6A16]/10 px-2 py-0.5 rounded border border-[#FF6A16]/20 font-bold">
+                    SYSTEM READY
+                  </span>
+                </div>
+
+                {/* 1-Click Workspace Launch Presets */}
+                <div className="space-y-2">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-[#8C8A84] block font-bold">
+                    DIRECT WORKSPACE LAUNCH (1-CLICK DEMO)
+                  </span>
                   
-                  {/* Mode Tabs */}
-                  <div className="flex items-center bg-[#050505] p-0.5 rounded-lg border border-white/10 text-[10px] font-mono">
+                  <div className="grid grid-cols-1 gap-2">
+                    {/* Admin Launcher */}
                     <button
-                      onClick={() => setAuthTab('signin')}
-                      className={`px-2.5 py-1 rounded transition-colors ${
-                        authTab === 'signin'
-                          ? 'bg-[#FF6A16] text-black font-bold'
-                          : 'text-[#8C8A84] hover:text-[#F5F2EA]'
-                      }`}
+                      type="button"
+                      onClick={() => fillCredentialsAndLogin('admin@clubflow.local')}
+                      disabled={isLoading}
+                      className="p-3 rounded-xl bg-[#141416] hover:bg-[#1C1C20] border border-white/10 hover:border-[#FF6A16] flex items-center justify-between text-left transition-all group/btn"
                     >
-                      ACCESS
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-lg bg-[#FF6A16]/20 text-[#FF6A16] flex items-center justify-center font-bold text-xs">
+                          👑
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-[#F5F2EA] group-hover/btn:text-[#FF6A16] transition-colors">
+                            Launch as Admin (President)
+                          </div>
+                          <div className="text-[10px] font-mono text-[#8C8A84]">Full governance, rosters & telemetry</div>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-[#8C8A84] group-hover/btn:text-[#FF6A16] group-hover/btn:translate-x-1 transition-all" />
                     </button>
+
+                    {/* Lead Launcher */}
                     <button
-                      onClick={() => setAuthTab('telemetry')}
-                      className={`px-2.5 py-1 rounded transition-colors ${
-                        authTab === 'telemetry'
-                          ? 'bg-[#FF6A16] text-black font-bold'
-                          : 'text-[#8C8A84] hover:text-[#F5F2EA]'
-                      }`}
+                      type="button"
+                      onClick={() => fillCredentialsAndLogin('lead.web@clubflow.local')}
+                      disabled={isLoading}
+                      className="p-3 rounded-xl bg-[#141416] hover:bg-[#1C1C20] border border-white/10 hover:border-[#FFD400] flex items-center justify-between text-left transition-all group/btn"
                     >
-                      TELEMETRY
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-lg bg-[#FFD400]/20 text-[#FFD400] flex items-center justify-center font-bold text-xs">
+                          ⚡
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-[#F5F2EA] group-hover/btn:text-[#FFD400] transition-colors">
+                            Launch as Project Lead
+                          </div>
+                          <div className="text-[10px] font-mono text-[#8C8A84]">Sprint backlogs & task verification</div>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-[#8C8A84] group-hover/btn:text-[#FFD400] group-hover/btn:translate-x-1 transition-all" />
+                    </button>
+
+                    {/* Member Launcher */}
+                    <button
+                      type="button"
+                      onClick={() => fillCredentialsAndLogin('alex.member@clubflow.local')}
+                      disabled={isLoading}
+                      className="p-3 rounded-xl bg-[#141416] hover:bg-[#1C1C20] border border-white/10 hover:border-white/30 flex items-center justify-between text-left transition-all group/btn"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-lg bg-white/10 text-white flex items-center justify-center font-bold text-xs">
+                          🛠️
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-[#F5F2EA] group-hover/btn:text-white transition-colors">
+                            Launch as Member
+                          </div>
+                          <div className="text-[10px] font-mono text-[#8C8A84]">Assigned tasks & 1-click status updates</div>
+                        </div>
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-[#8C8A84] group-hover/btn:text-white group-hover/btn:translate-x-1 transition-all" />
                     </button>
                   </div>
                 </div>
 
-                {/* TAB 1: WORKSPACE ACCESS / DIRECT SIGN IN */}
-                {authTab === 'signin' && (
-                  <div className="space-y-3.5">
-                    {isAuthenticated ? (
-                      /* Authenticated User Quick Jump */
-                      <div className="space-y-4 py-2">
-                        <div className="p-3.5 rounded-xl bg-[#141416] border border-white/10 space-y-2">
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#FF6A16] to-[#FFD400] text-black flex items-center justify-center font-bold text-sm">
-                              {user?.name?.charAt(0) || 'U'}
-                            </div>
-                            <div>
-                              <div className="font-bold text-xs text-[#F5F2EA]">{user?.name}</div>
-                              <div className="font-mono text-[10px] text-[#8C8A84]">{user?.email}</div>
-                            </div>
-                          </div>
-                          <div className="flex items-center justify-between pt-1 border-t border-white/5 font-mono text-[10px]">
-                            <span className="text-[#8C8A84]">ACTIVE ROLE</span>
-                            <span className="text-[#FF6A16] font-bold">{role}</span>
-                          </div>
-                        </div>
-
-                        <div className="flex gap-2">
-                          <button
-                            onClick={handleCtaClick}
-                            className="flex-1 py-2.5 rounded-xl bg-[#FF6A16] hover:bg-[#FF9D00] text-black font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 shadow-md"
-                          >
-                            <span>Open Dashboard</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => logout()}
-                            className="px-3 py-2.5 rounded-xl bg-[#141416] hover:bg-[#1C1C20] text-[#8C8A84] hover:text-rose-400 border border-white/10 text-xs transition-colors"
-                            title="Sign Out"
-                          >
-                            <LogOut className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      /* Unauthenticated Login Form */
-                      <form onSubmit={handleAuthSubmit} className="space-y-3">
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-mono uppercase tracking-wider text-[#8C8A84] block">
-                            QUICK DEMO ACCESS (1-CLICK)
-                          </span>
-                          <div className="grid grid-cols-3 gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() => fillCredentialsAndLogin('admin@clubflow.local')}
-                              className="p-1.5 rounded-lg bg-[#141416] hover:bg-[#1C1C20] border border-white/5 hover:border-[#FF6A16]/50 text-center font-mono text-[10px] transition-all"
-                            >
-                              <span className="text-[#FF6A16] font-bold block">ADMIN</span>
-                              <span className="text-[8px] text-[#8C8A84]">President</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => fillCredentialsAndLogin('lead.web@clubflow.local')}
-                              className="p-1.5 rounded-lg bg-[#141416] hover:bg-[#1C1C20] border border-white/5 hover:border-[#FFD400]/50 text-center font-mono text-[10px] transition-all"
-                            >
-                              <span className="text-[#FFD400] font-bold block">LEAD</span>
-                              <span className="text-[8px] text-[#8C8A84]">Sprint Lead</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => fillCredentialsAndLogin('alex.member@clubflow.local')}
-                              className="p-1.5 rounded-lg bg-[#141416] hover:bg-[#1C1C20] border border-white/5 hover:border-white/20 text-center font-mono text-[10px] transition-all"
-                            >
-                              <span className="text-[#F5F2EA] font-bold block">MEMBER</span>
-                              <span className="text-[8px] text-[#8C8A84]">Contributor</span>
-                            </button>
-                          </div>
-                        </div>
-
-                        {errorMessage && (
-                          <div className="p-2 rounded-lg bg-rose-950/40 border border-rose-800/60 text-rose-400 text-[10px] font-medium">
-                            {errorMessage}
-                          </div>
-                        )}
-
-                        <div className="space-y-2">
-                          <div className="relative">
-                            <Mail className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-2.5" />
-                            <input
-                              type="email"
-                              value={email}
-                              onChange={(e) => setEmail(e.target.value)}
-                              placeholder="admin@clubflow.local"
-                              className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#141416] border border-white/10 rounded-lg text-[#F5F2EA] placeholder:text-zinc-600 focus:outline-none focus:border-[#FF6A16]"
-                            />
-                          </div>
-                          <div className="relative">
-                            <Lock className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-2.5" />
-                            <input
-                              type={showPassword ? 'text' : 'password'}
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              placeholder="Password123!"
-                              className="w-full pl-8 pr-8 py-1.5 text-xs bg-[#141416] border border-white/10 rounded-lg text-[#F5F2EA] placeholder:text-zinc-600 focus:outline-none focus:border-[#FF6A16]"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowPassword(!showPassword)}
-                              className="absolute right-2.5 top-2.5 text-zinc-500 hover:text-zinc-300"
-                            >
-                              {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                            </button>
-                          </div>
-                        </div>
-
-                        <button
-                          type="submit"
-                          disabled={isLoading}
-                          className="w-full py-2.5 rounded-xl bg-[#FF6A16] hover:bg-[#FF9D00] text-black font-extrabold text-xs transition-all shadow-md flex items-center justify-center gap-1.5 disabled:opacity-50"
-                        >
-                          {isLoading ? (
-                            <span className="animate-pulse">Authenticating...</span>
-                          ) : (
-                            <>
-                              <span>Sign In to Workspace</span>
-                              <ArrowRight className="w-3.5 h-3.5" />
-                            </>
-                          )}
-                        </button>
-                      </form>
-                    )}
+                {/* Telemetry Summary Ticker */}
+                <div className="pt-2 border-t border-white/8 grid grid-cols-3 gap-2 text-center font-mono text-xs">
+                  <div className="p-2 rounded-lg bg-[#050505] border border-white/5">
+                    <div className="text-[9px] text-[#8C8A84]">TEAMS</div>
+                    <div className="font-bold text-[#F5F2EA] mt-0.5">14 Synced</div>
                   </div>
-                )}
-
-                {/* TAB 2: LIVE TELEMETRY STREAM */}
-                {authTab === 'telemetry' && (
-                  <div className="space-y-3">
-                    <div className="p-3 rounded-xl bg-[#141416] border border-white/5 space-y-1.5">
-                      <div className="flex justify-between text-xs font-bold">
-                        <span className="text-[#F5F2EA]">HackFest 2026 Arena</span>
-                        <span className="font-mono text-[#FF6A16]">82%</span>
-                      </div>
-                      <div className="w-full h-1.5 bg-[#050505] rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-[#FF6A16] to-[#FFD400] w-[82%] rounded-full" />
-                      </div>
-                      <div className="flex justify-between text-[10px] font-mono text-[#8C8A84] pt-0.5">
-                        <span>Lead: Rahul V.</span>
-                        <span>4 Tasks In Progress</span>
-                      </div>
-                    </div>
-
-                    <div className="p-3 rounded-xl bg-[#141416] border border-white/5 space-y-1.5">
-                      <div className="flex justify-between text-xs font-bold">
-                        <span className="text-[#F5F2EA]">Autonomous Flight Core</span>
-                        <span className="font-mono text-[#FFD400]">67%</span>
-                      </div>
-                      <div className="w-full h-1.5 bg-[#050505] rounded-full overflow-hidden">
-                        <div className="h-full bg-[#FFD400] w-[67%] rounded-full" />
-                      </div>
-                      <div className="flex justify-between text-[10px] font-mono text-[#8C8A84] pt-0.5">
-                        <span>Lead: Sarah C.</span>
-                        <span>Sprint #14</span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2 pt-1 text-center font-mono text-xs">
-                      <div className="p-2 rounded-lg bg-[#050505] border border-white/5">
-                        <div className="text-[9px] text-[#8C8A84]">TEAMS</div>
-                        <div className="font-bold text-[#F5F2EA] mt-0.5">14 Synced</div>
-                      </div>
-                      <div className="p-2 rounded-lg bg-[#050505] border border-white/5">
-                        <div className="text-[9px] text-[#8C8A84]">MEMBERS</div>
-                        <div className="font-bold text-[#FF6A16] mt-0.5">12 Online</div>
-                      </div>
-                      <div className="p-2 rounded-lg bg-[#050505] border border-white/5">
-                        <div className="text-[9px] text-[#8C8A84]">HEALTH</div>
-                        <div className="font-bold text-emerald-400 mt-0.5">99.8%</div>
-                      </div>
-                    </div>
+                  <div className="p-2 rounded-lg bg-[#050505] border border-white/5">
+                    <div className="text-[9px] text-[#8C8A84]">MEMBERS</div>
+                    <div className="font-bold text-[#FF6A16] mt-0.5">12 Online</div>
                   </div>
-                )}
+                  <div className="p-2 rounded-lg bg-[#050505] border border-white/5">
+                    <div className="text-[9px] text-[#8C8A84]">HEALTH</div>
+                    <div className="font-bold text-emerald-400 mt-0.5">99.8%</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
