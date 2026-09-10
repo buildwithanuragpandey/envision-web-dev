@@ -84,9 +84,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCloseMobile }) => {
       {/* Brand Header */}
       <div className="h-16 flex items-center px-5 justify-between border-b border-white/8 bg-[#050506]">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF6814] to-[#FFDD00] text-black flex items-center justify-center font-black text-xs shadow-glow-orange shrink-0">
-            <Layers className="w-4 h-4 text-black" />
-          </div>
+          <img
+            src="/clubflow_icon.jpg"
+            alt="ClubFlow"
+            className="w-8 h-8 rounded-lg object-contain shadow-glow-orange shrink-0 border border-white/10"
+          />
           <div className="min-w-0">
             <div className="font-bold text-sm tracking-tight text-[#F5F5F0] flex items-center gap-1 leading-tight">
               Club<span className="text-[#FF6814] font-semibold">Flow</span>

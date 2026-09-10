@@ -196,9 +196,11 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF6A16] to-[#FF9D00] flex items-center justify-center text-black font-extrabold text-sm shadow-md shadow-[#FF6A16]/20 transition-transform group-hover:scale-105">
-              CF
-            </div>
+            <img
+              src="/clubflow_icon.jpg"
+              alt="ClubFlow"
+              className="w-9 h-9 rounded-xl object-contain shadow-glow-orange shrink-0 border border-white/10 transition-transform group-hover:scale-105"
+            />
             <div>
               <span className="text-base font-extrabold tracking-tight text-[#F5F2EA] group-hover:text-white transition-colors block leading-tight">
                 ClubFlow
@@ -1460,9 +1462,11 @@ export const LandingPage: React.FC = () => {
       <footer className="py-12 px-6 sm:px-8 border-t border-white/8 bg-[#050505] text-xs text-[#8C8A84]">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#FF6A16] to-[#FF9D00] flex items-center justify-center text-black font-extrabold text-xs">
-              CF
-            </div>
+            <img
+              src="/clubflow_icon.jpg"
+              alt="ClubFlow"
+              className="w-7 h-7 rounded-lg object-contain shadow-glow-orange shrink-0 border border-white/10"
+            />
             <span className="font-bold text-[#F5F2EA]">ClubFlow</span>
             <span className="font-mono text-[10px] text-zinc-600">© 2026 ClubFlow</span>
           </div>
