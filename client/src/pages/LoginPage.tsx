@@ -190,6 +190,21 @@ export const LoginPage: React.FC = () => {
             </span>
           </div>
 
+          {/* Return to Public Website link */}
+          <div className="flex items-center justify-between pb-2">
+            <button
+              onClick={() => navigate('/')}
+              type="button"
+              className="inline-flex items-center gap-1.5 text-xs text-[#8C8A84] hover:text-[#F5F2EA] transition-colors font-mono group"
+            >
+              <span className="group-hover:-translate-x-1 transition-transform">←</span>
+              <span>Back to Public Website</span>
+            </button>
+            <span className="text-[10px] font-mono text-[#FF6A16] uppercase tracking-widest px-2 py-0.5 rounded bg-[#141416] border border-white/5">
+              SECURE ACCESS
+            </span>
+          </div>
+
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-[#F5F2EA]">Welcome back</h2>
             <p className="mt-1 text-xs text-[#8C8A84]">

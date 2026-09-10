@@ -5,6 +5,7 @@ import { ProtectedRoute, RoleGuard } from './components/layout/RoleGuard';
 import { AppLayout } from './components/layout/AppLayout';
 
 import { LoginPage } from './pages/LoginPage';
+import { LandingPage } from './pages/LandingPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { ProjectLeadDashboardPage } from './pages/ProjectLeadDashboardPage';
 import { MemberDashboardPage } from './pages/MemberDashboardPage';
@@ -32,13 +33,14 @@ const RootRedirect: React.FC = () => {
 export const App: React.FC = () => {
   return (
     <Routes>
-      {/* Public Route */}
+      {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
 
       {/* Protected Routes Container */}
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<RootRedirect />} />
+          <Route path="/app" element={<RootRedirect />} />
 
           {/* Admin Dashboard */}
           <Route
