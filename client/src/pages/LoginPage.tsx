@@ -90,9 +90,11 @@ export const LoginPage: React.FC = () => {
         {/* Top Header */}
         <div className="relative z-10">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#FF6A16] to-[#FFD400] text-black flex items-center justify-center font-black text-sm shadow-glow-orange shrink-0">
-              <Layers className="w-5 h-5 text-black" />
-            </div>
+            <img
+              src="/clubflow_icon.jpg"
+              alt="ClubFlow"
+              className="w-9 h-9 rounded-xl object-contain shadow-glow-orange shrink-0 border border-white/10"
+            />
             <div>
               <span className="font-bold text-base tracking-tight text-[#F5F2EA] flex items-center gap-1.5">
                 Club<span className="text-[#FF6A16] font-semibold">Flow</span>
@@ -182,11 +184,28 @@ export const LoginPage: React.FC = () => {
         <div className="w-full max-w-sm space-y-6">
           {/* Mobile Header */}
           <div className="lg:hidden flex items-center space-x-2.5 mb-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF6A16] to-[#FFD400] text-black flex items-center justify-center font-black text-sm shadow-glow-orange">
-              <Layers className="w-4 h-4 text-black" />
-            </div>
+            <img
+              src="/clubflow_icon.jpg"
+              alt="ClubFlow"
+              className="w-8 h-8 rounded-lg object-contain shadow-glow-orange shrink-0 border border-white/10"
+            />
             <span className="font-bold text-lg tracking-tight text-[#F5F2EA]">
               Club<span className="text-[#FF6A16]">Flow</span>
+            </span>
+          </div>
+
+          {/* Return to Public Website link */}
+          <div className="flex items-center justify-between pb-2">
+            <button
+              onClick={() => navigate('/')}
+              type="button"
+              className="inline-flex items-center gap-1.5 text-xs text-[#8C8A84] hover:text-[#F5F2EA] transition-colors font-mono group"
+            >
+              <span className="group-hover:-translate-x-1 transition-transform">←</span>
+              <span>Back to Public Website</span>
+            </button>
+            <span className="text-[10px] font-mono text-[#FF6A16] uppercase tracking-widest px-2 py-0.5 rounded bg-[#141416] border border-white/5">
+              SECURE ACCESS
             </span>
           </div>
 
