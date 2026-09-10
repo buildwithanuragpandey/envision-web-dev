@@ -4,30 +4,79 @@
 
 @layer base {
   :root {
-    --brand-primary: #10b981;
-    --brand-dark: #0f172a;
+    --brand: #10b981;
+    --brand-glow: rgba(16, 185, 129, 0.15);
   }
-  
+
+  html {
+    letter-spacing: -0.012em;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
   body {
-    @apply bg-slate-50 text-slate-900 selection:bg-brand-500 selection:text-white;
+    @apply bg-[#fafafa] text-zinc-900 selection:bg-zinc-900 selection:text-white antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.025em;
   }
 }
 
-/* Custom modern scrollbar */
+@layer components {
+  /* Layered subtle borders & surfaces */
+  .surface-card {
+    @apply bg-white border border-zinc-200/80 shadow-subtle transition-all duration-200;
+  }
+  .surface-card:hover {
+    @apply border-zinc-300 shadow-premium;
+  }
+
+  /* Subtle focus rings */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all;
+  }
+}
+
+/* Linear-grade ultra-clean scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 rounded-full hover:bg-slate-400 transition-colors;
+  @apply bg-zinc-300/80 rounded-full hover:bg-zinc-400 transition-colors;
 }
 
-/* Glassmorphism subtle helper */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+/* Subtle background dot grid pattern for login & hero sections */
+.bg-grid-pattern {
+  background-size: 24px 24px;
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+}
+
+.bg-grid-pattern-dark {
+  background-size: 24px 24px;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+}
+
+/* Marquee utilities with pause on hover */
+.marquee-container {
+  overflow: hidden;
+  user-select: none;
+  display: flex;
+}
+.marquee-container:hover .animate-marquee,
+.marquee-container:hover .animate-marquee-reverse,
+.marquee-container:hover .animate-marquee-fast {
+  animation-play-state: paused;
+}
+
+/* Accessibility: Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-reverse,
+  .animate-marquee-fast {
+    animation: none !important;
+  }
 }

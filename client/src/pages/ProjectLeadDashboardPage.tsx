@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { dashboardApi, taskApi } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import {
   FolderKanban,
   Users,
@@ -8,22 +9,29 @@ import {
   Clock,
   AlertCircle,
   Plus,
-  ArrowUpRight,
-  TrendingUp,
+  ArrowRight,
   Calendar,
 } from 'lucide-react';
 import { Button } from '../components/common/Button';
 import { ProgressBar, Skeleton } from '../components/common/CommonUI';
 import { StatusBadge, PriorityBadge } from '../components/common/Badge';
+import { Avatar } from '../components/common/Avatar';
+import { AnimatedCounter } from '../components/common/AnimatedCounter';
+import { DashboardTicker, TickerItem } from '../components/common/DashboardTicker';
+import { PageTransition } from '../components/common/PageTransition';
 import { Link } from 'react-router-dom';
 import { TaskModal } from '../components/tasks/TaskModal';
-import { format } from 'date-fns';
+import { TaskDetailDrawer } from '../components/tasks/TaskDetailDrawer';
+import { format, formatDistanceToNow, isPast, isToday } from 'date-fns';
 import { useToast } from '../context/ToastContext';
+import { Task } from '../types';
 
 export const ProjectLeadDashboardPage: React.FC = () => {
+  const { user } = useAuth();
   const { success, error } = useToast();
   const [isCreateTaskOpen, setIsCreateTaskOpen] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string | undefined>(undefined);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['lead-dashboard'],
@@ -36,7 +44,7 @@ export const ProjectLeadDashboardPage: React.FC = () => {
   const handleCreateTask = async (formData: any) => {
     try {
       await taskApi.createTask(formData);
-      success('Task Created', `Task "${formData.title}" assigned successfully.`);
+      success('Task Created', `Deliverable "${formData.title}" assigned successfully.`);
       refetch();
     } catch (err: any) {
       error('Creation Failed', err.response?.data?.error || 'Failed to create task');
@@ -44,192 +52,206 @@ export const ProjectLeadDashboardPage: React.FC = () => {
     }
   };
 
+  const handleStatusChange = async (taskId: string, newStatus: any) => {
+    try {
+      await taskApi.updateTaskStatus(taskId, newStatus);
+      success('Status Updated', `Deliverable marked as ${newStatus.replace('_', ' ')}.`);
+      refetch();
+      if (selectedTask && selectedTask.id === taskId) {
+        setSelectedTask({ ...selectedTask, status: newStatus });
+      }
+    } catch (err: any) {
+      error('Update Failed', err.response?.data?.error || 'Could not update task');
+    }
+  };
+
   if (isLoading || !data) {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Skeleton className="h-24 rounded-2xl" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-28 rounded-2xl" />
+            <Skeleton key={i} className="h-20 rounded-xl" />
           ))}
         </div>
-        <Skeleton className="h-80 rounded-2xl" />
+        <Skeleton className="h-72 rounded-xl" />
       </div>
     );
   }
 
   const { kpis, projectSummaries, memberPerformance, upcomingDeadlines } = data;
 
+  const tickerItems: TickerItem[] = [
+    { id: '1', category: 'INITIATIVES', label: `${kpis.totalLedProjects} initiatives under your team leadership` },
+    { id: '2', category: 'SQUAD', label: `${kpis.totalTeamSize} club members actively collaborating` },
+    { id: '3', category: 'PROGRESS', label: `Deliverable fulfillment at ${kpis.completionRate}%` },
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* Welcome Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-subtle">
+    <PageTransition>
+      {/* Editorial Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-zinc-200/80">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">Project Lead Hub</h2>
-          <p className="text-xs text-slate-500 mt-1">
-            Track milestones, oversee your team deliverables, and dispatch tasks.
+          <span className="font-mono text-[11px] uppercase tracking-wider text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">
+            Project Leadership Hub
+          </span>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight mt-1.5">
+            Good morning, {user?.name?.split(' ')[0] || 'Lead'}
+          </h1>
+          <p className="text-xs text-zinc-500 mt-1">
+            Your teams have {kpis.todoTasks + kpis.inProgressTasks} active deliverables across {kpis.totalLedProjects} initiatives.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+
+        <div className="flex items-center gap-2.5">
           <Button
             variant="primary"
-            size="md"
+            size="sm"
             onClick={() => {
               setSelectedProjectId(projectSummaries[0]?.id);
               setIsCreateTaskOpen(true);
             }}
-            leftIcon={<Plus className="w-4 h-4" />}
+            leftIcon={<Plus className="w-3.5 h-3.5" />}
             disabled={projectSummaries.length === 0}
           >
-            Create Task
+            Assign Task
           </Button>
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Led Projects */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-subtle flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold uppercase tracking-wider">Assigned Projects</span>
-            <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
-              <FolderKanban className="w-5 h-5" />
-            </div>
+      {/* Activity Ticker */}
+      <DashboardTicker items={tickerItems} className="rounded-lg my-2" />
+
+      {/* Inline Compact Metrics */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 py-2">
+        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-subtle">
+          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+            Led Projects
           </div>
-          <div className="mt-4 flex items-baseline justify-between">
-            <span className="text-2xl font-extrabold text-slate-900">{kpis.totalLedProjects}</span>
-            <span className="text-xs text-brand-600 font-medium bg-brand-50 px-2 py-0.5 rounded-md">
-              {kpis.activeProjects} active
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold font-mono text-zinc-900">
+              <AnimatedCounter value={kpis.totalLedProjects} />
+            </span>
+            <span className="text-xs text-zinc-400">({kpis.activeProjects} active)</span>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-subtle">
+          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+            Team Members
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold font-mono text-zinc-900">
+              <AnimatedCounter value={kpis.totalTeamSize} />
+            </span>
+            <span className="text-xs text-zinc-400">collaborators</span>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-subtle">
+          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+            Fulfillment Rate
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold font-mono text-emerald-600">
+              <AnimatedCounter value={kpis.completionRate} suffix="%" />
+            </span>
+            <span className="text-xs text-zinc-400">
+              {kpis.completedTasks}/{kpis.totalTasks}
             </span>
           </div>
         </div>
 
-        {/* Team Members */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-subtle flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold uppercase tracking-wider">Total Team Members</span>
-            <div className="p-2 bg-purple-50 text-purple-600 rounded-xl">
-              <Users className="w-5 h-5" />
-            </div>
+        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-subtle">
+          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+            Pending Deliverables
           </div>
-          <div className="mt-4 flex items-baseline justify-between">
-            <span className="text-2xl font-extrabold text-slate-900">{kpis.totalTeamSize}</span>
-            <span className="text-xs text-slate-500 font-medium">collaborators</span>
-          </div>
-        </div>
-
-        {/* Progress % */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-subtle flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold uppercase tracking-wider">Team Completion</span>
-            <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
-              <TrendingUp className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-baseline justify-between">
-            <span className="text-2xl font-extrabold text-slate-900">{kpis.completionRate}%</span>
-            <span className="text-xs text-slate-500 font-medium">
-              {kpis.completedTasks}/{kpis.totalTasks} completed
-            </span>
-          </div>
-        </div>
-
-        {/* Overdue / Urgent */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-subtle flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold uppercase tracking-wider">Pending Work</span>
-            <div className="p-2 bg-amber-50 text-amber-600 rounded-xl">
-              <Clock className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-baseline justify-between">
-            <span className="text-2xl font-extrabold text-slate-900">
-              {kpis.todoTasks + kpis.inProgressTasks}
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold font-mono text-zinc-900">
+              <AnimatedCounter value={kpis.todoTasks + kpis.inProgressTasks} />
             </span>
             {kpis.overdueTasks > 0 ? (
-              <span className="text-xs text-rose-600 font-medium bg-rose-50 px-2 py-0.5 rounded-md flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" />
+              <span className="text-[11px] font-mono text-rose-600 font-semibold bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200/60">
                 {kpis.overdueTasks} overdue
               </span>
             ) : (
-              <span className="text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded-md">
-                On schedule
-              </span>
+              <span className="text-[11px] font-mono text-emerald-600">on schedule</span>
             )}
           </div>
         </div>
       </div>
 
       {/* Led Projects Section */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-subtle">
-        <div className="flex items-center justify-between mb-4">
+      <div className="rounded-xl border border-zinc-200/80 bg-white overflow-hidden shadow-subtle">
+        <div className="p-5 border-b border-zinc-100 flex items-center justify-between">
           <div>
-            <h3 className="text-base font-bold text-slate-900">My Led Projects</h3>
-            <p className="text-xs text-slate-500">Projects under your active leadership</p>
+            <h2 className="text-base font-bold text-zinc-900 tracking-tight">
+              My Led Initiatives
+            </h2>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              Sprint deliverables, team composition, and overall milestone progression.
+            </p>
           </div>
           <Link
             to="/projects"
-            className="text-xs font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1"
+            className="text-xs font-semibold text-zinc-700 hover:text-zinc-900 flex items-center gap-1 group"
           >
-            All projects <ArrowUpRight className="w-3.5 h-3.5" />
+            <span>All projects</span>
+            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="divide-y divide-zinc-100">
           {projectSummaries.length === 0 ? (
-            <p className="text-xs text-slate-400 py-6 text-center col-span-2">
-              No projects currently assigned to you as lead.
+            <p className="text-xs text-zinc-400 p-8 text-center">
+              No initiatives currently assigned to you as project lead.
             </p>
           ) : (
             projectSummaries.map((p) => (
               <div
                 key={p.id}
-                className="p-5 rounded-xl border border-slate-200 hover:border-brand-500/40 hover:shadow-card transition-all flex flex-col justify-between"
+                className="p-5 hover:bg-zinc-50/60 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
               >
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-2">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2.5">
                     <Link
                       to={`/projects/${p.id}`}
-                      className="text-sm font-bold text-slate-900 hover:text-brand-600 transition-colors"
+                      className="text-sm font-bold text-zinc-900 hover:text-emerald-600 transition-colors"
                     >
                       {p.name}
                     </Link>
                     <StatusBadge status={p.status} size="sm" />
                   </div>
                   {p.description && (
-                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-3">
+                    <p className="text-xs text-zinc-500 mt-1 line-clamp-1 leading-relaxed">
                       {p.description}
                     </p>
                   )}
-                </div>
-
-                <div className="pt-3 border-t border-slate-100">
-                  <div className="flex items-center justify-between text-xs text-slate-500 mb-2 font-medium">
-                    <span>Team: {p.memberCount} members</span>
+                  <div className="flex items-center gap-3 mt-2 text-xs text-zinc-400 font-mono">
+                    <span>{p.memberCount} squad members</span>
+                    <span>•</span>
                     <span>
-                      {p.completed}/{p.taskCount} tasks ({p.progress}%)
+                      {p.completed}/{p.taskCount} tasks completed
                     </span>
                   </div>
-                  <ProgressBar progress={p.progress} size="md" />
+                </div>
 
-                  <div className="mt-3 flex items-center justify-between pt-2">
-                    <Link
-                      to={`/projects/${p.id}`}
-                      className="text-xs font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1"
-                    >
-                      Manage Project & Team <ArrowUpRight className="w-3.5 h-3.5" />
-                    </Link>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedProjectId(p.id);
-                        setIsCreateTaskOpen(true);
-                      }}
-                      leftIcon={<Plus className="w-3.5 h-3.5" />}
-                    >
-                      Add Task
-                    </Button>
+                <div className="flex items-center gap-4 shrink-0">
+                  <div className="w-36 flex items-center gap-2.5">
+                    <ProgressBar progress={p.progress} size="sm" />
+                    <span className="font-mono text-xs font-semibold text-zinc-700">{p.progress}%</span>
                   </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedProjectId(p.id);
+                      setIsCreateTaskOpen(true);
+                    }}
+                    leftIcon={<Plus className="w-3 h-3" />}
+                  >
+                    Add Task
+                  </Button>
                 </div>
               </div>
             ))
@@ -237,63 +259,60 @@ export const ProjectLeadDashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Team Workload & Upcoming Deadlines Grid */}
+      {/* Team Workload & Upcoming Deadlines */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Team Workload Table */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-subtle lg:col-span-2">
-          <h3 className="text-base font-bold text-slate-900 mb-1">Team Member Workload</h3>
-          <p className="text-xs text-slate-500 mb-4">Task fulfillment per member across your projects</p>
+        {/* Workload Table */}
+        <div className="rounded-xl border border-zinc-200/80 bg-white p-5 shadow-subtle lg:col-span-2">
+          <div className="pb-3 border-b border-zinc-100 mb-4">
+            <h3 className="text-sm font-bold text-zinc-900">
+              Team Member Deliverable Velocity
+            </h3>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              Task distribution across your initiative squad members.
+            </p>
+          </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-semibold border-y border-slate-200">
+              <thead className="bg-zinc-50 text-zinc-500 uppercase text-[10px] font-mono border-y border-zinc-200/60">
                 <tr>
-                  <th className="py-2.5 px-3">Member</th>
-                  <th className="py-2.5 px-3">Total Tasks</th>
-                  <th className="py-2.5 px-3">Completed</th>
-                  <th className="py-2.5 px-3">In Progress</th>
-                  <th className="py-2.5 px-3">Progress</th>
+                  <th className="py-2 px-3">Student</th>
+                  <th className="py-2 px-3">Total</th>
+                  <th className="py-2 px-3">Completed</th>
+                  <th className="py-2 px-3">In Progress</th>
+                  <th className="py-2 px-3">Velocity</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-zinc-100">
                 {memberPerformance.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-6 text-slate-400">
+                    <td colSpan={5} className="text-center py-6 text-zinc-400">
                       No team members assigned yet.
                     </td>
                   </tr>
                 ) : (
                   memberPerformance.map((m) => (
-                    <tr key={m.id} className="hover:bg-slate-50/60">
+                    <tr key={m.id} className="hover:bg-zinc-50/60">
                       <td className="py-3 px-3">
                         <div className="flex items-center gap-2.5">
-                          <img
-                            src={
-                              m.avatar ||
-                              `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                m.name
-                              )}&background=10b981&color=fff`
-                            }
-                            alt={m.name}
-                            className="w-7 h-7 rounded-full object-cover"
-                          />
+                          <Avatar name={m.name} size="xs" />
                           <div>
-                            <span className="font-semibold text-slate-900 block">{m.name}</span>
-                            <span className="text-[10px] text-slate-400">
-                              {m.department || 'General'}
+                            <span className="font-bold text-zinc-900 block">{m.name}</span>
+                            <span className="text-[10px] text-zinc-400 font-mono">
+                              {m.department || 'CSE'}
                             </span>
                           </div>
                         </div>
                       </td>
-                      <td className="py-3 px-3 font-semibold text-slate-800">{m.totalTasks}</td>
-                      <td className="py-3 px-3 text-emerald-600 font-semibold">{m.completedTasks}</td>
-                      <td className="py-3 px-3 text-blue-600 font-semibold">{m.inProgressTasks}</td>
+                      <td className="py-3 px-3 font-mono font-semibold text-zinc-800">{m.totalTasks}</td>
+                      <td className="py-3 px-3 font-mono text-emerald-600 font-semibold">{m.completedTasks}</td>
+                      <td className="py-3 px-3 font-mono text-blue-600 font-semibold">{m.inProgressTasks}</td>
                       <td className="py-3 px-3 w-36">
                         <div className="flex items-center gap-2">
                           <div className="flex-1">
                             <ProgressBar progress={m.progress} size="sm" />
                           </div>
-                          <span className="font-semibold text-slate-700 text-[11px]">
+                          <span className="font-mono font-semibold text-zinc-700 text-[11px]">
                             {m.progress}%
                           </span>
                         </div>
@@ -306,31 +325,42 @@ export const ProjectLeadDashboardPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Urgent Deadlines */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-subtle">
-          <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 mb-1">
-            <Calendar className="w-4 h-4 text-brand-600" />
-            Upcoming Deadlines
-          </h3>
-          <p className="text-xs text-slate-500 mb-4">Milestones due soon across your projects</p>
+        {/* Upcoming Milestones */}
+        <div className="rounded-xl border border-zinc-200/80 bg-white p-5 shadow-subtle">
+          <div className="pb-3 border-b border-zinc-100 mb-4 flex items-center justify-between">
+            <h3 className="text-sm font-bold text-zinc-900 flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-zinc-600" />
+              Sprint Deadlines
+            </h3>
+            <Link
+              to="/tasks"
+              className="text-xs font-semibold text-zinc-600 hover:text-zinc-900 flex items-center gap-1"
+            >
+              <span>Task board</span>
+              <ArrowRight className="w-3 h-3" />
+            </Link>
+          </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {upcomingDeadlines.length === 0 ? (
-              <p className="text-xs text-slate-400 py-6 text-center">No pending milestones.</p>
+              <p className="text-xs text-zinc-400 py-6 text-center">No pending milestones.</p>
             ) : (
-              upcomingDeadlines.map((t) => (
+              upcomingDeadlines.map((t: any) => (
                 <div
                   key={t.id}
-                  className="p-3 rounded-xl border border-slate-100 hover:border-slate-200 transition-all text-xs"
+                  onClick={() => setSelectedTask(t)}
+                  className="p-3 rounded-lg border border-zinc-100 hover:border-zinc-200 hover:bg-zinc-50/60 transition-all text-xs cursor-pointer group"
                 >
-                  <div className="flex items-start justify-between gap-1 mb-1">
-                    <p className="font-semibold text-slate-900 leading-snug">{t.title}</p>
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <p className="font-semibold text-zinc-900 leading-snug group-hover:text-emerald-600 transition-colors">
+                      {t.title}
+                    </p>
                     <PriorityBadge priority={t.priority} size="sm" />
                   </div>
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 mt-2 pt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-between text-[11px] text-zinc-500 mt-2 pt-2 border-t border-zinc-100 font-mono">
                     <span>{t.assignedTo?.name || 'Unassigned'}</span>
                     {t.deadline && (
-                      <span className="font-medium text-slate-700">
+                      <span className="font-semibold text-zinc-700">
                         {format(new Date(t.deadline), 'MMM dd')}
                       </span>
                     )}
@@ -342,14 +372,23 @@ export const ProjectLeadDashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Task Modal */}
+      {/* Task Creation Modal */}
       <TaskModal
         isOpen={isCreateTaskOpen}
         onClose={() => setIsCreateTaskOpen(false)}
         onSubmit={handleCreateTask}
         defaultProjectId={selectedProjectId}
-        title="Create & Assign Task"
+        title="Assign New Deliverable"
       />
-    </div>
+
+      {/* Task Detail Slide-over Drawer */}
+      <TaskDetailDrawer
+        task={selectedTask}
+        isOpen={!!selectedTask}
+        onClose={() => setSelectedTask(null)}
+        onStatusChange={handleStatusChange}
+        canEdit={true}
+      />
+    </PageTransition>
   );
 };

@@ -1,25 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { dashboardApi, taskApi } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import {
-  FolderKanban,
   CheckSquare,
-  CheckCircle2,
   Clock,
-  AlertCircle,
-  TrendingUp,
-  ArrowUpRight,
+  CheckCircle2,
+  FolderKanban,
   Calendar,
+  ArrowRight,
+  TrendingUp,
 } from 'lucide-react';
 import { ProgressBar, Skeleton } from '../components/common/CommonUI';
 import { StatusBadge, PriorityBadge } from '../components/common/Badge';
+import { Avatar } from '../components/common/Avatar';
+import { AnimatedCounter } from '../components/common/AnimatedCounter';
+import { DashboardTicker, TickerItem } from '../components/common/DashboardTicker';
+import { PageTransition } from '../components/common/PageTransition';
+import { TaskDetailDrawer, formatTaskDeadline } from '../components/tasks/TaskDetailDrawer';
 import { Link } from 'react-router-dom';
-import { format } from 'date-fns';
 import { useToast } from '../context/ToastContext';
-import { TaskStatus } from '../types';
+import { Task } from '../types';
 
 export const MemberDashboardPage: React.FC = () => {
+  const { user } = useAuth();
   const { success, error } = useToast();
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['member-dashboard'],
@@ -29,310 +35,280 @@ export const MemberDashboardPage: React.FC = () => {
     },
   });
 
-  const handleUpdateStatus = async (taskId: string, newStatus: TaskStatus) => {
+  const handleStatusToggle = async (taskId: string, currentStatus: string) => {
+    let nextStatus = 'IN_PROGRESS';
+    if (currentStatus === 'IN_PROGRESS') nextStatus = 'COMPLETED';
+    else if (currentStatus === 'COMPLETED') nextStatus = 'TODO';
+
     try {
-      await taskApi.updateTaskStatus(taskId, newStatus);
-      success('Status Updated', `Task status changed to ${newStatus}`);
+      await taskApi.updateTaskStatus(taskId, nextStatus);
+      success('Status Updated', `Deliverable moved to ${nextStatus.replace('_', ' ')}.`);
       refetch();
     } catch (err: any) {
-      error('Failed to update status', err.response?.data?.error || 'Could not update task');
+      error('Update Failed', err.response?.data?.error || 'Could not update task');
+    }
+  };
+
+  const handleStatusChangeFromDrawer = async (taskId: string, newStatus: any) => {
+    try {
+      await taskApi.updateTaskStatus(taskId, newStatus);
+      success('Status Updated', `Deliverable moved to ${newStatus.replace('_', ' ')}.`);
+      refetch();
+      if (selectedTask && selectedTask.id === taskId) {
+        setSelectedTask({ ...selectedTask, status: newStatus });
+      }
+    } catch (err: any) {
+      error('Update Failed', err.response?.data?.error || 'Could not update task');
     }
   };
 
   if (isLoading || !data) {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Skeleton className="h-24 rounded-2xl" />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-28 rounded-2xl" />
+            <Skeleton key={i} className="h-20 rounded-xl" />
           ))}
         </div>
-        <Skeleton className="h-80 rounded-2xl" />
+        <Skeleton className="h-72 rounded-xl" />
       </div>
     );
   }
 
-  const { kpis, projects, assignedTasks, upcomingTasks } = data;
+  const { kpis, assignedTasks, projects } = data;
+
+  const tickerItems: TickerItem[] = [
+    { id: '1', category: 'SQUADS', label: `Member of ${projects.length} club project teams` },
+    { id: '2', category: 'TASKS', label: `${kpis.todoTasks + kpis.inProgressTasks} deliverables assigned to you` },
+    { id: '3', category: 'FULFILLMENT', label: `${kpis.completedTasks} completed milestone deliverables` },
+  ];
 
   return (
-    <div className="space-y-6">
-      {/* Welcome Banner */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 tracking-tight">Member Dashboard</h2>
-          <p className="text-xs text-slate-500 mt-1">
-            Overview of your project assignments, pending deliverables, and upcoming milestones.
-          </p>
-        </div>
-        <Link
-          to="/tasks"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg shadow-sm transition-all self-start sm:self-auto"
-        >
-          <CheckSquare className="w-4 h-4" />
-          Open Task Board
-        </Link>
+    <PageTransition>
+      {/* Editorial Header */}
+      <div className="pb-4 border-b border-zinc-200/80">
+        <span className="font-mono text-[11px] uppercase tracking-wider text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">
+          Personal Club Workspace
+        </span>
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight mt-1.5">
+          Good morning, {user?.name?.split(' ')[0] || 'Member'}
+        </h1>
+        <p className="text-xs text-zinc-500 mt-1">
+          You have {kpis.todoTasks + kpis.inProgressTasks} assigned deliverables across {projects.length} project committees.
+        </p>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* My Projects */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-subtle flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold uppercase tracking-wider">My Projects</span>
-            <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
-              <FolderKanban className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-4 flex items-baseline justify-between">
-            <span className="text-2xl font-extrabold text-slate-900">{kpis.totalProjects}</span>
-            <span className="text-xs text-slate-500 font-medium">active memberships</span>
-          </div>
-        </div>
+      {/* Activity Ticker */}
+      <DashboardTicker items={tickerItems} className="rounded-lg my-2" />
 
-        {/* My Tasks Total */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-subtle flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold uppercase tracking-wider">Assigned Tasks</span>
-            <div className="p-2 bg-purple-50 text-purple-600 rounded-xl">
-              <CheckSquare className="w-5 h-5" />
-            </div>
+      {/* Inline Compact Statistics */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 py-2">
+        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-subtle">
+          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+            My Projects
           </div>
-          <div className="mt-4 flex items-baseline justify-between">
-            <span className="text-2xl font-extrabold text-slate-900">{kpis.totalTasks}</span>
-            <span className="text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded-md">
-              {kpis.completedTasks} completed
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold font-mono text-zinc-900">
+              <AnimatedCounter value={projects.length} />
             </span>
+            <span className="text-xs text-zinc-400">squads</span>
           </div>
         </div>
 
-        {/* Completion % */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-subtle flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold uppercase tracking-wider">My Completion Rate</span>
-            <div className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
-              <TrendingUp className="w-5 h-5" />
-            </div>
+        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-subtle">
+          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+            Active Deliverables
           </div>
-          <div className="mt-4 flex items-baseline justify-between">
-            <span className="text-2xl font-extrabold text-slate-900">{kpis.completionRate}%</span>
-            <span className="text-xs text-slate-500 font-medium">
-              {kpis.completedTasks}/{kpis.totalTasks} done
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold font-mono text-blue-600">
+              <AnimatedCounter value={kpis.todoTasks + kpis.inProgressTasks} />
             </span>
+            <span className="text-xs text-zinc-400">pending</span>
           </div>
         </div>
 
-        {/* Pending / Overdue */}
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-subtle flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-500">
-            <span className="text-xs font-semibold uppercase tracking-wider">Pending Work</span>
-            <div className="p-2 bg-amber-50 text-amber-600 rounded-xl">
-              <Clock className="w-5 h-5" />
-            </div>
+        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-subtle">
+          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+            Completed
           </div>
-          <div className="mt-4 flex items-baseline justify-between">
-            <span className="text-2xl font-extrabold text-slate-900">
-              {kpis.todoTasks + kpis.inProgressTasks}
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold font-mono text-emerald-600">
+              <AnimatedCounter value={kpis.completedTasks} />
+            </span>
+            <span className="text-xs text-zinc-400">tasks done</span>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-subtle">
+          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
+            Completion Rate
+          </div>
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-bold font-mono text-zinc-900">
+              <AnimatedCounter value={kpis.completionRate} suffix="%" />
             </span>
             {kpis.overdueTasks > 0 ? (
-              <span className="text-xs text-rose-600 font-medium bg-rose-50 px-2 py-0.5 rounded-md flex items-center gap-1">
-                <AlertCircle className="w-3 h-3" />
+              <span className="text-[11px] font-mono text-rose-600 font-semibold bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200/60">
                 {kpis.overdueTasks} overdue
               </span>
             ) : (
-              <span className="text-xs text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded-md">
-                On track
-              </span>
+              <span className="text-[11px] font-mono text-emerald-600">all on time</span>
             )}
           </div>
         </div>
       </div>
 
-      {/* Projects Section */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-subtle">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-base font-bold text-slate-900">My Projects</h3>
-            <p className="text-xs text-slate-500">Projects where you are an active collaborator</p>
+      {/* Main Grid: My Deliverables & My Project Squads */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left 2 Cols: My Assigned Deliverables List */}
+        <div className="lg:col-span-2 rounded-xl border border-zinc-200/80 bg-white p-5 shadow-subtle">
+          <div className="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
+            <div>
+              <h2 className="text-base font-bold text-zinc-900 tracking-tight">
+                My Assigned Deliverables
+              </h2>
+              <p className="text-xs text-zinc-500 mt-0.5">
+                Click task for details or toggle status directly.
+              </p>
+            </div>
+            <Link
+              to="/tasks"
+              className="text-xs font-semibold text-zinc-700 hover:text-zinc-900 flex items-center gap-1 group"
+            >
+              <span>Task board</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </Link>
           </div>
-          <Link
-            to="/projects"
-            className="text-xs font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1"
-          >
-            All projects <ArrowUpRight className="w-3.5 h-3.5" />
-          </Link>
+
+          <div className="space-y-2.5">
+            {assignedTasks.length === 0 ? (
+              <div className="p-8 text-center bg-zinc-50 rounded-xl border border-zinc-100">
+                <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
+                <p className="text-sm font-bold text-zinc-900">You are all caught up!</p>
+                <p className="text-xs text-zinc-500 mt-0.5">
+                  No pending deliverables currently assigned to your account.
+                </p>
+              </div>
+            ) : (
+              assignedTasks.map((t: any) => {
+                const deadlineInfo = formatTaskDeadline(t.deadline);
+                return (
+                  <div
+                    key={t.id}
+                    className="p-3.5 rounded-xl border border-zinc-100 hover:border-zinc-200 hover:bg-zinc-50/60 transition-all flex items-center justify-between gap-3 text-xs"
+                  >
+                    <div
+                      onClick={() => setSelectedTask(t)}
+                      className="min-w-0 flex-1 cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`font-semibold transition-colors ${
+                            t.status === 'COMPLETED' ? 'line-through text-zinc-400' : 'text-zinc-900'
+                          }`}
+                        >
+                          {t.title}
+                        </span>
+                        <PriorityBadge priority={t.priority} size="sm" />
+                      </div>
+                      <div className="flex items-center gap-2 mt-1.5 text-[11px] text-zinc-400 font-mono">
+                        <span className="text-zinc-600 font-medium">{t.project?.name}</span>
+                        {deadlineInfo && (
+                          <>
+                            <span>•</span>
+                            <span
+                              className={
+                                deadlineInfo.isOverdue
+                                  ? 'text-rose-600 font-semibold'
+                                  : deadlineInfo.isUrgent
+                                  ? 'text-amber-700 font-semibold'
+                                  : 'text-zinc-500'
+                              }
+                            >
+                              {deadlineInfo.text}
+                            </span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 1-Click Status Progression Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleStatusToggle(t.id, t.status)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all shrink-0 ${
+                        t.status === 'COMPLETED'
+                          ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
+                          : t.status === 'IN_PROGRESS'
+                          ? 'bg-blue-50 text-blue-800 border-blue-300 hover:bg-blue-100'
+                          : 'bg-zinc-100 text-zinc-700 border-zinc-300 hover:bg-zinc-200'
+                      }`}
+                    >
+                      {t.status === 'COMPLETED'
+                        ? 'Done ✓'
+                        : t.status === 'IN_PROGRESS'
+                        ? 'In Progress →'
+                        : 'Start →'}
+                    </button>
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {projects.length === 0 ? (
-            <p className="text-xs text-slate-400 py-6 text-center col-span-2">
-              You are not currently assigned to any projects.
+        {/* Right 1 Col: My Project Squads */}
+        <div className="rounded-xl border border-zinc-200/80 bg-white p-5 shadow-subtle">
+          <div className="pb-3 border-b border-zinc-100 mb-4">
+            <h2 className="text-base font-bold text-zinc-900 tracking-tight">
+              My Club Squads
+            </h2>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              Active project committees you are enrolled in.
             </p>
-          ) : (
-            projects.map((p) => (
-              <div
-                key={p.id}
-                className="p-5 rounded-xl border border-slate-200 hover:border-brand-500/40 hover:shadow-card transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-2 mb-2">
+          </div>
+
+          <div className="space-y-4">
+            {projects.length === 0 ? (
+              <p className="text-xs text-zinc-400 py-6 text-center">
+                You have not been added to any project committees yet.
+              </p>
+            ) : (
+              projects.map((p: any) => (
+                <div
+                  key={p.id}
+                  className="p-3.5 rounded-xl border border-zinc-100 hover:border-zinc-200 transition-all"
+                >
+                  <div className="flex items-start justify-between gap-2 mb-1.5">
                     <Link
                       to={`/projects/${p.id}`}
-                      className="text-sm font-bold text-slate-900 hover:text-brand-600 transition-colors"
+                      className="text-xs font-bold text-zinc-900 hover:text-emerald-600 transition-colors line-clamp-1"
                     >
                       {p.name}
                     </Link>
                     <StatusBadge status={p.status} size="sm" />
                   </div>
-                  {p.description && (
-                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-3">
-                      {p.description}
-                    </p>
-                  )}
-                </div>
-
-                <div className="pt-3 border-t border-slate-100">
-                  <div className="flex items-center justify-between text-xs text-slate-500 mb-2 font-medium">
-                    <span>Lead: {p.projectLead?.name || 'Faculty Advisor'}</span>
-                    <span>
-                      My tasks: {p.myCompletedCount}/{p.myTaskCount} ({p.myProgress}%)
-                    </span>
+                  <div className="flex items-center gap-1.5 text-[11px] text-zinc-500 mb-2">
+                    <Avatar name={p.projectLead?.name} size="xs" />
+                    <span>Lead: {p.projectLead?.name || 'Unassigned'}</span>
                   </div>
-                  <ProgressBar progress={p.myProgress} size="md" />
-
-                  <div className="mt-3 flex items-center justify-between pt-2">
-                    <span className="text-[11px] text-slate-400">
-                      Overall Project: {p.overallProgress}% complete
-                    </span>
-                    <Link
-                      to={`/projects/${p.id}`}
-                      className="text-xs font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1"
-                    >
-                      View Details <ArrowUpRight className="w-3.5 h-3.5" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Assigned Tasks & Deadlines Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Interactive Assigned Tasks List */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-subtle lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-base font-bold text-slate-900">My Assigned Deliverables</h3>
-              <p className="text-xs text-slate-500">Quickly update status as you make progress</p>
-            </div>
-            <Link
-              to="/tasks"
-              className="text-xs font-semibold text-brand-600 hover:text-brand-700 flex items-center gap-1"
-            >
-              Task Board <ArrowUpRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          <div className="space-y-3">
-            {assignedTasks.length === 0 ? (
-              <p className="text-xs text-slate-400 py-8 text-center">
-                No tasks currently assigned to you. Enjoy the break!
-              </p>
-            ) : (
-              assignedTasks.map((t) => (
-                <div
-                  key={t.id}
-                  className="p-4 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50/50 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10px] font-semibold text-brand-700 bg-brand-50 px-2 py-0.5 rounded-md truncate max-w-[150px]">
-                        {t.project?.name}
-                      </span>
-                      <PriorityBadge priority={t.priority} size="sm" />
-                      {t.deadline && (
-                        <span
-                          className={`text-[11px] font-medium flex items-center gap-1 ${
-                            t.isOverdue
-                              ? 'text-rose-600 font-semibold'
-                              : t.isDueToday
-                              ? 'text-amber-600 font-semibold'
-                              : 'text-slate-500'
-                          }`}
-                        >
-                          <Calendar className="w-3 h-3" />
-                          {format(new Date(t.deadline), 'MMM dd')}
-                          {t.isOverdue && ' (Overdue)'}
-                          {t.isDueToday && ' (Due Today)'}
-                        </span>
-                      )}
-                    </div>
-                    <p className="font-semibold text-slate-900 text-sm">{t.title}</p>
-                    {t.description && (
-                      <p className="text-slate-500 mt-1 line-clamp-1">{t.description}</p>
-                    )}
-                  </div>
-
-                  {/* Status Switcher Controls */}
-                  <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
-                    <select
-                      value={t.status}
-                      onChange={(e) => handleUpdateStatus(t.id, e.target.value as TaskStatus)}
-                      className={`px-3 py-1.5 rounded-lg font-semibold text-xs border outline-none cursor-pointer transition-all ${
-                        t.status === 'COMPLETED'
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                          : t.status === 'IN_PROGRESS'
-                          ? 'bg-blue-50 text-blue-700 border-blue-300'
-                          : 'bg-amber-50 text-amber-700 border-amber-300'
-                      }`}
-                    >
-                      <option value="TODO">To Do</option>
-                      <option value="IN_PROGRESS">In Progress</option>
-                      <option value="COMPLETED">Completed</option>
-                    </select>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        {/* Due Soon Deadlines */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-subtle">
-          <h3 className="text-base font-bold text-slate-900 flex items-center gap-2 mb-1">
-            <Calendar className="w-4 h-4 text-brand-600" />
-            Upcoming Deadlines
-          </h3>
-          <p className="text-xs text-slate-500 mb-4">Milestones due soon</p>
-
-          <div className="space-y-3">
-            {upcomingTasks.length === 0 ? (
-              <p className="text-xs text-slate-400 py-6 text-center">No upcoming deadlines.</p>
-            ) : (
-              upcomingTasks.map((t) => (
-                <div
-                  key={t.id}
-                  className="p-3 rounded-xl border border-slate-100 hover:border-slate-200 transition-all text-xs"
-                >
-                  <div className="flex items-start justify-between gap-1 mb-1">
-                    <p className="font-semibold text-slate-900 leading-snug">{t.title}</p>
-                    <PriorityBadge priority={t.priority} size="sm" />
-                  </div>
-                  <div className="flex items-center justify-between text-[11px] text-slate-500 mt-2 pt-2 border-t border-slate-100">
-                    <span className="truncate max-w-[130px]">{t.project?.name}</span>
-                    {t.deadline && (
-                      <span className="font-semibold text-slate-700">
-                        {format(new Date(t.deadline), 'MMM dd')}
-                      </span>
-                    )}
-                  </div>
+                  <ProgressBar progress={p.progress} size="sm" />
                 </div>
               ))
             )}
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Task Detail Slide-over Drawer */}
+      <TaskDetailDrawer
+        task={selectedTask}
+        isOpen={!!selectedTask}
+        onClose={() => setSelectedTask(null)}
+        onStatusChange={handleStatusChangeFromDrawer}
+        canEdit={true}
+      />
+    </PageTransition>
   );
 };

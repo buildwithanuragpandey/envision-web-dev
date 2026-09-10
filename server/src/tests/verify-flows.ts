@@ -17,7 +17,7 @@ async function runTests() {
 
   try {
     // Helper fetch wrapper
-    const req = async (path: string, options: any = {}) => {
+    const req = async (path: string, options: any = {}): Promise<{ status: number; data: any }> => {
       const url = `${API_URL}${path}`;
       const res = await fetch(url, {
         ...options,
@@ -26,7 +26,7 @@ async function runTests() {
           ...(options.headers || {}),
         },
       });
-      const data = await res.json().catch(() => null);
+      const data: any = await res.json().catch(() => null);
       return { status: res.status, data };
     };
 
@@ -197,15 +197,15 @@ async function runTests() {
     // ----------------------------------------------------
     console.log('\n--- FLOW 7: Project Lead Cross-Project Modification Protection ---');
     const allProjects = await req('/projects', { headers: adminHeaders });
-    const symposiumProject = allProjects.data.data.find((p: any) => p.name.includes('Symposium'));
+    const otherLeadProject = allProjects.data.data.find((p: any) => p.projectLeadId !== leadUser.id);
     
-    if (symposiumProject) {
+    if (otherLeadProject) {
       const crossTask = await req('/tasks', {
         method: 'POST',
         headers: leadHeaders,
         body: JSON.stringify({
           title: 'Unauthorized Task In Another Lead Project',
-          projectId: symposiumProject.id,
+          projectId: otherLeadProject.id,
         }),
       });
       assert(crossTask.status === 403, 'Lead creating task in unrelated project blocked with 403 Forbidden');

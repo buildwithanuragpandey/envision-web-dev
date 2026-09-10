@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldAlert, ArrowLeft } from 'lucide-react';
+import { ShieldAlert, ArrowLeft, Compass } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { motion } from 'framer-motion';
 
 export const UnauthorizedPage: React.FC = () => {
   const { role } = useAuth();
@@ -13,40 +14,56 @@ export const UnauthorizedPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center text-center p-6">
-      <div className="w-16 h-16 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mb-4 shadow-sm border border-rose-100">
-        <ShieldAlert className="w-8 h-8" />
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6"
+    >
+      <div className="w-14 h-14 rounded-2xl bg-rose-500/10 text-rose-600 flex items-center justify-center mb-4 border border-rose-500/20 shadow-subtle">
+        <ShieldAlert className="w-7 h-7" />
       </div>
-      <h1 className="text-2xl font-extrabold text-slate-900">403 – Access Forbidden</h1>
-      <p className="text-sm text-slate-500 max-w-md mt-2 mb-6">
-        You do not have the required permissions to access this administrative resource. Role-Based
-        Access Control (RBAC) has enforced this boundary.
+      <span className="text-xs font-mono font-semibold uppercase tracking-wider text-rose-600 mb-1">
+        Access Denied • 403
+      </span>
+      <h1 className="text-2xl font-bold text-surface-900 tracking-tight">Permission Boundary</h1>
+      <p className="text-sm text-surface-500 max-w-md mt-2 mb-6">
+        Your active role credentials do not possess the required RBAC privileges to access this resource.
       </p>
       <Link
         to={getHomePath()}
-        className="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl transition-all shadow-sm"
+        className="inline-flex items-center gap-2 px-4 py-2 bg-surface-900 hover:bg-surface-800 text-surface-0 text-xs font-semibold rounded-lg transition-all shadow-sm"
       >
         <ArrowLeft className="w-4 h-4" />
-        Return to My Dashboard
+        Return to Dashboard
       </Link>
-    </div>
+    </motion.div>
   );
 };
 
 export const NotFoundPage: React.FC = () => {
   return (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center text-center p-6">
-      <h1 className="text-4xl font-extrabold text-slate-900">404</h1>
-      <p className="text-base font-semibold text-slate-700 mt-2">Page Not Found</p>
-      <p className="text-xs text-slate-500 max-w-sm mt-1 mb-6">
-        The page you are trying to visit does not exist or has moved.
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6"
+    >
+      <div className="w-14 h-14 rounded-2xl bg-surface-100 text-surface-600 flex items-center justify-center mb-4 border border-border shadow-subtle">
+        <Compass className="w-7 h-7" />
+      </div>
+      <span className="text-xs font-mono font-semibold uppercase tracking-wider text-surface-400 mb-1">
+        HTTP 404 • Not Found
+      </span>
+      <h1 className="text-2xl font-bold text-surface-900 tracking-tight">Resource Not Located</h1>
+      <p className="text-sm text-surface-500 max-w-sm mt-2 mb-6">
+        The route or resource you are attempting to visit does not exist or has been relocated.
       </p>
       <Link
         to="/"
-        className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-xl transition-all shadow-sm"
+        className="inline-flex items-center gap-2 px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold rounded-lg transition-all shadow-sm"
       >
+        <ArrowLeft className="w-4 h-4" />
         Back to Safety
       </Link>
-    </div>
+    </motion.div>
   );
 };
