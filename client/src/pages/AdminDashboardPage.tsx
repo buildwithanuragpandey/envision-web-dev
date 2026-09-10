@@ -7,12 +7,10 @@ import {
   FolderKanban,
   CheckCircle2,
   Clock,
-  AlertCircle,
   Plus,
   ArrowRight,
   Activity,
   Calendar,
-  Sparkles,
   Video,
 } from 'lucide-react';
 import { Button } from '../components/common/Button';
@@ -23,10 +21,11 @@ import { AnimatedCounter } from '../components/common/AnimatedCounter';
 import { DashboardTicker, TickerItem } from '../components/common/DashboardTicker';
 import { MediaFrame } from '../components/common/MediaFrame';
 import { PageTransition } from '../components/common/PageTransition';
+import { BackgroundAtmosphere } from '../components/common/BackgroundAtmosphere';
 import { Link } from 'react-router-dom';
 import { ProjectModal } from '../components/projects/ProjectModal';
 import { MemberModal } from '../components/members/MemberModal';
-import { format, formatDistanceToNow, isPast, isToday, isTomorrow } from 'date-fns';
+import { format, formatDistanceToNow, isPast, isToday } from 'date-fns';
 import { useToast } from '../context/ToastContext';
 
 export const AdminDashboardPage: React.FC = () => {
@@ -68,13 +67,13 @@ export const AdminDashboardPage: React.FC = () => {
   if (isLoading || !data) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-24 rounded-2xl" />
+        <Skeleton className="h-32 rounded-lg" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-20 rounded-xl" />
+            <Skeleton key={i} className="h-20 rounded-lg" />
           ))}
         </div>
-        <Skeleton className="h-72 rounded-xl" />
+        <Skeleton className="h-72 rounded-lg" />
       </div>
     );
   }
@@ -98,140 +97,150 @@ export const AdminDashboardPage: React.FC = () => {
 
   return (
     <PageTransition>
-      {/* Editorial Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-zinc-200/80">
-        <div>
-          <span className="font-mono text-[11px] uppercase tracking-wider text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">
-            Faculty & Executive Overview
-          </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight mt-1.5">
-            Good morning, {user?.name?.split(' ')[0] || 'Advisor'}
-          </h1>
-          <p className="text-xs text-zinc-500 mt-1">
-            Here is what needs your attention across projects, student teams, and upcoming deadlines.
-          </p>
-        </div>
+      {/* Hero Dashboard Header with Background Video Atmosphere (10-20% visual intensity) */}
+      <div className="relative rounded-lg border border-white/8 bg-[#0A0A0C] p-6 sm:p-8 overflow-hidden shadow-premium">
+        <BackgroundAtmosphere variant="hero" showAmbientMesh={true} />
 
-        <div className="flex items-center gap-2.5">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsAddMemberOpen(true)}
-            leftIcon={<Users className="w-3.5 h-3.5" />}
-          >
-            Enroll Member
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => setIsCreateProjectOpen(true)}
-            leftIcon={<Plus className="w-3.5 h-3.5" />}
-          >
-            New Project
-          </Button>
+        <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-[#FFDD00] font-semibold bg-[#111114] px-2 py-0.5 rounded border border-white/10">
+                COMMAND CENTER • ADVISOR
+              </span>
+              <span className="text-[11px] font-mono text-zinc-500">
+                YOUR CLUB. IN MOTION.
+              </span>
+            </div>
+
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F5F5F0] tracking-tight mt-2">
+              Good morning, {user?.name?.split(' ')[0] || 'Advisor'}
+            </h1>
+            <p className="text-xs text-zinc-400 mt-1 max-w-xl">
+              Here is what needs your attention today across active initiatives, team velocity, and milestone deliverables.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2.5 shrink-0">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsAddMemberOpen(true)}
+              leftIcon={<Users className="w-3.5 h-3.5" />}
+            >
+              Enroll Member
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsCreateProjectOpen(true)}
+              leftIcon={<Plus className="w-3.5 h-3.5 text-black font-bold" />}
+            >
+              New Project
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Ticker */}
-      <DashboardTicker items={tickerItems} className="rounded-lg my-2" />
+      {/* Moving Marquee Ticker */}
+      <DashboardTicker items={tickerItems} className="rounded-lg my-3" />
 
-      {/* Inline Compact Statistics (Linear/Notion style - no heavy cards) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 py-2">
-        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-subtle">
-          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
-            Active Projects
+      {/* Command Center Statistics */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 py-1">
+        <div className="p-4 rounded-lg bg-[#0A0A0C] border border-white/8 shadow-subtle hover:border-[#FF6814]/30 transition-all">
+          <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold">
+            ACTIVE PROJECTS
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-zinc-900">
+            <span className="text-2xl font-bold font-mono text-[#F5F5F0]">
               <AnimatedCounter value={kpis.activeProjects} />
             </span>
-            <span className="text-xs text-zinc-400">/ {kpis.totalProjects} total</span>
+            <span className="text-xs font-mono text-zinc-500">/ {kpis.totalProjects} total</span>
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-subtle">
-          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
-            Tasks Due
+        <div className="p-4 rounded-lg bg-[#0A0A0C] border border-white/8 shadow-subtle hover:border-[#FF6814]/30 transition-all">
+          <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold">
+            TASKS DUE
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-zinc-900">
+            <span className="text-2xl font-bold font-mono text-[#F5F5F0]">
               <AnimatedCounter value={kpis.todoTasks + kpis.inProgressTasks} />
             </span>
-            <span className="text-xs text-zinc-400">in flight</span>
+            <span className="text-xs font-mono text-zinc-500">in flight</span>
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-subtle">
-          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
-            Completed
+        <div className="p-4 rounded-lg bg-[#0A0A0C] border border-white/8 shadow-subtle hover:border-[#FF6814]/30 transition-all">
+          <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold">
+            COMPLETED
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-emerald-600">
+            <span className="text-2xl font-bold font-mono text-[#FFDD00]">
               <AnimatedCounter value={kpis.completedTasks} />
             </span>
-            <span className="text-xs text-zinc-400">deliverables</span>
+            <span className="text-xs font-mono text-zinc-500">deliverables</span>
           </div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white border border-zinc-200/80 shadow-subtle">
-          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider">
-            Club Progress
+        <div className="p-4 rounded-lg bg-[#0A0A0C] border border-white/8 shadow-subtle hover:border-[#FF6814]/30 transition-all">
+          <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold">
+            PROGRESS
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-zinc-900">
+            <span className="text-2xl font-bold font-mono text-[#FF6814]">
               <AnimatedCounter value={kpis.clubCompletionRate} suffix="%" />
             </span>
             {kpis.overdueTasks > 0 ? (
-              <span className="text-[11px] font-mono text-rose-600 font-semibold bg-rose-50 px-1.5 py-0.5 rounded border border-rose-200/60">
+              <span className="text-[10px] font-mono text-rose-400 bg-rose-950/50 px-1.5 py-0.5 rounded border border-rose-800/60">
                 {kpis.overdueTasks} overdue
               </span>
             ) : (
-              <span className="text-[11px] font-mono text-emerald-600">on track</span>
+              <span className="text-[10px] font-mono text-[#FFDD00]">on track</span>
             )}
           </div>
         </div>
       </div>
 
       {/* Projects Table & Momentum Section */}
-      <div className="rounded-xl border border-zinc-200/80 bg-white overflow-hidden shadow-subtle">
-        <div className="p-5 border-b border-zinc-100 flex items-center justify-between">
+      <div className="rounded-lg border border-white/8 bg-[#0A0A0C] overflow-hidden shadow-subtle mt-4">
+        <div className="p-5 border-b border-white/8 flex items-center justify-between bg-[#050506]">
           <div>
-            <h2 className="text-base font-bold text-zinc-900 tracking-tight">
+            <h2 className="text-sm font-bold text-[#F5F5F0] tracking-tight">
               Current Club Initiatives
             </h2>
-            <p className="text-xs text-zinc-500 mt-0.5">
-              Live deliverable completion and team leadership across active projects.
+            <p className="text-xs text-zinc-400 mt-0.5">
+              Live deliverable completion and team leadership across active technical projects.
             </p>
           </div>
           <Link
             to="/projects"
-            className="text-xs font-semibold text-zinc-700 hover:text-zinc-900 flex items-center gap-1 group"
+            className="text-xs font-medium text-zinc-400 hover:text-[#FF6814] flex items-center gap-1 group transition-colors"
           >
             <span>All projects</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </div>
 
-        <div className="divide-y divide-zinc-100">
+        <div className="divide-y divide-white/5">
           {projectProgressList.map((p) => (
             <div
               key={p.id}
-              className="p-4 sm:px-6 hover:bg-zinc-50/60 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              className="p-4 sm:px-6 hover:bg-[#111114]/60 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2.5">
                   <Link
                     to={`/projects/${p.id}`}
-                    className="text-sm font-bold text-zinc-900 hover:text-emerald-600 transition-colors truncate"
+                    className="text-sm font-semibold text-[#F5F5F0] hover:text-[#FF6814] transition-colors truncate"
                   >
                     {p.name}
                   </Link>
                   <StatusBadge status={p.status} size="sm" />
                 </div>
-                <div className="flex items-center gap-3 mt-1.5 text-xs text-zinc-500">
+                <div className="flex items-center gap-3 mt-1.5 text-xs text-zinc-400 font-mono">
                   <div className="flex items-center gap-1.5">
                     <Avatar name={p.projectLead?.name} size="xs" />
-                    <span>Lead: {p.projectLead?.name || 'Unassigned'}</span>
+                    <span className="text-zinc-300">Lead: {p.projectLead?.name || 'Unassigned'}</span>
                   </div>
                   <span>•</span>
                   <span>{p.memberCount} members</span>
@@ -246,7 +255,7 @@ export const AdminDashboardPage: React.FC = () => {
                 <div className="flex-1">
                   <ProgressBar progress={p.progress} size="sm" />
                 </div>
-                <span className="font-mono text-xs font-semibold text-zinc-700 w-10 text-right">
+                <span className="font-mono text-xs font-semibold text-[#FF6814] w-10 text-right">
                   {p.progress}%
                 </span>
               </div>
@@ -255,42 +264,42 @@ export const AdminDashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Split: Upcoming Timeline & Recent Club Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Split: Upcoming Deadlines & Recent Club Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
         {/* Upcoming Deadlines Timeline */}
-        <div className="rounded-xl border border-zinc-200/80 bg-white p-5 shadow-subtle">
-          <div className="flex items-center justify-between pb-3 border-b border-zinc-100 mb-4">
-            <h3 className="text-sm font-bold text-zinc-900 flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-zinc-600" />
+        <div className="rounded-lg border border-white/8 bg-[#0A0A0C] p-5 shadow-subtle">
+          <div className="flex items-center justify-between pb-3 border-b border-white/8 mb-4">
+            <h3 className="text-xs font-bold text-[#F5F5F0] uppercase tracking-wider flex items-center gap-2 font-mono">
+              <Calendar className="w-3.5 h-3.5 text-[#FF6814]" />
               Upcoming Deliverables & Deadlines
             </h3>
             <Link
               to="/tasks"
-              className="text-xs font-semibold text-zinc-600 hover:text-zinc-900 flex items-center gap-1"
+              className="text-xs font-medium text-zinc-400 hover:text-[#FF6814] flex items-center gap-1 transition-colors"
             >
               <span>Task board</span>
               <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {upcomingDeadlines.length === 0 ? (
-              <p className="text-xs text-zinc-400 py-6 text-center">No upcoming deadlines.</p>
+              <p className="text-xs text-zinc-500 py-6 text-center">No upcoming deadlines scheduled.</p>
             ) : (
               upcomingDeadlines.map((t) => {
                 const isOverdue = t.deadline && isPast(new Date(t.deadline)) && !isToday(new Date(t.deadline));
                 return (
                   <div
                     key={t.id}
-                    className="flex items-center justify-between p-3 rounded-lg border border-zinc-100 hover:border-zinc-200 hover:bg-zinc-50/50 transition-all text-xs"
+                    className="flex items-center justify-between p-3 rounded-lg border border-white/5 bg-[#111114]/40 hover:border-white/10 hover:bg-[#111114] transition-all text-xs"
                   >
                     <div className="min-w-0 flex-1 pr-3">
-                      <p className="font-semibold text-zinc-900 truncate">{t.title}</p>
-                      <div className="flex items-center gap-2 mt-1 text-[11px] text-zinc-500">
+                      <p className="font-medium text-[#F5F5F0] truncate">{t.title}</p>
+                      <div className="flex items-center gap-2 mt-1 text-[11px] text-zinc-400">
                         <Avatar name={t.assignedTo?.name} size="xs" />
                         <span>{t.assignedTo?.name || 'Unassigned'}</span>
                         <span>•</span>
-                        <span className="truncate">{t.project?.name}</span>
+                        <span className="truncate text-zinc-500">{t.project?.name}</span>
                       </div>
                     </div>
 
@@ -298,10 +307,10 @@ export const AdminDashboardPage: React.FC = () => {
                       <PriorityBadge priority={t.priority} size="sm" />
                       {t.deadline && (
                         <span
-                          className={`text-[11px] font-mono px-2 py-0.5 rounded border ${
+                          className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
                             isOverdue
-                              ? 'bg-rose-50 text-rose-700 border-rose-200'
-                              : 'bg-zinc-100 text-zinc-600 border-zinc-200'
+                              ? 'bg-rose-950/50 text-rose-400 border-rose-800/60'
+                              : 'bg-[#16161A] text-zinc-300 border-white/10'
                           }`}
                         >
                           {format(new Date(t.deadline), 'MMM dd')}
@@ -316,24 +325,24 @@ export const AdminDashboardPage: React.FC = () => {
         </div>
 
         {/* Live Activity Stream */}
-        <div className="rounded-xl border border-zinc-200/80 bg-white p-5 shadow-subtle">
-          <div className="pb-3 border-b border-zinc-100 mb-4">
-            <h3 className="text-sm font-bold text-zinc-900 flex items-center gap-2">
-              <Activity className="w-4 h-4 text-zinc-600" />
+        <div className="rounded-lg border border-white/8 bg-[#0A0A0C] p-5 shadow-subtle">
+          <div className="pb-3 border-b border-white/8 mb-4">
+            <h3 className="text-xs font-bold text-[#F5F5F0] uppercase tracking-wider flex items-center gap-2 font-mono">
+              <Activity className="w-3.5 h-3.5 text-[#FFDD00]" />
               Club Activity Stream
             </h3>
           </div>
 
-          <div className="space-y-3.5">
+          <div className="space-y-3">
             {recentActivities.length === 0 ? (
-              <p className="text-xs text-zinc-400 py-6 text-center">No recent activity logged.</p>
+              <p className="text-xs text-zinc-500 py-6 text-center">No recent activity logged.</p>
             ) : (
               recentActivities.map((log) => (
                 <div key={log.id} className="flex items-start gap-3 text-xs">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#FF6814] mt-1.5 shrink-0 shadow-glow-orange" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-zinc-800 font-medium leading-snug">{log.description}</p>
-                    <p className="text-[10px] font-mono text-zinc-400 mt-0.5">
+                    <p className="text-zinc-300 font-medium leading-snug">{log.description}</p>
+                    <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
                       {formatDistanceToNow(new Date(log.createdAt), { addSuffix: true })}
                     </p>
                   </div>
@@ -344,16 +353,16 @@ export const AdminDashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Club Highlights & Workspace Media Section (Real media with video reel) */}
-      <div className="space-y-4 pt-2">
+      {/* Club Highlights & Workspace Media Section */}
+      <div className="space-y-4 pt-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-base font-bold text-zinc-900 flex items-center gap-2">
-              <Video className="w-4 h-4 text-zinc-700" />
-              Club Highlights & Workspace Media
+            <h2 className="text-sm font-bold text-[#F5F5F0] flex items-center gap-2">
+              <Video className="w-4 h-4 text-[#FF6814]" />
+              Club Highlights & Media Reel
             </h2>
-            <p className="text-xs text-zinc-500 mt-0.5">
-              Event documentation, workshop recordings, and technical demonstrations.
+            <p className="text-xs text-zinc-400 mt-0.5">
+              Event documentation, workshop archives, and technical project showcases.
             </p>
           </div>
         </div>
@@ -373,7 +382,7 @@ export const AdminDashboardPage: React.FC = () => {
           <MediaFrame
             type="image"
             src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&auto=format&fit=crop&q=80"
-            title="HackFest 2026 – Hackathon Operations Room"
+            title="HackFest 2026 – Hackathon Sprint"
             category="EVENT HIGHLIGHT"
             description="36-hour sprint with 300+ collegiate developers and live mentorship queues."
             aspectRatio="video"

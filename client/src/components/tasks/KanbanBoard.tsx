@@ -27,9 +27,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   const { user } = useAuth();
 
   const columns: { id: TaskStatus; title: string; dotColor: string }[] = [
-    { id: 'TODO', title: 'To Do', dotColor: 'bg-zinc-400' },
-    { id: 'IN_PROGRESS', title: 'In Progress', dotColor: 'bg-blue-500 animate-pulse' },
-    { id: 'COMPLETED', title: 'Completed', dotColor: 'bg-emerald-500' },
+    { id: 'TODO', title: 'TO DO', dotColor: 'bg-zinc-500' },
+    { id: 'IN_PROGRESS', title: 'IN PROGRESS', dotColor: 'bg-[#FF6814] shadow-glow-orange' },
+    { id: 'COMPLETED', title: 'COMPLETED', dotColor: 'bg-[#FFDD00] shadow-glow-yellow' },
   ];
 
   const getTasksByStatus = (status: TaskStatus) => {
@@ -37,24 +37,24 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {columns.map((col) => {
         const columnTasks = getTasksByStatus(col.id);
 
         return (
           <div
             key={col.id}
-            className="bg-zinc-100/60 rounded-2xl p-3.5 flex flex-col min-h-[500px] border border-zinc-200/70"
+            className="bg-[#070709] rounded-lg p-3.5 flex flex-col min-h-[500px] border border-white/5"
           >
             {/* Column Header */}
-            <div className="flex items-center justify-between pb-3 px-1 mb-2 border-b border-zinc-200/60">
+            <div className="flex items-center justify-between pb-3 px-1 mb-2 border-b border-white/5">
               <div className="flex items-center gap-2">
                 <span className={`w-2 h-2 rounded-full ${col.dotColor}`} />
-                <span className="font-bold text-xs uppercase tracking-wider text-zinc-800">
+                <span className="font-bold text-xs uppercase tracking-wider text-zinc-300 font-mono">
                   {col.title}
                 </span>
               </div>
-              <span className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-full bg-white text-zinc-600 border border-zinc-200 shadow-2xs">
+              <span className="font-mono text-[10px] font-semibold px-2 py-0.5 rounded bg-[#111114] text-zinc-400 border border-white/8">
                 {columnTasks.length}
               </span>
             </div>
@@ -63,7 +63,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
             <div className="flex-1 space-y-2.5 overflow-y-auto">
               <AnimatePresence mode="popLayout">
                 {columnTasks.length === 0 ? (
-                  <div className="h-36 flex items-center justify-center border border-dashed border-zinc-300/80 rounded-xl text-xs font-mono text-zinc-400">
+                  <div className="h-32 flex items-center justify-center border border-dashed border-white/8 rounded-lg text-xs font-mono text-zinc-600">
                     No tasks in {col.title.toLowerCase()}
                   </div>
                 ) : (
@@ -80,7 +80,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         exit={{ opacity: 0, scale: 0.96 }}
                         transition={{ duration: 0.2, ease: 'easeOut' }}
                         key={task.id}
-                        className="bg-white rounded-xl p-3.5 shadow-subtle border border-zinc-200/80 hover:border-zinc-300 transition-all group"
+                        className="bg-[#0D0D10] rounded-lg p-3.5 shadow-subtle border border-white/8 hover:border-[#FF6814]/40 hover:-translate-y-0.5 transition-all group"
                       >
                         {/* Clickable Card Body (Opens Drawer) */}
                         <div
@@ -89,33 +89,33 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         >
                           {/* Project Tag & Priority */}
                           <div className="flex items-center justify-between gap-2 mb-2">
-                            <span className="font-mono text-[10px] uppercase font-semibold text-zinc-500 bg-zinc-100 px-2 py-0.5 rounded truncate max-w-[140px]">
+                            <span className="font-mono text-[10px] uppercase font-semibold text-zinc-400 bg-[#16161A] px-2 py-0.5 rounded truncate max-w-[140px] border border-white/5">
                               {task.project?.name || 'Project'}
                             </span>
                             <PriorityBadge priority={task.priority} size="sm" />
                           </div>
 
                           {/* Title */}
-                          <h4 className="text-xs font-bold text-zinc-900 group-hover:text-emerald-700 transition-colors leading-snug">
+                          <h4 className="text-xs font-semibold text-[#F5F5F0] group-hover:text-[#FF6814] transition-colors leading-snug">
                             {task.title}
                           </h4>
 
                           {/* Description */}
                           {task.description && (
-                            <p className="text-[11px] text-zinc-500 mt-1 line-clamp-2 leading-relaxed">
+                            <p className="text-[11px] text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
                               {task.description}
                             </p>
                           )}
 
                           {/* Deadline & Assignee */}
-                          <div className="mt-3 pt-2.5 border-t border-zinc-100 flex items-center justify-between text-[11px] text-zinc-500">
+                          <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-[11px] text-zinc-400">
                             {deadlineInfo ? (
                               <div
                                 className={`flex items-center gap-1 font-mono text-[10px] ${
                                   deadlineInfo.isOverdue
-                                    ? 'text-rose-600 font-bold'
+                                    ? 'text-rose-400 font-bold'
                                     : deadlineInfo.isUrgent
-                                    ? 'text-amber-700 font-semibold'
+                                    ? 'text-[#FFDD00] font-semibold'
                                     : 'text-zinc-500'
                                 }`}
                               >
@@ -123,7 +123,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                                 <span>{deadlineInfo.text}</span>
                               </div>
                             ) : (
-                              <div className="flex items-center gap-1 text-zinc-400 font-mono text-[10px]">
+                              <div className="flex items-center gap-1 text-zinc-600 font-mono text-[10px]">
                                 <Clock className="w-3 h-3" />
                                 <span>No deadline</span>
                               </div>
@@ -132,7 +132,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                             {/* Assignee Initials Avatar */}
                             <div className="flex items-center gap-1.5" title={task.assignedTo?.name || 'Unassigned'}>
                               <Avatar name={task.assignedTo?.name} size="xs" />
-                              <span className="text-[10px] text-zinc-600 font-medium truncate max-w-[70px]">
+                              <span className="text-[10px] text-zinc-400 font-medium truncate max-w-[70px]">
                                 {task.assignedTo?.name?.split(' ')[0] || 'Unassigned'}
                               </span>
                             </div>
@@ -140,14 +140,14 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         </div>
 
                         {/* Status Transition Action Buttons */}
-                        <div className="mt-2.5 pt-2 border-t border-zinc-100 flex items-center justify-between gap-1">
+                        <div className="mt-2.5 pt-2 border-t border-white/5 flex items-center justify-between gap-1">
                           <div className="flex items-center gap-1">
                             {col.id === 'IN_PROGRESS' && canChangeThisStatus && (
                               <button
                                 type="button"
                                 onClick={() => onUpdateStatus(task.id, 'TODO')}
                                 title="Move back to To Do"
-                                className="p-1 rounded text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
+                                className="p-1 rounded text-zinc-500 hover:text-white hover:bg-[#16161A] transition-colors"
                               >
                                 <ArrowLeft className="w-3 h-3" />
                               </button>
@@ -157,7 +157,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                                 type="button"
                                 onClick={() => onUpdateStatus(task.id, 'IN_PROGRESS')}
                                 title="Move back to In Progress"
-                                className="p-1 rounded text-zinc-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                className="p-1 rounded text-zinc-500 hover:text-[#FF6814] hover:bg-[#16161A] transition-colors"
                               >
                                 <ArrowLeft className="w-3 h-3" />
                               </button>
@@ -167,17 +167,17 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                               <button
                                 type="button"
                                 onClick={() => onUpdateStatus(task.id, 'IN_PROGRESS')}
-                                className="px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-800 flex items-center gap-1 transition-colors"
+                                className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#16161A] hover:bg-[#202025] text-zinc-300 hover:text-white flex items-center gap-1 transition-colors border border-white/5"
                               >
                                 <span>Start</span>
-                                <ArrowRight className="w-2.5 h-2.5" />
+                                <ArrowRight className="w-2.5 h-2.5 text-[#FF6814]" />
                               </button>
                             )}
                             {col.id === 'IN_PROGRESS' && canChangeThisStatus && (
                               <button
                                 type="button"
                                 onClick={() => onUpdateStatus(task.id, 'COMPLETED')}
-                                className="px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-700 flex items-center gap-1 transition-colors border border-emerald-200/60"
+                                className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#16161A] hover:bg-[#202025] text-[#FFDD00] flex items-center gap-1 transition-colors border border-white/8"
                               >
                                 <CheckCircle2 className="w-2.5 h-2.5" />
                                 <span>Complete</span>
@@ -192,7 +192,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => onEditTask(task)}
-                                  className="p-1 text-zinc-400 hover:text-zinc-800 rounded hover:bg-zinc-100"
+                                  className="p-1 text-zinc-500 hover:text-white rounded hover:bg-[#16161A]"
                                   title="Edit task"
                                 >
                                   <Edit2 className="w-3 h-3" />
@@ -202,7 +202,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => onDeleteTask(task.id)}
-                                  className="p-1 text-zinc-400 hover:text-rose-600 rounded hover:bg-rose-50"
+                                  className="p-1 text-zinc-500 hover:text-rose-400 rounded hover:bg-rose-950/40"
                                   title="Delete task"
                                 >
                                   <Trash2 className="w-3 h-3" />

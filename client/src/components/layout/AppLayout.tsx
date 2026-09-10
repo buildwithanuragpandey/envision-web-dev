@@ -22,7 +22,7 @@ export const AppLayout: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex h-screen bg-[#fafafa] overflow-hidden">
+    <div className="flex h-screen bg-[#030304] text-[#F5F5F0] overflow-hidden">
       {/* Desktop Static Sidebar */}
       <div className="hidden lg:block h-full shrink-0">
         <Sidebar />
@@ -32,10 +32,10 @@ export const AppLayout: React.FC = () => {
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
           <div
-            className="fixed inset-0 bg-zinc-950/60 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-zinc-950 z-10 animate-in slide-in-from-left duration-200">
+          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-[#050506] z-10 animate-in slide-in-from-left duration-200 border-r border-white/10">
             <div className="absolute top-3 right-3 z-20">
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
