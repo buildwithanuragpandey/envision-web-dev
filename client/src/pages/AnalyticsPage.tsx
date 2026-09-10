@@ -95,74 +95,94 @@ export const AnalyticsPage: React.FC = () => {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-6 text-[#F5F5F0]"
+      className="space-y-6 text-[#F5F2EA]"
     >
-      {/* Editorial Header */}
-      <motion.div variants={itemVariants} className="border-b border-white/8 pb-4">
-        <div className="flex items-center gap-2 mb-1.5">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-[#111114] text-[#FFDD00] border border-white/10">
-            <TrendingUp className="w-3 h-3 text-[#FFDD00]" />
-            PERFORMANCE INTELLIGENCE
-          </span>
+      {/* Editorial Header with Frame 04 Halo Visual */}
+      <motion.div variants={itemVariants} className="relative rounded-xl border border-white/8 bg-[#0D0D0F] overflow-hidden shadow-2xl">
+        <div className="grid grid-cols-1 md:grid-cols-12 items-center">
+          <div className="p-6 sm:p-8 md:col-span-7 space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-[#FFD400] font-semibold bg-[#141416] px-2.5 py-1 rounded border border-white/8">
+                04 / TELEMETRY WORKSPACE
+              </span>
+              <span className="text-[11px] font-mono text-[#8C8A84]">
+                PERFORMANCE INTELLIGENCE
+              </span>
+            </div>
+
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-[#F5F2EA] tracking-tight">
+              Club Telemetry & Analytics
+            </h1>
+            <p className="text-xs sm:text-sm text-[#8C8A84] leading-relaxed max-w-lg">
+              Real-time telemetry across project deliverable velocity, resource allocation, and squad completion momentum.
+            </p>
+          </div>
+
+          <div className="md:col-span-5 h-48 md:h-64 relative overflow-hidden border-t md:border-t-0 md:border-l border-white/8 group">
+            <img
+              src="/frames/04_halo.jpg"
+              alt="Halo Innovation Center"
+              className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0D0D0F] via-transparent to-transparent opacity-90" />
+            <div className="absolute bottom-3 right-3 bg-[#050505]/80 backdrop-blur-md px-2.5 py-1 rounded border border-white/10 text-[10px] font-mono text-[#F5F2EA]">
+              04 / HALO
+            </div>
+            <div className="absolute top-0 left-0 h-[2px] w-full bg-gradient-to-r from-transparent via-[#FF6A16] to-transparent animate-travel-line" />
+          </div>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F5F5F0] tracking-tight">
-          Club Analytics & Insights
-        </h1>
-        <p className="text-xs text-zinc-400 mt-1 max-w-2xl">
-          Real-time telemetry across project deliverables, organizational velocity, and member department representation.
-        </p>
       </motion.div>
 
       {/* KPI Metric Strip */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-[#0A0A0C] border border-white/8 rounded-lg p-5 hover:border-[#FF6814]/30 transition-colors shadow-subtle">
-          <div className="flex items-center justify-between text-[10px] font-mono font-semibold text-zinc-500 uppercase tracking-wider">
+        <div className="bg-[#0D0D0F] border border-white/8 rounded-xl p-5 hover:border-[#FF6A16]/30 transition-colors shadow-subtle">
+          <div className="flex items-center justify-between text-[10px] font-mono font-semibold text-[#8C8A84] uppercase tracking-wider">
             <span>Overall Completion</span>
-            <CheckSquare className="w-4 h-4 text-[#FFDD00]" />
+            <CheckSquare className="w-4 h-4 text-[#FFD400]" />
           </div>
           <div className="mt-2 flex items-baseline gap-1">
-            <span className="text-3xl font-bold font-mono tracking-tight text-[#FF6814]">
+            <span className="text-3xl font-bold font-mono tracking-tight text-[#FF6A16]">
               <AnimatedCounter value={kpis.clubCompletionRate} />
             </span>
-            <span className="text-lg font-semibold text-zinc-500">%</span>
+            <span className="text-lg font-semibold text-[#8C8A84]">%</span>
           </div>
-          <p className="text-xs text-zinc-500 mt-1 font-mono">
+          <p className="text-xs text-[#8C8A84] mt-1 font-mono">
             {kpis.completedTasks} of {kpis.totalTasks} deliverables fulfilled
           </p>
         </div>
 
-        <div className="bg-[#0A0A0C] border border-white/8 rounded-lg p-5 hover:border-[#FF6814]/30 transition-colors shadow-subtle">
-          <div className="flex items-center justify-between text-[10px] font-mono font-semibold text-zinc-500 uppercase tracking-wider">
+        <div className="bg-[#0D0D0F] border border-white/8 rounded-xl p-5 hover:border-[#FF6A16]/30 transition-colors shadow-subtle">
+          <div className="flex items-center justify-between text-[10px] font-mono font-semibold text-[#8C8A84] uppercase tracking-wider">
             <span>Active Initiatives</span>
-            <FolderKanban className="w-4 h-4 text-[#FF6814]" />
+            <FolderKanban className="w-4 h-4 text-[#FF6A16]" />
           </div>
           <div className="mt-2">
-            <span className="text-3xl font-bold font-mono tracking-tight text-[#F5F5F0]">
+            <span className="text-3xl font-bold font-mono tracking-tight text-[#F5F2EA]">
               <AnimatedCounter value={kpis.activeProjects} />
             </span>
           </div>
-          <p className="text-xs text-zinc-500 mt-1 font-mono">
+          <p className="text-xs text-[#8C8A84] mt-1 font-mono">
             Across {kpis.totalProjects} tracked club projects
           </p>
         </div>
 
-        <div className="bg-[#0A0A0C] border border-white/8 rounded-lg p-5 hover:border-[#FF6814]/30 transition-colors shadow-subtle">
-          <div className="flex items-center justify-between text-[10px] font-mono font-semibold text-zinc-500 uppercase tracking-wider">
+        <div className="bg-[#0D0D0F] border border-white/8 rounded-xl p-5 hover:border-[#FF6A16]/30 transition-colors shadow-subtle">
+          <div className="flex items-center justify-between text-[10px] font-mono font-semibold text-[#8C8A84] uppercase tracking-wider">
             <span>Active Contributors</span>
-            <Users className="w-4 h-4 text-[#FFDD00]" />
+            <Users className="w-4 h-4 text-[#FFD400]" />
           </div>
           <div className="mt-2">
-            <span className="text-3xl font-bold font-mono tracking-tight text-[#F5F5F0]">
+            <span className="text-3xl font-bold font-mono tracking-tight text-[#F5F2EA]">
               <AnimatedCounter value={kpis.activeMembers} />
             </span>
           </div>
-          <p className="text-xs text-zinc-500 mt-1 font-mono">
+          <p className="text-xs text-[#8C8A84] mt-1 font-mono">
             Out of {kpis.totalMembers} enrolled students
           </p>
         </div>
 
-        <div className="bg-[#0A0A0C] border border-white/8 rounded-lg p-5 hover:border-[#FF6814]/30 transition-colors shadow-subtle">
-          <div className="flex items-center justify-between text-[10px] font-mono font-semibold text-zinc-500 uppercase tracking-wider">
+        <div className="bg-[#0D0D0F] border border-white/8 rounded-xl p-5 hover:border-[#FF6A16]/30 transition-colors shadow-subtle">
+          <div className="flex items-center justify-between text-[10px] font-mono font-semibold text-[#8C8A84] uppercase tracking-wider">
             <span>Overdue Deliverables</span>
             <AlertCircle className="w-4 h-4 text-rose-400" />
           </div>
@@ -171,7 +191,7 @@ export const AnalyticsPage: React.FC = () => {
               <AnimatedCounter value={kpis.overdueTasks} />
             </span>
           </div>
-          <p className="text-xs text-zinc-500 mt-1 font-mono">
+          <p className="text-xs text-[#8C8A84] mt-1 font-mono">
             {kpis.overdueTasks === 0 ? 'All milestones on schedule' : 'Requiring team focus'}
           </p>
         </div>
@@ -180,13 +200,13 @@ export const AnalyticsPage: React.FC = () => {
       {/* Charts Section */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Department Distribution */}
-        <div className="bg-[#0A0A0C] border border-white/8 rounded-lg p-6 shadow-subtle">
+        <div className="bg-[#0D0D0F] border border-white/8 rounded-xl p-6 shadow-subtle">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-sm font-bold text-[#F5F5F0]">Department Representation</h2>
-              <p className="text-xs text-zinc-400 mt-0.5">Enrolled member allocation across academic departments</p>
+              <h2 className="text-sm font-bold text-[#F5F2EA]">Department Representation</h2>
+              <p className="text-xs text-[#8C8A84] mt-0.5">Enrolled member allocation across academic departments</p>
             </div>
-            <span className="text-xs font-mono text-[#FFDD00] bg-[#111114] px-2 py-0.5 rounded border border-white/5">{totalDeptCount} Students</span>
+            <span className="text-xs font-mono text-[#FFD400] bg-[#141416] px-2.5 py-1 rounded border border-white/8">{totalDeptCount} Students</span>
           </div>
 
           <div className="h-64 w-full">
@@ -197,17 +217,17 @@ export const AnalyticsPage: React.FC = () => {
                 margin={{ top: 0, right: 20, left: 10, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="rgba(255,255,255,0.05)" />
-                <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: '#71717a' }} axisLine={false} tickLine={false} />
+                <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: '#8C8A84' }} axisLine={false} tickLine={false} />
                 <YAxis
                   dataKey="department"
                   type="category"
                   width={120}
-                  tick={{ fontSize: 11, fill: '#a1a1aa' }}
+                  tick={{ fontSize: 11, fill: '#F5F2EA' }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="count" fill="#FF6814" radius={[0, 4, 4, 0]} barSize={16} />
+                <Bar dataKey="count" fill="#FF6A16" radius={[0, 4, 4, 0]} barSize={16} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -216,10 +236,10 @@ export const AnalyticsPage: React.FC = () => {
             {departmentDistribution.map((d: any) => {
               const pct = totalDeptCount ? Math.round((d.count / totalDeptCount) * 100) : 0;
               return (
-                <div key={d.department} className="flex items-center gap-1.5 text-xs text-zinc-300 bg-[#111114] px-2.5 py-1 rounded border border-white/5">
-                  <span className="w-2 h-2 rounded-full bg-[#FF6814]" />
-                  <span className="font-medium text-zinc-300">{d.department}:</span>
-                  <span className="font-mono text-[#FFDD00]">{pct}%</span>
+                <div key={d.department} className="flex items-center gap-1.5 text-xs text-[#F5F2EA] bg-[#141416] px-2.5 py-1 rounded border border-white/5">
+                  <span className="w-2 h-2 rounded-full bg-[#FF6A16]" />
+                  <span className="font-medium text-[#F5F2EA]">{d.department}:</span>
+                  <span className="font-mono text-[#FFD400]">{pct}%</span>
                 </div>
               );
             })}
@@ -227,11 +247,11 @@ export const AnalyticsPage: React.FC = () => {
         </div>
 
         {/* Priority Distribution */}
-        <div className="bg-[#0A0A0C] border border-white/8 rounded-lg p-6 shadow-subtle">
+        <div className="bg-[#0D0D0F] border border-white/8 rounded-xl p-6 shadow-subtle">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-sm font-bold text-[#F5F5F0]">Task Priority Breakdown</h2>
-              <p className="text-xs text-zinc-400 mt-0.5">Active deliverables organized by urgency rating</p>
+              <h2 className="text-sm font-bold text-[#F5F2EA]">Task Priority Breakdown</h2>
+              <p className="text-xs text-[#8C8A84] mt-0.5">Active deliverables organized by urgency rating</p>
             </div>
           </div>
 
@@ -244,27 +264,27 @@ export const AnalyticsPage: React.FC = () => {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 11, fill: '#a1a1aa' }}
+                  tick={{ fontSize: 11, fill: '#F5F2EA' }}
                   axisLine={false}
                   tickLine={false}
                 />
-                <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#71717a' }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#8C8A84' }} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="count" radius={[4, 4, 0, 0]} barSize={32}>
                   {priorityDistribution.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={priorityColorMap[entry.name] || '#FF6814'} />
+                    <Cell key={`cell-${index}`} fill={priorityColorMap[entry.name] || '#FF6A16'} />
                   ))}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>
 
-          <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-zinc-400">
+          <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-[#8C8A84]">
             {priorityDistribution.map((p: any) => (
               <div key={p.name} className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: priorityColorMap[p.name] || '#FF6814' }} />
-                <span className="font-medium text-zinc-300">{p.name}</span>
-                <span className="font-mono text-zinc-500">({p.count})</span>
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: priorityColorMap[p.name] || '#FF6A16' }} />
+                <span className="font-medium text-[#F5F2EA]">{p.name}</span>
+                <span className="font-mono text-[#8C8A84]">({p.count})</span>
               </div>
             ))}
           </div>
@@ -272,22 +292,22 @@ export const AnalyticsPage: React.FC = () => {
       </motion.div>
 
       {/* Project Momentum Summary Table */}
-      <motion.div variants={itemVariants} className="bg-[#0A0A0C] border border-white/8 rounded-lg p-6 shadow-subtle">
+      <motion.div variants={itemVariants} className="bg-[#0D0D0F] border border-white/8 rounded-xl p-6 shadow-subtle">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-sm font-bold text-[#F5F5F0]">Initiative Velocity Matrix</h2>
-            <p className="text-xs text-zinc-400 mt-0.5">Progress and workload density for all active club initiatives</p>
+            <h2 className="text-sm font-bold text-[#F5F2EA]">Initiative Velocity Matrix</h2>
+            <p className="text-xs text-[#8C8A84] mt-0.5">Progress and workload density for all active club initiatives</p>
           </div>
-          <span className="text-xs font-mono text-[#FFDD00] bg-[#111114] px-2 py-0.5 rounded border border-white/5">{projectProgressList.length} Initiatives</span>
+          <span className="text-xs font-mono text-[#FFD400] bg-[#141416] px-2.5 py-1 rounded border border-white/8">{projectProgressList.length} Initiatives</span>
         </div>
 
         <div className="divide-y divide-white/5">
           {projectProgressList.map((p: any) => (
-            <div key={p.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#111114]/60 px-2 rounded-lg transition-colors">
+            <div key={p.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#141416]/60 px-2 rounded-lg transition-colors">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-[#F5F5F0]">{p.name}</span>
-                  <span className="text-[11px] font-mono text-zinc-500">
+                  <span className="text-xs font-bold text-[#F5F2EA]">{p.name}</span>
+                  <span className="text-[11px] font-mono text-[#8C8A84]">
                     {p.completedTasks}/{p.taskCount} tasks
                   </span>
                 </div>
@@ -298,8 +318,8 @@ export const AnalyticsPage: React.FC = () => {
 
               <div className="flex items-center gap-4 text-xs">
                 <div className="text-right">
-                  <span className="font-mono font-semibold text-[#FF6814]">{p.progress}%</span>
-                  <span className="text-zinc-500 ml-1">complete</span>
+                  <span className="font-mono font-bold text-[#FF6A16]">{p.progress}%</span>
+                  <span className="text-[#8C8A84] ml-1">complete</span>
                 </div>
               </div>
             </div>

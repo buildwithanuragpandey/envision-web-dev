@@ -16,9 +16,8 @@ import { ProgressBar, Skeleton } from '../components/common/CommonUI';
 import { StatusBadge, PriorityBadge } from '../components/common/Badge';
 import { Avatar } from '../components/common/Avatar';
 import { AnimatedCounter } from '../components/common/AnimatedCounter';
-import { DashboardTicker, TickerItem } from '../components/common/DashboardTicker';
 import { PageTransition } from '../components/common/PageTransition';
-import { BackgroundAtmosphere } from '../components/common/BackgroundAtmosphere';
+import { ProjectStrip } from '../components/common/ProjectStrip';
 import { Link } from 'react-router-dom';
 import { TaskModal } from '../components/tasks/TaskModal';
 import { TaskDetailDrawer } from '../components/tasks/TaskDetailDrawer';
@@ -68,7 +67,7 @@ export const ProjectLeadDashboardPage: React.FC = () => {
   if (isLoading || !data) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-32 rounded-lg" />
+        <Skeleton className="h-64 rounded-lg" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
             <Skeleton key={i} className="h-20 rounded-lg" />
@@ -81,89 +80,107 @@ export const ProjectLeadDashboardPage: React.FC = () => {
 
   const { kpis, projectSummaries, memberPerformance, upcomingDeadlines } = data;
 
-  const tickerItems: TickerItem[] = [
-    { id: '1', category: 'INITIATIVES', label: `${kpis.totalLedProjects} initiatives under your team leadership` },
-    { id: '2', category: 'SQUAD', label: `${kpis.totalTeamSize} club members actively collaborating` },
-    { id: '3', category: 'PROGRESS', label: `Deliverable fulfillment at ${kpis.completionRate}%` },
-  ];
+  const projectStripItems = projectSummaries.map((p) => ({
+    id: p.id,
+    name: p.name.toUpperCase(),
+    category: 'SQUAD',
+    progress: p.progress,
+  }));
 
   return (
     <PageTransition>
-      {/* Hero Header with Atmosphere */}
-      <div className="relative rounded-lg border border-white/8 bg-[#0A0A0C] p-6 sm:p-8 overflow-hidden shadow-premium">
-        <BackgroundAtmosphere variant="hero" showAmbientMesh={true} />
+      {/* Visual Hero Header with Frame 03 (Innovation Workspace) */}
+      <div className="relative rounded-lg border border-white/8 bg-[#0D0D0F] overflow-hidden shadow-premium">
+        <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+          <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between z-10">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-[#FF6A16] font-semibold bg-[#141416] px-2.5 py-1 rounded border border-white/10 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#FF6A16] animate-pulse" />
+                  03 / PROJECT LEAD HUB
+                </span>
+                <span className="text-[11px] font-mono text-zinc-500">
+                  DEVELOPMENT LAB
+                </span>
+              </div>
 
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-widest text-[#FF6814] font-semibold bg-[#111114] px-2 py-0.5 rounded border border-white/10">
-                PROJECT LEAD HUB
-              </span>
-              <span className="text-[11px] font-mono text-zinc-500">
-                TEAM COMMAND & DISPATCH
-              </span>
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-[#F5F2EA] tracking-tight mt-3 leading-tight">
+                Good morning, {user?.name?.split(' ')[0] || 'Lead'}
+              </h1>
+              <p className="text-xs sm:text-sm text-[#8C8A84] mt-2 max-w-lg leading-relaxed">
+                Your squad has {kpis.todoTasks + kpis.inProgressTasks} active deliverables across {kpis.totalLedProjects} initiatives.
+              </p>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F5F5F0] tracking-tight mt-2">
-              Good morning, {user?.name?.split(' ')[0] || 'Lead'}
-            </h1>
-            <p className="text-xs text-zinc-400 mt-1 max-w-xl">
-              Your squad has {kpis.todoTasks + kpis.inProgressTasks} active deliverables across {kpis.totalLedProjects} initiatives.
-            </p>
+            <div className="mt-6 flex items-center gap-3 pt-4 border-t border-white/5">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={() => {
+                  setSelectedProjectId(projectSummaries[0]?.id);
+                  setIsCreateTaskOpen(true);
+                }}
+                leftIcon={<Plus className="w-3.5 h-3.5 text-black font-bold" />}
+                disabled={projectSummaries.length === 0}
+              >
+                Assign Task
+              </Button>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2.5 shrink-0">
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => {
-                setSelectedProjectId(projectSummaries[0]?.id);
-                setIsCreateTaskOpen(true);
-              }}
-              leftIcon={<Plus className="w-3.5 h-3.5 text-black font-bold" />}
-              disabled={projectSummaries.length === 0}
-            >
-              Assign Task
-            </Button>
+          <div className="lg:col-span-5 relative min-h-[200px] lg:min-h-full overflow-hidden border-t lg:border-t-0 lg:border-l border-white/8">
+            <img
+              src="/frames/03_workspace.jpg"
+              alt="Innovation Workspace"
+              className="w-full h-full object-cover animate-slow-pan"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#0D0D0F] via-[#0D0D0F]/40 to-transparent" />
+            <div className="absolute bottom-3 right-3 z-10">
+              <span className="text-[10px] font-mono text-zinc-400 bg-[#050505]/80 px-2 py-0.5 rounded border border-white/10 backdrop-blur-md">
+                FRAME 03 • WORKSPACE
+              </span>
+            </div>
           </div>
+        </div>
+
+        {/* Travelling Light Line */}
+        <div className="absolute top-0 left-0 right-0 h-[1.5px] overflow-hidden z-20 pointer-events-none">
+          <div className="w-1/3 h-full bg-gradient-to-r from-transparent via-[#FF6A16] to-transparent animate-travel-line opacity-80" />
         </div>
       </div>
 
-      {/* Activity Ticker */}
-      <DashboardTicker items={tickerItems} className="rounded-lg my-3" />
-
-      {/* Command Center Inline Metrics */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 py-1">
-        <div className="p-4 rounded-lg bg-[#0A0A0C] border border-white/8 shadow-subtle hover:border-[#FF6814]/30 transition-all">
+      {/* Activity Metric Strip */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="p-4 rounded-lg bg-[#0D0D0F] border border-white/8 shadow-subtle hover:border-[#FF6A16]/30 transition-all">
           <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold">
             LED PROJECTS
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-[#F5F5F0]">
+            <span className="text-2xl font-bold font-mono text-[#F5F2EA]">
               <AnimatedCounter value={kpis.totalLedProjects} />
             </span>
             <span className="text-xs font-mono text-zinc-500">({kpis.activeProjects} active)</span>
           </div>
         </div>
 
-        <div className="p-4 rounded-lg bg-[#0A0A0C] border border-white/8 shadow-subtle hover:border-[#FF6814]/30 transition-all">
+        <div className="p-4 rounded-lg bg-[#0D0D0F] border border-white/8 shadow-subtle hover:border-[#FF6A16]/30 transition-all">
           <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold">
             TEAM SQUAD
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-[#F5F5F0]">
+            <span className="text-2xl font-bold font-mono text-[#F5F2EA]">
               <AnimatedCounter value={kpis.totalTeamSize} />
             </span>
             <span className="text-xs font-mono text-zinc-500">collaborators</span>
           </div>
         </div>
 
-        <div className="p-4 rounded-lg bg-[#0A0A0C] border border-white/8 shadow-subtle hover:border-[#FF6814]/30 transition-all">
+        <div className="p-4 rounded-lg bg-[#0D0D0F] border border-white/8 shadow-subtle hover:border-[#FF6A16]/30 transition-all">
           <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold">
             COMPLETED
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-[#FFDD00]">
+            <span className="text-2xl font-bold font-mono text-[#FFD400]">
               <AnimatedCounter value={kpis.completionRate} suffix="%" />
             </span>
             <span className="text-xs font-mono text-zinc-500">
@@ -172,12 +189,12 @@ export const ProjectLeadDashboardPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="p-4 rounded-lg bg-[#0A0A0C] border border-white/8 shadow-subtle hover:border-[#FF6814]/30 transition-all">
+        <div className="p-4 rounded-lg bg-[#0D0D0F] border border-white/8 shadow-subtle hover:border-[#FF6A16]/30 transition-all">
           <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold">
             DELIVERABLES DUE
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-[#FF6814]">
+            <span className="text-2xl font-bold font-mono text-[#FF6A16]">
               <AnimatedCounter value={kpis.todoTasks + kpis.inProgressTasks} />
             </span>
             {kpis.overdueTasks > 0 ? (
@@ -185,26 +202,29 @@ export const ProjectLeadDashboardPage: React.FC = () => {
                 {kpis.overdueTasks} overdue
               </span>
             ) : (
-              <span className="text-[10px] font-mono text-[#FFDD00]">on schedule</span>
+              <span className="text-[10px] font-mono text-[#FFD400]">on schedule</span>
             )}
           </div>
         </div>
       </div>
 
+      {/* Project Strip */}
+      {projectStripItems.length > 0 && <ProjectStrip items={projectStripItems} className="rounded-lg" />}
+
       {/* Led Projects Section */}
-      <div className="rounded-lg border border-white/8 bg-[#0A0A0C] overflow-hidden shadow-subtle mt-4">
-        <div className="p-5 border-b border-white/8 flex items-center justify-between bg-[#050506]">
+      <div className="rounded-lg border border-white/8 bg-[#0D0D0F] overflow-hidden shadow-subtle">
+        <div className="p-5 border-b border-white/8 flex items-center justify-between bg-[#050505]">
           <div>
-            <h2 className="text-sm font-bold text-[#F5F5F0] tracking-tight">
+            <h2 className="text-sm font-bold text-[#F5F2EA] tracking-tight">
               My Led Initiatives
             </h2>
-            <p className="text-xs text-zinc-400 mt-0.5">
+            <p className="text-xs text-[#8C8A84] mt-0.5">
               Sprint deliverables, squad allocation, and overall milestone progression.
             </p>
           </div>
           <Link
             to="/projects"
-            className="text-xs font-medium text-zinc-400 hover:text-[#FF6814] flex items-center gap-1 group transition-colors"
+            className="text-xs font-medium text-zinc-400 hover:text-[#FF6A16] flex items-center gap-1 group transition-colors"
           >
             <span>All projects</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
@@ -220,13 +240,13 @@ export const ProjectLeadDashboardPage: React.FC = () => {
             projectSummaries.map((p) => (
               <div
                 key={p.id}
-                className="p-5 hover:bg-[#111114]/60 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
+                className="p-5 hover:bg-[#141416]/60 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-4"
               >
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2.5">
                     <Link
                       to={`/projects/${p.id}`}
-                      className="text-sm font-semibold text-[#F5F5F0] hover:text-[#FF6814] transition-colors truncate"
+                      className="text-sm font-semibold text-[#F5F2EA] hover:text-[#FF6A16] transition-colors truncate"
                     >
                       {p.name}
                     </Link>
@@ -249,7 +269,7 @@ export const ProjectLeadDashboardPage: React.FC = () => {
                 <div className="flex items-center gap-4 shrink-0">
                   <div className="w-36 flex items-center gap-2.5">
                     <ProgressBar progress={p.progress} size="sm" />
-                    <span className="font-mono text-xs font-semibold text-[#FF6814]">{p.progress}%</span>
+                    <span className="font-mono text-xs font-semibold text-[#FF6A16]">{p.progress}%</span>
                   </div>
                   <Button
                     variant="outline"
@@ -270,21 +290,21 @@ export const ProjectLeadDashboardPage: React.FC = () => {
       </div>
 
       {/* Team Workload & Upcoming Deadlines */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Workload Table */}
-        <div className="rounded-lg border border-white/8 bg-[#0A0A0C] p-5 shadow-subtle lg:col-span-2">
+        <div className="rounded-lg border border-white/8 bg-[#0D0D0F] p-5 shadow-subtle lg:col-span-2">
           <div className="pb-3 border-b border-white/8 mb-4">
-            <h3 className="text-xs font-bold text-[#F5F5F0] uppercase tracking-wider font-mono">
+            <h3 className="text-xs font-bold text-[#F5F2EA] uppercase tracking-wider font-mono">
               Team Member Velocity
             </h3>
-            <p className="text-xs text-zinc-400 mt-0.5">
+            <p className="text-xs text-[#8C8A84] mt-0.5">
               Task distribution across your initiative squad members.
             </p>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#050506] text-zinc-400 uppercase text-[10px] font-mono border-y border-white/5">
+              <thead className="bg-[#050505] text-zinc-400 uppercase text-[10px] font-mono border-y border-white/5">
                 <tr>
                   <th className="py-2.5 px-3">Student</th>
                   <th className="py-2.5 px-3">Total</th>
@@ -302,12 +322,12 @@ export const ProjectLeadDashboardPage: React.FC = () => {
                   </tr>
                 ) : (
                   memberPerformance.map((m) => (
-                    <tr key={m.id} className="hover:bg-[#111114]/60">
+                    <tr key={m.id} className="hover:bg-[#141416]/60">
                       <td className="py-3 px-3">
                         <div className="flex items-center gap-2.5">
                           <Avatar name={m.name} size="xs" />
                           <div>
-                            <span className="font-semibold text-[#F5F5F0] block">{m.name}</span>
+                            <span className="font-semibold text-[#F5F2EA] block">{m.name}</span>
                             <span className="text-[10px] text-zinc-500 font-mono">
                               {m.department || 'CSE'}
                             </span>
@@ -315,8 +335,8 @@ export const ProjectLeadDashboardPage: React.FC = () => {
                         </div>
                       </td>
                       <td className="py-3 px-3 font-mono font-semibold text-zinc-300">{m.totalTasks}</td>
-                      <td className="py-3 px-3 font-mono text-[#FFDD00] font-semibold">{m.completedTasks}</td>
-                      <td className="py-3 px-3 font-mono text-[#FF6814] font-semibold">{m.inProgressTasks}</td>
+                      <td className="py-3 px-3 font-mono text-[#FFD400] font-semibold">{m.completedTasks}</td>
+                      <td className="py-3 px-3 font-mono text-[#FF6A16] font-semibold">{m.inProgressTasks}</td>
                       <td className="py-3 px-3 w-36">
                         <div className="flex items-center gap-2">
                           <div className="flex-1">
@@ -336,15 +356,15 @@ export const ProjectLeadDashboardPage: React.FC = () => {
         </div>
 
         {/* Upcoming Milestones */}
-        <div className="rounded-lg border border-white/8 bg-[#0A0A0C] p-5 shadow-subtle">
+        <div className="rounded-lg border border-white/8 bg-[#0D0D0F] p-5 shadow-subtle">
           <div className="pb-3 border-b border-white/8 mb-4 flex items-center justify-between">
-            <h3 className="text-xs font-bold text-[#F5F5F0] uppercase tracking-wider flex items-center gap-2 font-mono">
-              <Calendar className="w-3.5 h-3.5 text-[#FF6814]" />
+            <h3 className="text-xs font-bold text-[#F5F2EA] uppercase tracking-wider flex items-center gap-2 font-mono">
+              <Calendar className="w-3.5 h-3.5 text-[#FF6A16]" />
               Sprint Deadlines
             </h3>
             <Link
               to="/tasks"
-              className="text-xs font-medium text-zinc-400 hover:text-[#FF6814] flex items-center gap-1 transition-colors"
+              className="text-xs font-medium text-zinc-400 hover:text-[#FF6A16] flex items-center gap-1 transition-colors"
             >
               <span>Task board</span>
               <ArrowRight className="w-3 h-3" />
@@ -359,10 +379,10 @@ export const ProjectLeadDashboardPage: React.FC = () => {
                 <div
                   key={t.id}
                   onClick={() => setSelectedTask(t)}
-                  className="p-3 rounded-lg border border-white/5 bg-[#111114]/40 hover:border-white/10 hover:bg-[#111114] transition-all text-xs cursor-pointer group"
+                  className="p-3 rounded-lg border border-white/5 bg-[#141416]/40 hover:border-white/10 hover:bg-[#141416] transition-all text-xs cursor-pointer group"
                 >
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <p className="font-medium text-[#F5F5F0] leading-snug group-hover:text-[#FF6814] transition-colors truncate">
+                    <p className="font-medium text-[#F5F2EA] leading-snug group-hover:text-[#FF6A16] transition-colors truncate">
                       {t.title}
                     </p>
                     <PriorityBadge priority={t.priority} size="sm" />

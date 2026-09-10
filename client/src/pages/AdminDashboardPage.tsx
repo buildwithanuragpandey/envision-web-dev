@@ -11,17 +11,18 @@ import {
   ArrowRight,
   Activity,
   Calendar,
-  Video,
+  Sparkles,
+  ArrowUpRight,
 } from 'lucide-react';
 import { Button } from '../components/common/Button';
 import { ProgressBar, Skeleton } from '../components/common/CommonUI';
 import { StatusBadge, PriorityBadge } from '../components/common/Badge';
 import { Avatar } from '../components/common/Avatar';
 import { AnimatedCounter } from '../components/common/AnimatedCounter';
-import { DashboardTicker, TickerItem } from '../components/common/DashboardTicker';
-import { MediaFrame } from '../components/common/MediaFrame';
 import { PageTransition } from '../components/common/PageTransition';
-import { BackgroundAtmosphere } from '../components/common/BackgroundAtmosphere';
+import { CinematicCarousel } from '../components/common/CinematicCarousel';
+import { FramesSection } from '../components/common/FramesSection';
+import { ProjectStrip } from '../components/common/ProjectStrip';
 import { Link } from 'react-router-dom';
 import { ProjectModal } from '../components/projects/ProjectModal';
 import { MemberModal } from '../components/members/MemberModal';
@@ -67,7 +68,7 @@ export const AdminDashboardPage: React.FC = () => {
   if (isLoading || !data) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-32 rounded-lg" />
+        <Skeleton className="h-64 rounded-lg" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
             <Skeleton key={i} className="h-20 rounded-lg" />
@@ -80,114 +81,142 @@ export const AdminDashboardPage: React.FC = () => {
 
   const { kpis, projectProgressList, upcomingDeadlines, recentActivities } = data;
 
-  // Build live ticker items
-  const tickerItems: TickerItem[] = [
-    { id: '1', category: 'COMPLETED', label: `${kpis.completedTasks} deliverables fulfilled club-wide` },
-    { id: '2', category: 'INITIATIVES', label: `${kpis.activeProjects} projects actively running` },
-    { id: '3', category: 'COMMUNITY', label: `${kpis.activeMembers} student contributors enrolled` },
-    { id: '4', category: 'PROGRESS', label: `Overall club completion at ${kpis.clubCompletionRate}%` },
-  ];
-  if (recentActivities.length > 0) {
-    tickerItems.unshift({
-      id: 'recent',
-      category: 'LATEST UPDATE',
-      label: recentActivities[0].description,
-    });
-  }
+  // Format project strip items from live data
+  const projectStripItems = projectProgressList.map((p) => ({
+    id: p.id,
+    name: p.name.toUpperCase(),
+    category: 'INITIATIVE',
+    progress: p.progress,
+  }));
 
   return (
     <PageTransition>
-      {/* Hero Dashboard Header with Background Video Atmosphere (10-20% visual intensity) */}
-      <div className="relative rounded-lg border border-white/8 bg-[#0A0A0C] p-6 sm:p-8 overflow-hidden shadow-premium">
-        <BackgroundAtmosphere variant="hero" showAmbientMesh={true} />
+      {/* 1. VISUAL HERO BANNER WITH FRAME 02 (CORRIDOR) */}
+      <div className="relative rounded-lg border border-white/8 bg-[#0D0D0F] overflow-hidden shadow-premium">
+        <div className="grid grid-cols-1 lg:grid-cols-12 items-stretch">
+          {/* Left Hero Content (7 cols) */}
+          <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between z-10">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-[#FF6A16] font-semibold bg-[#141416] px-2.5 py-1 rounded border border-white/10 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#FF6A16] animate-pulse" />
+                  02 / COMMAND CENTER
+                </span>
+                <span className="text-[11px] font-mono text-zinc-500">
+                  EXECUTIVE LAB
+                </span>
+              </div>
 
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-widest text-[#FFDD00] font-semibold bg-[#111114] px-2 py-0.5 rounded border border-white/10">
-                COMMAND CENTER • ADVISOR
-              </span>
-              <span className="text-[11px] font-mono text-zinc-500">
-                YOUR CLUB. IN MOTION.
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-[#F5F2EA] tracking-tight mt-3 leading-tight">
+                Good morning, {user?.name?.split(' ')[0] || 'Advisor'}
+              </h1>
+              <p className="text-xs sm:text-sm text-[#8C8A84] mt-2 max-w-lg leading-relaxed">
+                Your club, projects, and squads in one workspace. Monitor telemetry and sprint milestones in real time.
+              </p>
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center gap-3 pt-4 border-t border-white/5">
+              <Link
+                to="/projects"
+                className="btn-brand text-xs px-4 py-2 rounded-lg inline-flex items-center gap-1.5 group"
+              >
+                <span>Open Projects</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsAddMemberOpen(true)}
+                leftIcon={<Users className="w-3.5 h-3.5" />}
+              >
+                Enroll Member
+              </Button>
+
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsCreateProjectOpen(true)}
+                leftIcon={<Plus className="w-3.5 h-3.5" />}
+              >
+                New Project
+              </Button>
+            </div>
+          </div>
+
+          {/* Right Hero Frame Visual (5 cols) */}
+          <div className="lg:col-span-5 relative min-h-[220px] lg:min-h-full overflow-hidden border-t lg:border-t-0 lg:border-l border-white/8">
+            <img
+              src="/frames/02_corridor.jpg"
+              alt="ClubFlow Innovation Corridor"
+              className="w-full h-full object-cover animate-slow-pan"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-[#0D0D0F] via-[#0D0D0F]/40 to-transparent" />
+
+            <div className="absolute top-3 right-3 z-10">
+              <span className="text-[9px] font-mono uppercase bg-[#050505]/80 text-[#FFD400] px-2 py-0.5 rounded border border-white/10 backdrop-blur-md">
+                LIVE TELEMETRY
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F5F5F0] tracking-tight mt-2">
-              Good morning, {user?.name?.split(' ')[0] || 'Advisor'}
-            </h1>
-            <p className="text-xs text-zinc-400 mt-1 max-w-xl">
-              Here is what needs your attention today across active initiatives, team velocity, and milestone deliverables.
-            </p>
+            <div className="absolute bottom-3 right-3 z-10">
+              <span className="text-[10px] font-mono text-zinc-400 bg-[#050505]/80 px-2 py-0.5 rounded border border-white/10 backdrop-blur-md">
+                FRAME 02 • CORRIDOR
+              </span>
+            </div>
           </div>
+        </div>
 
-          <div className="flex items-center gap-2.5 shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsAddMemberOpen(true)}
-              leftIcon={<Users className="w-3.5 h-3.5" />}
-            >
-              Enroll Member
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setIsCreateProjectOpen(true)}
-              leftIcon={<Plus className="w-3.5 h-3.5 text-black font-bold" />}
-            >
-              New Project
-            </Button>
-          </div>
+        {/* Travelling Light Line */}
+        <div className="absolute top-0 left-0 right-0 h-[1.5px] overflow-hidden z-20 pointer-events-none">
+          <div className="w-1/3 h-full bg-gradient-to-r from-transparent via-[#FF6A16] to-transparent animate-travel-line opacity-80" />
         </div>
       </div>
 
-      {/* Moving Marquee Ticker */}
-      <DashboardTicker items={tickerItems} className="rounded-lg my-3" />
-
-      {/* Command Center Statistics */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 py-1">
-        <div className="p-4 rounded-lg bg-[#0A0A0C] border border-white/8 shadow-subtle hover:border-[#FF6814]/30 transition-all">
+      {/* 2. COMPACT ACTIVITY STRIP */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="p-4 rounded-lg bg-[#0D0D0F] border border-white/8 shadow-subtle hover:border-[#FF6A16]/30 transition-all">
           <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold">
             ACTIVE PROJECTS
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-[#F5F5F0]">
+            <span className="text-2xl font-bold font-mono text-[#F5F2EA]">
               <AnimatedCounter value={kpis.activeProjects} />
             </span>
             <span className="text-xs font-mono text-zinc-500">/ {kpis.totalProjects} total</span>
           </div>
         </div>
 
-        <div className="p-4 rounded-lg bg-[#0A0A0C] border border-white/8 shadow-subtle hover:border-[#FF6814]/30 transition-all">
+        <div className="p-4 rounded-lg bg-[#0D0D0F] border border-white/8 shadow-subtle hover:border-[#FF6A16]/30 transition-all">
           <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold">
             TASKS DUE
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-[#F5F5F0]">
+            <span className="text-2xl font-bold font-mono text-[#F5F2EA]">
               <AnimatedCounter value={kpis.todoTasks + kpis.inProgressTasks} />
             </span>
             <span className="text-xs font-mono text-zinc-500">in flight</span>
           </div>
         </div>
 
-        <div className="p-4 rounded-lg bg-[#0A0A0C] border border-white/8 shadow-subtle hover:border-[#FF6814]/30 transition-all">
+        <div className="p-4 rounded-lg bg-[#0D0D0F] border border-white/8 shadow-subtle hover:border-[#FF6A16]/30 transition-all">
           <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold">
             COMPLETED
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-[#FFDD00]">
+            <span className="text-2xl font-bold font-mono text-[#FFD400]">
               <AnimatedCounter value={kpis.completedTasks} />
             </span>
             <span className="text-xs font-mono text-zinc-500">deliverables</span>
           </div>
         </div>
 
-        <div className="p-4 rounded-lg bg-[#0A0A0C] border border-white/8 shadow-subtle hover:border-[#FF6814]/30 transition-all">
+        <div className="p-4 rounded-lg bg-[#0D0D0F] border border-white/8 shadow-subtle hover:border-[#FF6A16]/30 transition-all">
           <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold">
             PROGRESS
           </div>
           <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-[#FF6814]">
+            <span className="text-2xl font-bold font-mono text-[#FF6A16]">
               <AnimatedCounter value={kpis.clubCompletionRate} suffix="%" />
             </span>
             {kpis.overdueTasks > 0 ? (
@@ -195,28 +224,34 @@ export const AdminDashboardPage: React.FC = () => {
                 {kpis.overdueTasks} overdue
               </span>
             ) : (
-              <span className="text-[10px] font-mono text-[#FFDD00]">on track</span>
+              <span className="text-[10px] font-mono text-[#FFD400]">on track</span>
             )}
           </div>
         </div>
       </div>
 
-      {/* Projects Table & Momentum Section */}
-      <div className="rounded-lg border border-white/8 bg-[#0A0A0C] overflow-hidden shadow-subtle mt-4">
-        <div className="p-5 border-b border-white/8 flex items-center justify-between bg-[#050506]">
+      {/* 3. CONTINUOUS PROJECT SCROLLING STRIP */}
+      <ProjectStrip items={projectStripItems} className="rounded-lg" />
+
+      {/* 4. CINEMATIC PROJECT CAROUSEL */}
+      <CinematicCarousel />
+
+      {/* 5. CURRENT WORK: LARGE EDITORIAL PROJECT ROWS */}
+      <div className="rounded-lg border border-white/8 bg-[#0D0D0F] overflow-hidden shadow-subtle">
+        <div className="p-5 border-b border-white/8 flex items-center justify-between bg-[#050505]">
           <div>
-            <h2 className="text-sm font-bold text-[#F5F5F0] tracking-tight">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-500 font-semibold block">
+              WORK MATRIX
+            </span>
+            <h2 className="text-sm font-bold text-[#F5F2EA] tracking-tight mt-0.5">
               Current Club Initiatives
             </h2>
-            <p className="text-xs text-zinc-400 mt-0.5">
-              Live deliverable completion and team leadership across active technical projects.
-            </p>
           </div>
           <Link
             to="/projects"
-            className="text-xs font-medium text-zinc-400 hover:text-[#FF6814] flex items-center gap-1 group transition-colors"
+            className="text-xs font-medium text-zinc-400 hover:text-[#FF6A16] flex items-center gap-1 group transition-colors"
           >
-            <span>All projects</span>
+            <span>All initiatives</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </div>
@@ -225,13 +260,13 @@ export const AdminDashboardPage: React.FC = () => {
           {projectProgressList.map((p) => (
             <div
               key={p.id}
-              className="p-4 sm:px-6 hover:bg-[#111114]/60 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+              className="p-4 sm:px-6 hover:bg-[#141416]/60 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2.5">
                   <Link
                     to={`/projects/${p.id}`}
-                    className="text-sm font-semibold text-[#F5F5F0] hover:text-[#FF6814] transition-colors truncate"
+                    className="text-sm font-semibold text-[#F5F2EA] hover:text-[#FF6A16] transition-colors truncate"
                   >
                     {p.name}
                   </Link>
@@ -243,7 +278,7 @@ export const AdminDashboardPage: React.FC = () => {
                     <span className="text-zinc-300">Lead: {p.projectLead?.name || 'Unassigned'}</span>
                   </div>
                   <span>•</span>
-                  <span>{p.memberCount} members</span>
+                  <span>{p.memberCount} squad members</span>
                   <span>•</span>
                   <span>
                     {p.completedCount}/{p.taskCount} tasks done
@@ -255,7 +290,7 @@ export const AdminDashboardPage: React.FC = () => {
                 <div className="flex-1">
                   <ProgressBar progress={p.progress} size="sm" />
                 </div>
-                <span className="font-mono text-xs font-semibold text-[#FF6814] w-10 text-right">
+                <span className="font-mono text-xs font-semibold text-[#FF6A16] w-10 text-right">
                   {p.progress}%
                 </span>
               </div>
@@ -264,18 +299,18 @@ export const AdminDashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Split: Upcoming Deadlines & Recent Club Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+      {/* 6. SPLIT: UPCOMING DEADLINES & ACTIVITY STREAM */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Upcoming Deadlines Timeline */}
-        <div className="rounded-lg border border-white/8 bg-[#0A0A0C] p-5 shadow-subtle">
+        <div className="rounded-lg border border-white/8 bg-[#0D0D0F] p-5 shadow-subtle">
           <div className="flex items-center justify-between pb-3 border-b border-white/8 mb-4">
-            <h3 className="text-xs font-bold text-[#F5F5F0] uppercase tracking-wider flex items-center gap-2 font-mono">
-              <Calendar className="w-3.5 h-3.5 text-[#FF6814]" />
+            <h3 className="text-xs font-bold text-[#F5F2EA] uppercase tracking-wider flex items-center gap-2 font-mono">
+              <Calendar className="w-3.5 h-3.5 text-[#FF6A16]" />
               Upcoming Deliverables & Deadlines
             </h3>
             <Link
               to="/tasks"
-              className="text-xs font-medium text-zinc-400 hover:text-[#FF6814] flex items-center gap-1 transition-colors"
+              className="text-xs font-medium text-zinc-400 hover:text-[#FF6A16] flex items-center gap-1 transition-colors"
             >
               <span>Task board</span>
               <ArrowRight className="w-3 h-3" />
@@ -291,10 +326,10 @@ export const AdminDashboardPage: React.FC = () => {
                 return (
                   <div
                     key={t.id}
-                    className="flex items-center justify-between p-3 rounded-lg border border-white/5 bg-[#111114]/40 hover:border-white/10 hover:bg-[#111114] transition-all text-xs"
+                    className="flex items-center justify-between p-3 rounded-lg border border-white/5 bg-[#141416]/40 hover:border-white/10 hover:bg-[#141416] transition-all text-xs"
                   >
                     <div className="min-w-0 flex-1 pr-3">
-                      <p className="font-medium text-[#F5F5F0] truncate">{t.title}</p>
+                      <p className="font-medium text-[#F5F2EA] truncate">{t.title}</p>
                       <div className="flex items-center gap-2 mt-1 text-[11px] text-zinc-400">
                         <Avatar name={t.assignedTo?.name} size="xs" />
                         <span>{t.assignedTo?.name || 'Unassigned'}</span>
@@ -310,7 +345,7 @@ export const AdminDashboardPage: React.FC = () => {
                           className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
                             isOverdue
                               ? 'bg-rose-950/50 text-rose-400 border-rose-800/60'
-                              : 'bg-[#16161A] text-zinc-300 border-white/10'
+                              : 'bg-[#1C1C20] text-zinc-300 border-white/10'
                           }`}
                         >
                           {format(new Date(t.deadline), 'MMM dd')}
@@ -325,11 +360,11 @@ export const AdminDashboardPage: React.FC = () => {
         </div>
 
         {/* Live Activity Stream */}
-        <div className="rounded-lg border border-white/8 bg-[#0A0A0C] p-5 shadow-subtle">
+        <div className="rounded-lg border border-white/8 bg-[#0D0D0F] p-5 shadow-subtle">
           <div className="pb-3 border-b border-white/8 mb-4">
             <h3 className="text-xs font-bold text-[#F5F5F0] uppercase tracking-wider flex items-center gap-2 font-mono">
-              <Activity className="w-3.5 h-3.5 text-[#FFDD00]" />
-              Club Activity Stream
+              <Activity className="w-3.5 h-3.5 text-[#FFD400]" />
+              Live Activity Feed
             </h3>
           </div>
 
@@ -339,7 +374,7 @@ export const AdminDashboardPage: React.FC = () => {
             ) : (
               recentActivities.map((log) => (
                 <div key={log.id} className="flex items-start gap-3 text-xs">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#FF6814] mt-1.5 shrink-0 shadow-glow-orange" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#FF6A16] mt-1.5 shrink-0 shadow-glow-orange" />
                   <div className="flex-1 min-w-0">
                     <p className="text-zinc-300 font-medium leading-snug">{log.description}</p>
                     <p className="text-[10px] font-mono text-zinc-500 mt-0.5">
@@ -353,50 +388,9 @@ export const AdminDashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Club Highlights & Workspace Media Section */}
-      <div className="space-y-4 pt-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-sm font-bold text-[#F5F5F0] flex items-center gap-2">
-              <Video className="w-4 h-4 text-[#FF6814]" />
-              Club Highlights & Media Reel
-            </h2>
-            <p className="text-xs text-zinc-400 mt-0.5">
-              Event documentation, workshop archives, and technical project showcases.
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <MediaFrame
-            type="video"
-            src="https://assets.mixkit.co/videos/preview/mixkit-software-developer-working-on-code-41551-large.mp4"
-            poster="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&auto=format&fit=crop&q=80"
-            title="Web Development & Cloud Bootcamp 2026"
-            category="WORKSHOP RECAP"
-            description="Hands-on session covering React 19 architecture and API integrations."
-            aspectRatio="video"
-            autoPlayMuted={false}
-          />
-
-          <MediaFrame
-            type="image"
-            src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&auto=format&fit=crop&q=80"
-            title="HackFest 2026 – Hackathon Sprint"
-            category="EVENT HIGHLIGHT"
-            description="36-hour sprint with 300+ collegiate developers and live mentorship queues."
-            aspectRatio="video"
-          />
-
-          <MediaFrame
-            type="image"
-            src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&auto=format&fit=crop&q=80"
-            title="Design System & Component Sprint"
-            category="TEAM SHOWCASE"
-            description="Figma tokens, accessible ARIA patterns, and Tailwind documentation portal."
-            aspectRatio="video"
-          />
-        </div>
+      {/* 7. DEDICATED EDITORIAL "CLUB / FRAMES" SECTION */}
+      <div className="pt-2">
+        <FramesSection />
       </div>
 
       {/* Modals */}
